@@ -1,0 +1,50 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+/public/build
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Logs
+/storage/logs/*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives / clutter (old domain backups & duplicate folders)
+*.tar.gz
+*.tar
+*.zip
+*.gz
+/app.*
+/bootstrap.*
+/config.*
+/database.*
+/resources.*
+/routes.*
+/storage.*
+/public.*
+/public/build.*
+
+# Keep storage skeleton but ignore generated cache/session/view files
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep

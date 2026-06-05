@@ -1,0 +1,184 @@
+@import '@fortawesome/fontawesome-free/css/all.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;700&display=swap');
+
+/* Custom Styles */
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-900;
+    }
+    
+    [dir="rtl"] {
+        font-family: 'Tajawal', sans-serif;
+    }
+    
+    [dir="ltr"] {
+        font-family: 'Inter', sans-serif;
+    }
+}
+
+@layer components {
+    /* Buttons */
+    .btn {
+        @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 inline-flex items-center justify-center;
+    }
+    
+    .btn-primary {
+        @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300;
+    }
+    
+    .btn-secondary {
+        @apply bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-4 focus:ring-gray-200;
+    }
+    
+    .btn-success {
+        @apply bg-green-600 text-white hover:bg-green-700 focus:ring-4 focus:ring-green-300;
+    }
+    
+    .btn-danger {
+        @apply bg-red-600 text-white hover:bg-red-700 focus:ring-4 focus:ring-red-300;
+    }
+    
+    .btn-sm {
+        @apply px-3 py-1.5 text-sm;
+    }
+    
+    .btn-lg {
+        @apply px-6 py-3 text-lg;
+    }
+    
+    /* Cards */
+    .card {
+        @apply bg-white rounded-lg shadow-sm border border-gray-200;
+    }
+    
+    .card-header {
+        @apply px-6 py-4 border-b border-gray-200;
+    }
+    
+    .card-body {
+        @apply px-6 py-4;
+    }
+    
+    .card-footer {
+        @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
+    }
+    
+    /* Forms */
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-2;
+    }
+    
+    .form-input {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    }
+    
+    .form-select {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    }
+    
+    .form-textarea {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+    }
+    
+    .form-error {
+        @apply text-red-600 text-sm mt-1;
+    }
+    
+    /* Badges */
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    }
+    
+    /* Tables */
+    .table {
+        @apply w-full text-sm text-left;
+    }
+    
+    .table thead {
+        @apply bg-gray-50 border-b border-gray-200;
+    }
+    
+    .table th {
+        @apply px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider;
+    }
+    
+    .table td {
+        @apply px-6 py-4 whitespace-nowrap;
+    }
+    
+    .table tbody tr {
+        @apply border-b border-gray-200 hover:bg-gray-50 transition-colors;
+    }
+    
+    /* Sidebar */
+    .sidebar-link {
+        @apply flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-700 rounded-lg transition-all duration-200;
+    }
+    
+    .sidebar-link.active {
+        @apply bg-primary-100 text-primary-700 font-medium;
+    }
+    
+    .sidebar-link i {
+        @apply w-5 text-center;
+    }
+}
+
+@layer utilities {
+    /* RTL Support */
+    [dir="rtl"] .ltr\:ml-2 {
+        margin-left: 0;
+        margin-right: 0.5rem;
+    }
+    
+    [dir="rtl"] .ltr\:mr-2 {
+        margin-right: 0;
+        margin-left: 0.5rem;
+    }
+    
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+    }
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #3b82f6;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
