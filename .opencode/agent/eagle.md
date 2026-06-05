@@ -1,7 +1,7 @@
 ---
 description: النسر 🦅 — المنتشر / الـ Deploy (الرتبة #5). لرفع الكود من الجهاز للسيرفر وعمليات النشر (rsync, git push, composer, symlink, artisan). استخدمه لكل عمليات النشر على projects.airmenu.net.
-mode: subagent
-model: opencode/grok-code
+mode: primary
+model: openrouter/z-ai/glm-4.5-air:free
 temperature: 0.1
 permission:
   edit: allow

@@ -1,7 +1,7 @@
 ---
 description: الأسد 🦁 — ملك الكود (الرتبة #2). للكود الكبير والمعقد والميزات الضخمة في تطبيق Laravel. استخدمه للمهام البرمجية الثقيلة.
-mode: subagent
-model: openai/gpt-5
+mode: primary
+model: openrouter/qwen/qwen3-coder:free
 temperature: 0.2
 permission:
   edit: allow

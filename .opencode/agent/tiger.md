@@ -1,6 +1,6 @@
 ---
 description: النمر 🐯 — متخصص الكود والـ Codex (الرتبة #3). لتوليد الكود الدقيق المتخصص. استخدمه للمهام البرمجية التي تتطلب دقة عالية في كتابة الكود.
-mode: subagent
+mode: primary
 model: openai/gpt-5-codex
 temperature: 0.1
 permission:

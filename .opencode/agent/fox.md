@@ -1,7 +1,7 @@
 ---
 description: الثعلب 🦊 — الكاشف (الرتبة #7). للاختبار وحل المشاكل واكتشاف الأخطاء. استخدمه لفحص الكود وتشخيص الأعطال قبل النشر.
-mode: subagent
-model: openrouter/meta-llama/llama-3.3-70b-instruct
+mode: primary
+model: openrouter/meta-llama/llama-3.3-70b-instruct:free
 temperature: 0.2
 permission:
   edit: allow

@@ -1,7 +1,7 @@
 ---
 description: الفهد 🐆 — السريع (الرتبة #4). للتعديلات الصغيرة والمهام اللحظية السريعة. استخدمه للإصلاحات الصغيرة وردود الفعل الفورية.
-mode: subagent
-model: openai/gpt-5-mini
+mode: primary
+model: google/gemini-2.5-flash
 temperature: 0.2
 permission:
   edit: allow

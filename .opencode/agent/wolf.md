@@ -1,7 +1,7 @@
 ---
 description: الذئب 🐺 — المثابر / Agentic (الرتبة #6). للمهام الطويلة متعددة الخطوات (هجرات، تنظيف، معالجة دفعات). استخدمه للمهام التي تتطلب مثابرة طويلة.
-mode: subagent
-model: openrouter/moonshotai/kimi-k2
+mode: primary
+model: openrouter/moonshotai/kimi-k2.6:free
 temperature: 0.3
 permission:
   edit: allow

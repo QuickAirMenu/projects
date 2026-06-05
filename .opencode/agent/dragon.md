@@ -1,7 +1,7 @@
 ---
 description: التنين 🐉 — القائد والمخطط (الرتبة #1). يضع الخطة والمعمارية ويوزّع المهام على باقي الوكلاء. استخدمه لبدء أي مهمة كبيرة وللقرارات المعمارية.
 mode: primary
-model: anthropic/claude-opus-4-8
+model: anthropic/claude-sonnet-4-5
 temperature: 0.2
 permission:
   edit: allow

@@ -1,7 +1,7 @@
 ---
 description: السلحفاة 🛡️ — الحارس الأخير (الرتبة #8). مراجعة الأمان قبل كل deploy. استخدمه كبوابة أمان إلزامية قبل أي نشر على السيرفر.
-mode: subagent
-model: anthropic/claude-opus-4-8
+mode: all
+model: anthropic/claude-sonnet-4-5
 temperature: 0
 permission:
   edit: deny
