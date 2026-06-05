@@ -1,0 +1,185 @@
+
+<style>
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; padding: 1rem 0; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; display: flex; flex-direction: column; gap: 10px; }
+.card-header { display: flex; align-items: center; gap: 12px; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.card-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+.card-rank { font-size: 12px; color: var(--color-text-secondary); margin: 0; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--border-radius-md); margin-bottom: 2px; }
+.new-badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: var(--border-radius-md); background: #EEEDFE; color: #3C3489; margin-right: 6px; }
+.upgraded-badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: var(--border-radius-md); background: #E1F5EE; color: #085041; margin-right: 6px; }
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 4px 0; }
+.row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 3px 0; }
+.label { color: var(--color-text-secondary); }
+.value { color: var(--color-text-primary); font-weight: 500; text-align: right; max-width: 60%; }
+.model-tag { font-size: 11px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 2px 8px; color: var(--color-text-secondary); font-family: var(--font-mono); }
+.model-tag-paid { font-size: 11px; background: #EEEDFE; border: 0.5px solid #AFA9EC; border-radius: var(--border-radius-md); padding: 2px 8px; color: #3C3489; font-family: var(--font-mono); }
+.model-tag-free { font-size: 11px; background: #E1F5EE; border: 0.5px solid #5DCAA5; border-radius: var(--border-radius-md); padding: 2px 8px; color: #085041; font-family: var(--font-mono); }
+.personality { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; font-style: italic; }
+.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); padding: 0.5rem 0 0.25rem; letter-spacing: 0.05em; }
+.full-width { grid-column: 1 / -1; }
+</style>
+
+<h2 class="sr-only">الفريق المحدث مع GPT-5</h2>
+
+<p class="section-title">— القيادة —</p>
+<div class="team-grid">
+
+  <!-- التنين -->
+  <div class="card full-width" style="border: 2px solid #AFA9EC;">
+    <div class="card-header">
+      <div class="avatar" style="background:#EEEDFE;">🐉</div>
+      <div>
+        <p class="card-title">التنين <span class="upgraded-badge">بدون تغيير</span></p>
+        <p class="card-rank">الرتبة #1 — القائد والمخطط</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#EEEDFE; color:#3C3489;">التخطيط والمعمارية والقرارات الكبرى</span>
+    <hr class="divider">
+    <p class="personality">"أرى ما لا يراه الآخرون. أضع الخطة، أحدد الطريق، والجميع ينتظر أوامري."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-paid">Claude (هنا)</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag">claude.ai</span></div>
+  </div>
+
+</div>
+
+<p class="section-title">— الكود —</p>
+<div class="team-grid">
+
+  <!-- الأسد - ترقية -->
+  <div class="card" style="border: 2px solid #FAC775;">
+    <div class="card-header">
+      <div class="avatar" style="background:#FAEEDA;">🦁</div>
+      <div>
+        <p class="card-title">الأسد <span class="new-badge">ترقية</span></p>
+        <p class="card-rank">الرتبة #2 — ملك الكود</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#FAEEDA; color:#633806;">الكود الكبير والمعقد</span>
+    <hr class="divider">
+    <p class="personality">"الآن أقوى. GPT-5.5 Pro يجعلني لا يُقهر في الكود الضخم والمشاريع الكبيرة."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-paid">GPT-5.5 Pro</span></div>
+    <div class="row"><span class="label">البديل</span><span class="model-tag">Qwen3 Coder 480B</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag-paid">OpenAI (مدفوع)</span></div>
+  </div>
+
+  <!-- النمر - جديد -->
+  <div class="card" style="border-color: #AFA9EC;">
+    <div class="card-header">
+      <div class="avatar" style="background:#EEEDFE;">🐯</div>
+      <div>
+        <p class="card-title">النمر <span class="new-badge">جديد</span></p>
+        <p class="card-rank">الرتبة #3 — متخصص الكود</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#EEEDFE; color:#3C3489;">الكود المتخصص والـ Codex</span>
+    <hr class="divider">
+    <p class="personality">"مبني للكود فقط. GPT-5.3 Codex Spark مصمم خصيصاً لتوليد الكود بدقة لا تُضاهى."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-paid">GPT-5.3 Codex Spark</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag-paid">OpenAI (مدفوع)</span></div>
+  </div>
+
+  <!-- الفهد - ترقية -->
+  <div class="card" style="border-color: #9FE1CB;">
+    <div class="card-header">
+      <div class="avatar" style="background:#E1F5EE;">🐆</div>
+      <div>
+        <p class="card-title">الفهد <span class="upgraded-badge">ترقية</span></p>
+        <p class="card-rank">الرتبة #4 — السريع</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#E1F5EE; color:#085041;">الكود الصغير والسريع</span>
+    <hr class="divider">
+    <p class="personality">"أسرع من قبل. GPT-5.4 Fast أو mini Fast للمهام اللحظية بدون تأخير."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-paid">GPT-5.4 mini Fast</span></div>
+    <div class="row"><span class="label">البديل</span><span class="model-tag-free">Gemini 2.5 Flash</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag-paid">OpenAI (مدفوع)</span></div>
+  </div>
+
+</div>
+
+<p class="section-title">— العمليات —</p>
+<div class="team-grid">
+
+  <!-- النسر -->
+  <div class="card" style="border-color: #85B7EB;">
+    <div class="card-header">
+      <div class="avatar" style="background:#E6F1FB;">🦅</div>
+      <div>
+        <p class="card-title">النسر <span class="upgraded-badge">بدون تغيير</span></p>
+        <p class="card-rank">الرتبة #5 — المنتشر</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#E6F1FB; color:#0C447C;">رفع السيرفر والـ Deploy</span>
+    <hr class="divider">
+    <p class="personality">"أطير عالياً وأنقل الكود بأمان من الجهاز للسيرفر."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-free">DeepSeek V4 Flash</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag-free">OpenCode Zen (free)</span></div>
+  </div>
+
+  <!-- الذئب -->
+  <div class="card" style="border-color: #B4B2A9;">
+    <div class="card-header">
+      <div class="avatar" style="background:#F1EFE8;">🐺</div>
+      <div>
+        <p class="card-title">الذئب <span class="upgraded-badge">بدون تغيير</span></p>
+        <p class="card-rank">الرتبة #6 — المثابر</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#F1EFE8; color:#444441;">الـ Agentic والمهام الطويلة</span>
+    <hr class="divider">
+    <p class="personality">"لا أتوقف. المهام الطويلة المتعددة الخطوات هي تخصصي."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-free">Kimi K2.6</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag-free">OpenRouter (free)</span></div>
+  </div>
+
+  <!-- الثعلب -->
+  <div class="card" style="border-color: #F0997B;">
+    <div class="card-header">
+      <div class="avatar" style="background:#FAECE7;">🦊</div>
+      <div>
+        <p class="card-title">الثعلب <span class="upgraded-badge">بدون تغيير</span></p>
+        <p class="card-rank">الرتبة #7 — الكاشف</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#FAECE7; color:#712B13;">الاختبار وحل المشاكل</span>
+    <hr class="divider">
+    <p class="personality">"أجد ما يخفى. لا خطأ يفوتني مهما كان صغيراً."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-free">Llama 3.3 70B</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag-free">OpenRouter (free)</span></div>
+  </div>
+
+  <!-- السلحفاة -->
+  <div class="card full-width" style="border-color: #C0DD97;">
+    <div class="card-header">
+      <div class="avatar" style="background:#EAF3DE;">🛡️</div>
+      <div>
+        <p class="card-title">السلحفاة <span class="upgraded-badge">بدون تغيير</span></p>
+        <p class="card-rank">الرتبة #8 — الحارس الأخير</p>
+      </div>
+    </div>
+    <span class="badge" style="background:#EAF3DE; color:#27500A;">مراجعة الأمان قبل كل deploy</span>
+    <hr class="divider">
+    <p class="personality">"بطيء لكن لا أخطئ أبداً. آخر خط دفاع قبل أن يصل الكود للسيرفر."</p>
+    <hr class="divider">
+    <div class="row"><span class="label">النموذج</span><span class="model-tag-paid">Claude (هنا)</span></div>
+    <div class="row"><span class="label">المصدر</span><span class="model-tag">claude.ai</span></div>
+  </div>
+
+</div>
+
+<div style="margin-top: 1rem; padding: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary);">
+  <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 8px;">توزيع التكلفة</p>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <span style="font-size: 12px; background:#EEEDFE; color:#3C3489; padding: 4px 12px; border-radius: var(--border-radius-md);">مدفوع — GPT-5.5 Pro / Codex Spark / mini Fast</span>
+    <span style="font-size: 12px; background:#E1F5EE; color:#085041; padding: 4px 12px; border-radius: var(--border-radius-md);">مجاني — DeepSeek / Kimi / Llama / Gemini</span>
+  </div>
+</div>
