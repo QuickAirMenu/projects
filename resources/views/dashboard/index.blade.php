@@ -56,16 +56,17 @@
             </div>
         </div>
 
+        @if($canViewFinancialStats)
         <!-- Clients -->
         <div class="card">
             <div class="card-body">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">{{ __('common.total_clients') }}</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $stats['total_clients'] }}</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ $financialStats['total_clients'] }}</p>
                         <p class="text-sm text-green-600 mt-2">
                             <i class="fas fa-check-circle {{ is_rtl() ? 'ml-1' : 'mr-1' }}"></i>
-                            {{ __('common.active_count', ['count' => $stats['active_clients']]) }}
+                            {{ __('common.active_count', ['count' => $financialStats['active_clients']]) }}
                         </p>
                     </div>
                     <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
@@ -81,7 +82,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">{{ __('common.unpaid_invoices') }}</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ format_currency($stats['unpaid_invoices']) }}</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ format_currency($financialStats['unpaid_invoices']) }}</p>
                         <p class="text-sm text-gray-500 mt-2">
                             <i class="fas fa-clock {{ is_rtl() ? 'ml-1' : 'mr-1' }}"></i>
                             {{ __('common.pending_payment') }}
@@ -93,6 +94,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -104,7 +106,7 @@
                         <i class="fas fa-briefcase {{ is_rtl() ? 'ml-2' : 'mr-2' }} text-primary-600"></i>
                         {{ __('common.recent_projects') }}
                     </h2>
-                    <a href="#" class="text-sm text-primary-600 hover:text-primary-700">
+                    <a href="{{ route('projects.index') }}" class="text-sm text-primary-600 hover:text-primary-700">
                         {{ __('common.view_all') }}
                         <i class="fas fa-arrow-{{ is_rtl() ? 'left' : 'right' }} {{ is_rtl() ? 'mr-1' : 'ml-1' }}"></i>
                     </a>
@@ -131,7 +133,7 @@
                                         </div>
                                     </td>
                                     <td>{{ $project->client->name }}</td>
-                                    <td>{!! $project->status->name_ar !!}</td>
+                                    <td>{{ $project->status->name_ar }}</td>
                                     <td>
                                         <div class="flex items-center">
                                             <img src="{{ $project->manager->avatar_url }}" alt="{{ $project->manager->name }}" class="w-8 h-8 rounded-full {{ is_rtl() ? 'ml-2' : 'mr-2' }}">

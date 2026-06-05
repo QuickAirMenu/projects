@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StoreInvoiceRequest;
 use App\Models\Client;
+use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Models\Quote;
+use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 
@@ -36,7 +40,23 @@ class InvoiceController extends Controller
     {
         $projects = Project::with('client')->orderBy('name')->get();
         $clients  = Client::orderBy('name')->get();
-        return view('finance.invoices.create', compact('projects','clients'));
+
+        $prefillData = null;
+        if (request()->filled('quote_id')) {
+            $quote = Quote::with(['items.serviceType', 'client'])->findOrFail(request('quote_id'));
+            $prefillData = [
+                'quote' => $quote,
+                'client_id' => request('client_id', $quote->client_id),
+                'description' => request('description', $quote->subject),
+                'items' => $quote->items->map(fn($item) => [
+                    'description' => $item->description,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->unit_price,
+                ])->toArray(),
+            ];
+        }
+
+        return view('finance.invoices.create', compact('projects','clients','prefillData'));
     }
 
     public function store(StoreInvoiceRequest $request)
@@ -48,12 +68,26 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['client','project','items','payments']);
+        $invoice->load(['client','project','items','payments','contract']);
         return view('finance.invoices.show', compact('invoice'));
+    }
+
+    public function pdf(Invoice $invoice)
+    {
+        $invoice->load(['client', 'project', 'items', 'createdBy']);
+        $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
+            ->pluck('value', 'key')
+            ->toArray();
+
+        $pdf = Pdf::loadView('pdf.invoice', compact('invoice', 'settings'));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
     }
 
     public function edit(Invoice $invoice)
     {
+        $invoice->load('items');
         $projects = Project::orderBy('name')->get();
         $clients  = Client::orderBy('name')->get();
         return view('finance.invoices.create', compact('invoice','projects','clients'));
@@ -61,20 +95,8 @@ class InvoiceController extends Controller
 
     public function update(StoreInvoiceRequest $request, Invoice $invoice)
     {
-        $invoice->items()->delete();
-        $data            = $request->validated();
-        $subtotal        = collect($data['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']);
-        $taxAmount       = round($subtotal * ($data['tax_percentage'] ?? 0) / 100, 2);
-        $discountAmount  = $data['discount_amount'] ?? 0;
-        $total           = $subtotal + $taxAmount - $discountAmount;
+        $invoice = $this->invoiceService->updateInvoice($invoice, $request->validated());
 
-        $invoice->update(array_merge(array_diff_key($data, ['items'=>'']), [
-            'subtotal' => $subtotal, 'tax_amount' => $taxAmount, 'total' => $total,
-            'remaining_amount' => $total - $invoice->paid_amount,
-        ]));
-        foreach ($data['items'] as $i => $item) {
-            $invoice->items()->create(['description'=>$item['description'],'quantity'=>$item['quantity'],'unit_price'=>$item['unit_price'],'total'=>$item['quantity']*$item['unit_price'],'sort_order'=>$i]);
-        }
         return redirect()->route('invoices.show', $invoice)
             ->with('success', __('messages.updated_successfully'));
     }
@@ -84,5 +106,20 @@ class InvoiceController extends Controller
         $invoice->delete();
         return redirect()->route('invoices.index')
             ->with('success', __('messages.deleted_successfully'));
+    }
+
+    public function convertToContract(Invoice $invoice)
+    {
+        if ($invoice->contract) {
+            return redirect()->route('contracts.show', $invoice->contract)
+                ->with('success', 'هذه الفاتورة مرتبطة بعقد بالفعل');
+        }
+
+        return redirect()->route('contracts.create', [
+            'invoice_id' => $invoice->id,
+            'client_id' => $invoice->client_id,
+            'project_id' => $invoice->project_id,
+            'contract_value' => $invoice->total,
+        ]);
     }
 }

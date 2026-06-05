@@ -8,6 +8,14 @@
         <p class="text-gray-500 text-sm mt-1">{{ $client->company_name }}</p>
     </div>
     <div class="flex gap-2">
+        @if($client->email)
+        <form action="{{ route('clients.portal-invite', $client) }}" method="POST">
+            @csrf
+            <button type="submit" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl transition">
+                <i class="fas fa-envelope"></i> دعوة البوابة
+            </button>
+        </form>
+        @endif
         @can('update', $client)
         <a href="{{ route('clients.edit', $client) }}" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition">
             <i class="fas fa-edit"></i> {{ __('messages.edit') }}
@@ -56,6 +64,16 @@
                 <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-industry w-4 text-gray-400"></i> {{ $client->industry }}</div>
                 @endif
             </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-gray-800">بوابة العميل</h3>
+                <span class="text-xs px-2 py-1 rounded-full {{ $client->portalAccount?->email_verified_at ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                    {{ $client->portalAccount?->email_verified_at ? 'مفعلة' : 'بانتظار الإعداد' }}
+                </span>
+            </div>
+            <p class="mt-3 text-sm text-gray-500">{{ $client->email ? 'يمكن إرسال رابط إعداد الحساب مباشرة إلى بريد العميل.' : 'أضف بريدًا إلكترونيًا لإرسال دعوة البوابة.' }}</p>
         </div>
 
         {{-- Stats --}}

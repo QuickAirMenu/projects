@@ -66,7 +66,10 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        $task->load(['project','status','assignedUser','comments.user','checklists','timeLogs.user','subtasks.status']);
+        $task->load(['project', 'status', 'assignedUser', 'subtasks.status']);
+        $task->setRelation('checklists', $task->checklists()->orderBy('sort_order')->get());
+        $task->setRelation('timeLogs', $task->timeLogs()->with('user')->latest()->take(5)->get());
+        $task->setRelation('comments', $task->comments()->with('user')->latest()->get());
         return view('tasks.show', compact('task'));
     }
 

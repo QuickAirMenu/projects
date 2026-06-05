@@ -116,6 +116,10 @@ return [
             'other' => 'أخرى',
         ],
     ],
+
+    'tinify' => [
+        'api_key' => env('TINIFY_API_KEY'),
+    ],
     
     'contract' => [
         'number_prefix' => 'CNT',

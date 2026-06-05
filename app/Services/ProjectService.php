@@ -33,14 +33,17 @@ class ProjectService
     public function createProject(array $data): Project
     {
         return DB::transaction(function () use ($data) {
+            $teamMembers = $data['team_members'] ?? [];
+            unset($data['team_members']);
+
             $data['created_by']     = Auth::id();
             $data['project_number'] = $this->generateProjectNumber();
 
             $project = Project::create($data);
 
             // Attach team members
-            if (!empty($data['team_members'])) {
-                $project->teamMembers()->sync($data['team_members']);
+            if (!empty($teamMembers)) {
+                $project->teamMembers()->sync($teamMembers);
             }
 
             // Create default workflow steps
@@ -61,10 +64,13 @@ class ProjectService
     public function updateProject(Project $project, array $data): Project
     {
         return DB::transaction(function () use ($project, $data) {
+            $teamMembers = $data['team_members'] ?? null;
+            unset($data['team_members']);
+
             $project->update($data);
 
-            if (isset($data['team_members'])) {
-                $project->teamMembers()->sync($data['team_members']);
+            if ($teamMembers !== null) {
+                $project->teamMembers()->sync($teamMembers);
             }
 
             return $project->fresh();

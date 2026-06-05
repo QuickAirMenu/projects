@@ -113,7 +113,10 @@ class ProjectStatusSeeder extends Seeder
         ];
 
         foreach ($statuses as $status) {
-            ProjectStatus::create($status);
+            ProjectStatus::updateOrCreate(
+                ['slug' => $status['slug']],
+                $status
+            );
         }
 
         $this->command->info('Project Statuses created successfully!');

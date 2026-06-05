@@ -46,7 +46,7 @@
                        class="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-plus"></i></button>
             </form>
-            @php $checklist = $task->checklists()->orderBy('sort_order')->get(); $done = $checklist->where('is_completed',true)->count(); @endphp
+            @php $checklist = $task->checklists; $done = $checklist->where('is_completed',true)->count(); @endphp
             @if($checklist->count())
             <div class="text-xs text-gray-400 mb-2">{{ $done }}/{{ $checklist->count() }} {{ __('task.checklist') }}</div>
             @endif
@@ -82,7 +82,7 @@
                 </button>
             </form>
             <p class="text-xs text-gray-500 mb-3">{{ __('task.actual_hours') }}: <strong>{{ $task->actual_hours }}h</strong> / {{ __('task.estimated_hours') }}: <strong>{{ $task->estimated_hours ?? '-' }}h</strong></p>
-            @foreach($task->timeLogs()->with('user')->latest()->take(5)->get() as $log)
+            @foreach($task->timeLogs as $log)
             <div class="flex items-center justify-between py-2 border-b last:border-0 text-sm">
                 <div>
                     <span class="font-medium text-gray-700">{{ $log->hours }}h</span>
@@ -108,7 +108,7 @@
                     <i class="fas fa-paper-plane me-1"></i>{{ __('messages.save') }}
                 </button>
             </form>
-            @forelse($task->comments()->with('user')->latest()->get() as $comment)
+            @forelse($task->comments as $comment)
             <div class="flex gap-3 py-3 border-t">
                 <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 text-xs font-bold text-purple-600">
                     {{ mb_substr($comment->user->name, 0, 1) }}

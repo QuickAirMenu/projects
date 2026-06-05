@@ -17,17 +17,20 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             DemoClientSeeder::class,
             DemoProjectSeeder::class,
+            DemoBusinessSeeder::class,
         ]);
 
         $this->command->info('');
         $this->command->info('🎉 Air Menu | Workspace seeded successfully!');
         $this->command->info('');
-        $this->command->info('Default credentials:');
-        $this->command->info('  Super Admin : superadmin@workspace.com / password');
-        $this->command->info('  Admin       : admin@workspace.com / password');
-        $this->command->info('  PM          : pm@workspace.com / password');
-        $this->command->info('  Team        : team@workspace.com / password');
-        $this->command->info('  Finance     : finance@workspace.com / password');
+        $this->command->info('Demo credentials only (not for production):');
+        $this->command->info('  Shared demo password: ' . UserSeeder::DEMO_PASSWORD);
+        $this->command->info('  Super Admin : admin@airmenu.net');
+        $this->command->info('  Admin       : mohamed@airmenu.net');
+        $this->command->info('  PM          : sara@airmenu.net');
+        $this->command->info('  Team        : ahmed@airmenu.net');
+        $this->command->info('  Dev         : dev@workspace.com');
+        $this->command->info('  Finance     : fatima@airmenu.net');
         $this->command->info('');
     }
 }

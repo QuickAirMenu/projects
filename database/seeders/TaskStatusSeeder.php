@@ -65,7 +65,10 @@ class TaskStatusSeeder extends Seeder
         ];
 
         foreach ($statuses as $status) {
-            TaskStatus::create($status);
+            TaskStatus::updateOrCreate(
+                ['slug' => $status['slug']],
+                $status
+            );
         }
 
         $this->command->info('Task Statuses created successfully!');

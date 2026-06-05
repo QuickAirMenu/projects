@@ -97,8 +97,9 @@ class DemoProjectSeeder extends Seeder
             $statusId   = $statuses[$pData['status_slug']]?->id ?? $statuses->first()->id;
             $serviceId  = $services[$pData['service_idx']]?->id ?? $services->first()->id;
 
-            $project = Project::create([
-                'project_number'      => 'PRJ-' . date('Ym') . '-' . str_pad(Project::count() + 1, 4, '0', STR_PAD_LEFT),
+            $project = Project::updateOrCreate([
+                'name' => $pData['name'],
+            ], [
                 'name'                => $pData['name'],
                 'client_id'           => $client->id,
                 'service_type_id'     => $serviceId,
@@ -116,7 +117,9 @@ class DemoProjectSeeder extends Seeder
 
             // Attach team member
             if ($member) {
-                $project->teamMembers()->attach($member->id, ['role' => 'designer', 'assigned_at' => now()]);
+                $project->teamMembers()->syncWithoutDetaching([
+                    $member->id => ['role' => 'designer', 'assigned_at' => now()],
+                ]);
             }
 
             // Add sample tasks
@@ -130,7 +133,10 @@ class DemoProjectSeeder extends Seeder
                 ];
 
                 foreach ($sampleTasks as $t) {
-                    Task::create([
+                    Task::updateOrCreate([
+                        'project_id' => $project->id,
+                        'title'      => $t['title'],
+                    ], [
                         'project_id'  => $project->id,
                         'title'       => $t['title'],
                         'status_id'   => $t['status']->id,

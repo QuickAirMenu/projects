@@ -106,7 +106,10 @@ class ServiceTypeSeeder extends Seeder
         ];
 
         foreach ($serviceTypes as $serviceType) {
-            ServiceType::create($serviceType);
+            ServiceType::updateOrCreate(
+                ['name_en' => $serviceType['name_en']],
+                $serviceType
+            );
         }
 
         $this->command->info('Service Types created successfully!');

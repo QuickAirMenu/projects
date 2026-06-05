@@ -51,6 +51,7 @@
                 <th class="text-start px-4 py-3 font-semibold text-gray-600">المبلغ</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">طريقة الدفع</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">التاريخ</th>
+                <th class="text-end px-5 py-3 font-semibold text-gray-600">الإجراءات</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
@@ -64,9 +65,25 @@
                 <td class="px-4 py-3 font-bold text-green-600">{{ number_format($payment->amount, 2) }} ر.س</td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ __('finance.method_'.$payment->payment_method) }}</td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ $payment->payment_date->format('Y-m-d') }}</td>
+                <td class="px-5 py-3">
+                    <div class="flex items-center justify-end gap-2">
+                        <a href="{{ route('payments.edit', $payment) }}" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
+                            <i class="fas fa-pen"></i>
+                            {{ __('messages.edit') ?? 'تعديل' }}
+                        </a>
+                        <form action="{{ route('payments.destroy', $payment) }}" method="POST" onsubmit="return confirm('هل تريد حذف هذه الدفعة؟')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition">
+                                <i class="fas fa-trash"></i>
+                                {{ __('messages.delete') ?? 'حذف' }}
+                            </button>
+                        </form>
+                    </div>
+                </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="py-16 text-center text-gray-400">
+            <tr><td colspan="7" class="py-16 text-center text-gray-400">
                 <i class="fas fa-money-bill text-5xl mb-3 block text-gray-200"></i>
                 لا توجد دفعات مسجلة
             </td></tr>

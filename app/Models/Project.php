@@ -37,6 +37,9 @@ class Project extends Model
         'client_notes',
         'is_archived',
         'archived_at',
+        'is_handed_off',
+        'handed_off_at',
+        'handoff_notes',
         'created_by',
     ];
 
@@ -54,6 +57,8 @@ class Project extends Model
         'progress_percentage' => 'integer',
         'is_archived' => 'boolean',
         'archived_at' => 'datetime',
+        'is_handed_off' => 'boolean',
+        'handed_off_at' => 'datetime',
     ];
 
     /**

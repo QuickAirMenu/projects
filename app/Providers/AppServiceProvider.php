@@ -10,7 +10,9 @@ use App\Observers\InvoiceObserver;
 use App\Observers\PaymentObserver;
 use App\Observers\ProjectObserver;
 use App\Observers\TaskObserver;
+use App\Services\MailConfigService;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,5 +35,13 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('date', function ($date) {
             return "<?php echo $date ? \Carbon\Carbon::parse($date)->format('Y-m-d') : '-'; ?>";
         });
+
+        try {
+            if (Schema::hasTable('settings')) {
+                app(MailConfigService::class)->applyDynamicMailConfig();
+            }
+        } catch (\Throwable) {
+            // Ignore during early boot or if DB is unavailable.
+        }
     }
 }

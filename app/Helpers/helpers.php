@@ -6,7 +6,70 @@ if (!function_exists('workspace_config')) {
      */
     function workspace_config($key, $default = null)
     {
+        if ($key === 'company_logo') {
+            $logo = \App\Models\Setting::where('key', 'company_logo')->value('value') ?: config('workspace.company_logo', $default);
+
+            if (blank($logo)) {
+                return $default;
+            }
+
+            if (filter_var($logo, FILTER_VALIDATE_URL)) {
+                return $logo;
+            }
+
+            return \Illuminate\Support\Facades\Storage::url($logo);
+        }
+
         return config("workspace.{$key}", $default);
+    }
+}
+
+if (!function_exists('pdf_logo_data')) {
+    /**
+     * Resolve the company logo into a PDF-safe image source.
+     */
+    function pdf_logo_data($logo = null)
+    {
+        if (blank($logo)) {
+            $logo = \App\Models\Setting::where('key', 'company_logo')->value('value') ?: config('workspace.company_logo');
+        }
+
+        if (blank($logo)) {
+            return null;
+        }
+
+        if (str_starts_with($logo, 'data:image/')) {
+            return $logo;
+        }
+
+        if (filter_var($logo, FILTER_VALIDATE_URL)) {
+            $content = @file_get_contents($logo);
+
+            if ($content !== false) {
+                $extension = strtolower(pathinfo(parse_url($logo, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+                $mime = $extension === 'svg' ? 'image/svg+xml' : 'image/' . ($extension ?: 'png');
+
+                return 'data:' . $mime . ';base64,' . base64_encode($content);
+            }
+
+            return $logo;
+        }
+
+        $paths = [
+            public_path(ltrim($logo, '/')),
+            storage_path('app/public/' . ltrim(preg_replace('#^storage/#', '', $logo), '/')),
+        ];
+
+        foreach ($paths as $path) {
+            if (is_file($path)) {
+                $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                $mime = $extension === 'svg' ? 'image/svg+xml' : 'image/' . ($extension ?: 'png');
+
+                return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+            }
+        }
+
+        return $logo;
     }
 }
 

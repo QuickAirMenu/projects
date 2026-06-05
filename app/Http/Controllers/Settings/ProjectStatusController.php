@@ -16,7 +16,7 @@ class ProjectStatusController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'name_ar'    => 'required|string|max:100',
             'name_en'    => 'required|string|max:100',
             'slug'       => 'required|string|max:100|unique:project_statuses,slug',
@@ -26,7 +26,7 @@ class ProjectStatusController extends Controller
             'is_active'  => 'boolean',
         ]);
 
-        ProjectStatus::create($request->all());
+        ProjectStatus::create($data);
 
         return redirect()->route('settings.project-statuses.index')
             ->with('success', __('common.created_successfully'));
@@ -34,13 +34,16 @@ class ProjectStatusController extends Controller
 
     public function update(Request $request, ProjectStatus $projectStatus)
     {
-        $request->validate([
+        $data = $request->validate([
             'name_ar' => 'required|string|max:100',
             'name_en' => 'required|string|max:100',
             'color'   => 'required|string|max:7',
+            'icon'    => 'nullable|string|max:50',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'boolean',
         ]);
 
-        $projectStatus->update($request->all());
+        $projectStatus->update($data);
 
         return redirect()->route('settings.project-statuses.index')
             ->with('success', __('common.updated_successfully'));

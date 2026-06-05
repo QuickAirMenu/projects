@@ -64,6 +64,11 @@ class Client extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
+    public function assignedUser()
+    {
+        return $this->assignedTo();
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -72,6 +77,11 @@ class Client extends Model
     public function projects()
     {
         return $this->hasMany(Project::class);
+    }
+
+    public function portalAccount()
+    {
+        return $this->hasOne(ClientPortalAccount::class);
     }
 
     public function quotes()

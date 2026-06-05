@@ -49,6 +49,11 @@ class ServiceType extends Model
         return $this->hasMany(Project::class);
     }
 
+    public function defaultItems()
+    {
+        return $this->hasMany(ServiceTypeItem::class)->orderBy('sort_order');
+    }
+
     /**
      * Scopes
      */

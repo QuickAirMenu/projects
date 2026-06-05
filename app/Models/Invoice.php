@@ -16,6 +16,7 @@ class Invoice extends Model
         'invoice_number',
         'project_id',
         'client_id',
+        'quote_id',
         'invoice_type',
         'invoice_date',
         'due_date',
@@ -92,6 +93,11 @@ class Invoice extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function quote()
+    {
+        return $this->belongsTo(Quote::class);
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -105,6 +111,11 @@ class Invoice extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function contract()
+    {
+        return $this->hasOne(Contract::class);
     }
 
     /**

@@ -15,6 +15,7 @@ class Contract extends Model
         'contract_number',
         'project_id',
         'client_id',
+        'invoice_id',
         'title',
         'description',
         'start_date',
@@ -64,8 +65,18 @@ class Contract extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function creator()
+    {
+        return $this->createdBy();
     }
 }

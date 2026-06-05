@@ -19,6 +19,8 @@ class Payment extends Model
         'payment_method',
         'transaction_reference',
         'notes',
+        'proof_file_name',
+        'proof_file_path',
         'received_by',
     ];
 
@@ -84,6 +86,11 @@ class Payment extends Model
     public function receivedBy()
     {
         return $this->belongsTo(User::class, 'received_by');
+    }
+
+    public function receiver()
+    {
+        return $this->receivedBy();
     }
 
     /**

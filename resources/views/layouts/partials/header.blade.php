@@ -58,7 +58,7 @@
                      x-transition
                      class="absolute {{ is_rtl() ? 'left-0' : 'right-0' }} mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200">
                     <div class="p-4 border-b border-gray-200">
-                        <h3 class="font-semibold text-gray-900">{{ __('common.notifications') }}</h3>
+                        <h3 class="font-semibold text-gray-900">{{ __('messages.notifications') }}</h3>
                     </div>
                     <div class="max-h-96 overflow-y-auto custom-scrollbar">
                         <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">

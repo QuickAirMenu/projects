@@ -31,6 +31,15 @@ class SettingSeeder extends Seeder
             ['key' => 'bank_account_name',    'value' => 'Digital Business Solutions', 'type' => 'string', 'group' => 'finance'],
             ['key' => 'bank_iban',            'value' => 'SA0000000000000000000000',  'type' => 'string',  'group' => 'finance'],
 
+            // Mail
+            ['key' => 'mail_host',            'value' => '', 'type' => 'string', 'group' => 'mail'],
+            ['key' => 'mail_port',            'value' => '465', 'type' => 'string', 'group' => 'mail'],
+            ['key' => 'mail_encryption',      'value' => 'ssl', 'type' => 'string', 'group' => 'mail'],
+            ['key' => 'mail_username',        'value' => '', 'type' => 'string', 'group' => 'mail'],
+            ['key' => 'mail_password',        'value' => '', 'type' => 'string', 'group' => 'mail'],
+            ['key' => 'mail_from_address',    'value' => '', 'type' => 'string', 'group' => 'mail'],
+            ['key' => 'mail_from_name',       'value' => '', 'type' => 'string', 'group' => 'mail'],
+
             // Notifications
             ['key' => 'notify_task_assigned',   'value' => '1', 'type' => 'boolean', 'group' => 'notifications'],
             ['key' => 'notify_deadline_days',   'value' => '2', 'type' => 'number',  'group' => 'notifications'],

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
+    public const DEMO_PASSWORD = 'demo-only-local-use';
+
     public function run(): void
     {
         $users = [
@@ -25,7 +27,7 @@ class UserSeeder extends Seeder
             $user = User::firstOrCreate(
                 ['email' => $userData['email']],
                 array_merge($userData, [
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make(self::DEMO_PASSWORD),
                     'is_active' => true,
                     'language' => 'ar',
                     'timezone' => 'Asia/Riyadh',

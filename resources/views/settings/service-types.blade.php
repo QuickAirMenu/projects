@@ -67,6 +67,52 @@
                         </form>
                     </td>
                 </tr>
+                <tr class="bg-gray-50/50 border-b">
+                    <td colspan="4" class="px-5 py-4">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-semibold text-gray-700">العناصر الافتراضية</h4>
+                                <span class="text-xs text-gray-500">{{ $type->defaultItems->count() }} عنصر</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                @forelse($type->defaultItems as $item)
+                                    <div class="flex items-center justify-between bg-white border rounded-xl px-3 py-2 text-sm">
+                                        <div>
+                                            <p class="font-medium text-gray-800">{{ $item->description }}</p>
+                                            <p class="text-xs text-gray-500">{{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</p>
+                                        </div>
+                                        <form action="{{ route('settings.service-types.items.destroy', [$type, $item]) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                @empty
+                                    <p class="text-sm text-gray-400">لا توجد عناصر افتراضية</p>
+                                @endforelse
+                            </div>
+
+                            <form action="{{ route('settings.service-types.items.store', $type) }}" method="POST" class="grid grid-cols-12 gap-2 items-end">
+                                @csrf
+                                <div class="col-span-5">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">الوصف</label>
+                                    <input type="text" name="description" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">الكمية</label>
+                                    <input type="number" name="quantity" value="1" min="1" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">السعر</label>
+                                    <input type="number" name="unit_price" step="0.01" min="0" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                                </div>
+                                <div class="col-span-2">
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-3 py-2 text-sm">إضافة</button>
+                                </div>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
                 @empty
                 <tr><td colspan="4" class="py-10 text-center text-gray-400">لا توجد بيانات</td></tr>
                 @endforelse

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
@@ -14,6 +15,7 @@ class Quote extends Model
 
     protected $fillable = [
         'quote_number',
+        'public_token',
         'client_id',
         'subject',
         'description',
@@ -76,6 +78,10 @@ class Quote extends Model
                 );
             }
 
+            if (!$quote->public_token) {
+                $quote->public_token = (string) Str::uuid();
+            }
+
             // Set default valid until date
             if (!$quote->valid_until) {
                 $quote->valid_until = now()->addDays(workspace_config('quote.valid_days', 30));
@@ -100,9 +106,19 @@ class Quote extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function creator()
+    {
+        return $this->createdBy();
+    }
+
     public function items()
     {
         return $this->hasMany(QuoteItem::class);
+    }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class, 'quote_id');
     }
 
     public function convertedProject()

@@ -8,6 +8,7 @@
         <p class="text-gray-500 text-sm">{{ $invoice->client->name }} · {{ $invoice->project->name }}</p>
     </div>
     <div class="flex gap-2">
+        <a href="{{ route('invoices.pdf', $invoice) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>تحميل PDF</a>
         <a href="{{ route('invoices.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
     </div>
 </div>
@@ -43,7 +44,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 class="font-semibold text-gray-700 mb-4">{{ __('finance.payments') }}</h3>
             @if($invoice->payment_status !== 'paid')
-            <form action="{{ route('payments.store') }}" method="POST" class="grid grid-cols-4 gap-2 mb-4">
+            <form id="payment-form" action="{{ route('payments.store') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-4 gap-2 mb-4">
                 @csrf
                 <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
                 <input type="number" name="amount" step="0.01" placeholder="{{ __('finance.paid_amount') }}" required
@@ -58,6 +59,9 @@
                 <button type="submit" class="col-span-1 bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-2 rounded-xl transition">
                     <i class="fas fa-plus me-1"></i>{{ __('finance.add_payment') }}
                 </button>
+                <input type="file" name="proof_of_payment" accept=".pdf,.jpg,.jpeg,.png,.webp" class="col-span-4 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="col-span-4 text-xs text-gray-400 -mt-1">{{ __('finance.payment_proof') }}. سيتم ضغط الصور تلقائياً قبل الرفع.</p>
+                <div id="payment-form-error" class="hidden col-span-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
             </form>
             @endif
             @forelse($invoice->payments as $payment)
@@ -65,6 +69,11 @@
                 <div>
                     <p class="font-medium text-gray-800">{{ number_format($payment->amount, 2) }} {{ __('messages.currency') }}</p>
                     <p class="text-xs text-gray-400">{{ __('finance.method_'.$payment->payment_method) }} · {{ $payment->payment_date->format('Y-m-d') }}</p>
+                    @if($payment->proof_file_path)
+                    <a href="{{ Storage::url($payment->proof_file_path) }}" target="_blank" class="text-xs text-blue-600 hover:underline">
+                        {{ __('finance.payment_proof') }}: {{ $payment->proof_file_name }}
+                    </a>
+                    @endif
                 </div>
                 <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">{{ $payment->payment_number }}</span>
             </div>
@@ -84,7 +93,122 @@
             <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.total') }}</span><span class="font-bold">{{ number_format($invoice->total, 2) }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.paid_amount') }}</span><span class="text-green-600 font-medium">{{ number_format($invoice->paid_amount, 2) }}</span></div>
             <div class="flex justify-between border-t pt-2"><span class="font-semibold">{{ __('finance.remaining') }}</span><span class="font-bold text-red-500">{{ number_format($invoice->remaining_amount, 2) }}</span></div>
+            @if($invoice->contract)
+            <div class="border-t pt-2">
+                <a href="{{ route('contracts.show', $invoice->contract) }}" class="text-blue-600 hover:underline text-sm">عرض العقد المرتبط</a>
+            </div>
+            @endif
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(() => {
+    const form = document.getElementById('payment-form');
+    const errorBox = document.getElementById('payment-form-error');
+    if (!form || !errorBox) return;
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    const fileInput = form.querySelector('input[type="file"][name="proof_of_payment"]');
+    const defaultButtonHtml = submitButton ? submitButton.innerHTML : '';
+
+    const showError = (message) => {
+        errorBox.textContent = message;
+        errorBox.classList.remove('hidden');
+    };
+
+    const hideError = () => {
+        errorBox.textContent = '';
+        errorBox.classList.add('hidden');
+    };
+
+    const compressImageFile = async (file) => {
+        if (!file || !file.type.startsWith('image/')) return file;
+
+        const maxSide = 1600;
+        const quality = 0.82;
+
+        const bitmap = await createImageBitmap(file);
+        const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+        const width = Math.round(bitmap.width * scale);
+        const height = Math.round(bitmap.height * scale);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return file;
+
+        ctx.drawImage(bitmap, 0, 0, width, height);
+
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (!blob || blob.size >= file.size) return file;
+
+        const safeName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+        return new File([blob], safeName, { type: 'image/jpeg', lastModified: Date.now() });
+    };
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        hideError();
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>جاري الرفع...';
+        }
+
+        try {
+            const formData = new FormData(form);
+            const file = fileInput?.files?.[0];
+            if (file && file.type.startsWith('image/')) {
+                const compressed = await compressImageFile(file);
+                if (compressed !== file) {
+                    formData.set('proof_of_payment', compressed, compressed.name);
+                }
+            }
+
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+            });
+
+            if (response.status === 422) {
+                const data = await response.json();
+                const firstError = data?.errors ? Object.values(data.errors).flat()[0] : null;
+                showError(firstError || 'تعذر رفع الإيصال. تحقق من البيانات ثم أعد المحاولة.');
+                return;
+            }
+
+            if (response.status === 419) {
+                showError('انتهت الجلسة، أعد تحميل الصفحة ثم حاول مرة أخرى.');
+                return;
+            }
+
+            if (!response.ok) {
+                showError('تعذر رفع الإيصال الآن. أعد المحاولة بعد قليل.');
+                return;
+            }
+
+            window.location.href = response.url || form.action;
+        } catch (error) {
+            showError('فشل الاتصال أثناء رفع الإيصال. تم تقليل الصورة تلقائياً، جرّب مرة أخرى.');
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                submitButton.innerHTML = defaultButtonHtml;
+            }
+        }
+    });
+})();
+</script>
+@endpush

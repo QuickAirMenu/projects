@@ -16,7 +16,7 @@
 </div>
 @endif
 
-@if($errors->any())
+@if(isset($errors) && $errors->any())
 <div class="bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 mb-4">
     <div class="flex items-center gap-2 mb-2">
         <i class="fas fa-exclamation-triangle text-red-500"></i>

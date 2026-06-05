@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\ChangeRequest;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangeRequest\StoreChangeRequestRequest;
 use App\Models\ChangeRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ChangeRequestService;
 
 class ChangeRequestController extends Controller
 {
+    public function __construct(protected ChangeRequestService $changeRequestService) {}
+
     public function index(Request $request)
     {
         $query = ChangeRequest::with(['project', 'project.client', 'creator', 'approver'])
@@ -37,25 +41,9 @@ class ChangeRequestController extends Controller
         return view('change-requests.create', compact('projects'));
     }
 
-    public function store(Request $request)
+    public function store(StoreChangeRequestRequest $request)
     {
-        $request->validate([
-            'project_id'       => 'required|exists:projects,id',
-            'title'            => 'required|string|max:255',
-            'description'      => 'required|string',
-            'requested_by'     => 'required|in:client,internal',
-            'scope_type'       => 'required|in:in_scope,out_of_scope',
-            'priority'         => 'required|in:low,medium,high',
-            'impact_analysis'  => 'nullable|string',
-            'additional_cost'  => 'nullable|numeric|min:0',
-            'additional_hours' => 'nullable|numeric|min:0',
-        ]);
-
-        $data = $request->all();
-        $data['created_by']     = Auth::id();
-        $data['request_number'] = 'CR-' . date('Ym') . '-' . str_pad(ChangeRequest::count() + 1, 4, '0', STR_PAD_LEFT);
-
-        ChangeRequest::create($data);
+        $this->changeRequestService->create($request->validated());
 
         return redirect()->route('change-requests.index')
             ->with('success', __('common.created_successfully'));
@@ -69,6 +57,8 @@ class ChangeRequestController extends Controller
 
     public function approve(Request $request, ChangeRequest $changeRequest)
     {
+        abort_unless(Auth::user()->hasAnyRole(['super-admin', 'admin', 'finance']), 403);
+
         $changeRequest->update([
             'status'      => 'approved',
             'approved_by' => Auth::id(),
@@ -81,6 +71,8 @@ class ChangeRequestController extends Controller
 
     public function reject(Request $request, ChangeRequest $changeRequest)
     {
+        abort_unless(Auth::user()->hasAnyRole(['super-admin', 'admin', 'finance']), 403);
+
         $request->validate(['rejection_reason' => 'required|string|max:1000']);
 
         $changeRequest->update([

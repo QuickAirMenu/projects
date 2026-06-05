@@ -30,6 +30,7 @@ class FinanceReportController extends Controller
             'total_paid'     => Invoice::sum('paid_amount'),
             'total_unpaid'   => Invoice::where('payment_status', 'unpaid')->sum('remaining_amount'),
             'total_overdue'  => Invoice::where('payment_status', 'overdue')->sum('remaining_amount'),
+            'overdue_count'  => Invoice::where('payment_status', 'overdue')->count(),
         ];
 
         $monthlyData = Invoice::selectRaw('MONTH(invoice_date) as month, YEAR(invoice_date) as year, SUM(total) as total, SUM(paid_amount) as paid')

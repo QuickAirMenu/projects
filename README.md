@@ -1,327 +1,69 @@
-# Air Menu | Workspace
+# Air Menu | Projects
 
-<div align="center">
-  <h3>🚀 نظام إدارة مشاريع وتشغيل احترافي متكامل</h3>
-  <p>نظام شامل لإدارة المشاريع والمهام والعملاء والمالية لشركات الخدمات الرقمية</p>
-</div>
+نظام Laravel لإدارة مشاريع Air Menu على `https://projects.airmenu.net`.
 
----
+## نظرة عامة
 
-## 📋 نظرة عامة
+Air Menu Projects منصة عملية لإدارة المشاريع والعملاء والمالية لشركات الخدمات. النظام يدعم العربية والإنجليزية، والصلاحيات، وتتبع النشاط، وتدفق العمل من العرض إلى الفاتورة والتحصيل.
 
-**Air Menu | Workspace** هو نظام إدارة مشاريع متكامل مصمم خصيصًا لشركات الخدمات الرقمية. يوفر النظام جميع الأدوات اللازمة لإدارة دورة حياة المشروع الكاملة من استقبال الطلب حتى التسليم والإغلاق.
+## المكونات المتاحة
 
-### ✨ المميزات الرئيسية
+- المشاريع والعملاء والمهام وتتبع الوقت والتقارير.
+- عروض الأسعار مع KPIs، ورابط عرض عام، وتحويل العرض إلى فاتورة.
+- عرض الأسعار يدعم عناصر مسبقة التعبئة عند إنشاء الفاتورة من العرض.
+- العقود مع بيانات تجريبية وعلاقتها بالمشاريع والفواتير.
+- الفواتير والمدفوعات ومرفقات إثبات السداد.
+- PDF للعروض والعقود والفواتير مع دعم شعار الشركة.
+- بوابة العملاء مع دعوة الإعداد، ودخول البوابة، ومشاركة WhatsApp، وإرسال البريد عبر SMTP.
+- الإعدادات العامة تشمل بيانات الشركة والبريد والشعار والعملة والضريبة.
 
-- ✅ **إدارة العملاء (CRM)** - نظام شامل لإدارة العملاء والتواصل
-- ✅ **إدارة المشاريع** - 12 حالة مختلفة + Workflow كامل
-- ✅ **إدارة المهام** - Kanban Board + Calendar + Time Tracking
-- ✅ **النظام المالي** - عروض أسعار + فواتير + عقود + مدفوعات
-- ✅ **الصلاحيات** - 6 أدوار + 30+ صلاحية
-- ✅ **متعدد اللغات** - دعم العربية والإنجليزية مع RTL/LTR
-- ✅ **التقارير** - تقارير شاملة للمشاريع والمهام والمالية
-- ✅ **Activity Log** - تتبع كامل لجميع الأنشطة
-- ✅ **Notifications** - نظام إشعارات متقدم
+## المتطلبات
 
----
-
-## 🛠 التقنيات المستخدمة
-
-### Backend
-- **Laravel 10.x** - PHP Framework
-- **MySQL 8.0+** - Database
-- **Spatie Permission** - Roles & Permissions
-- **Spatie Activity Log** - Activity Tracking
-
-### Frontend
-- **Tailwind CSS** - Utility-First CSS Framework
-- **Alpine.js** - Lightweight JavaScript Framework
-- **Font Awesome 6** - Icons
-- **ApexCharts** - Charts & Graphs
-- **Vite** - Build Tool
-
----
-
-## 📦 متطلبات التشغيل
-
-- PHP >= 8.1
+- PHP 8.1+
 - Composer
-- Node.js >= 18.x
-- npm or yarn
-- MySQL >= 8.0
-- Apache/Nginx
+- Node.js 18+ و npm
+- MySQL 8+
 
----
-
-## 🚀 التنصيب والإعداد
-
-### 1. استنساخ المشروع
+## إعداد سريع
 
 ```bash
-git clone https://github.com/your-repo/air-menu-workspace.git
-cd air-menu-workspace
-```
-
-### 2. تثبيت الحزم
-
-```bash
-# Install PHP dependencies
 composer install
-
-# Install Node dependencies
 npm install
-```
-
-### 3. إعداد البيئة
-
-```bash
-# Copy environment file
 cp .env.example .env
-
-# Generate application key
 php artisan key:generate
+php artisan migrate --seed
+npm run build
+php artisan storage:link
 ```
 
-### 4. تكوين قاعدة البيانات
-
-قم بتعديل ملف `.env` وأضف بيانات قاعدة البيانات:
+اضبط في `.env` على الأقل:
 
 ```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=air_menu_workspace
-DB_USERNAME=root
-DB_PASSWORD=your_password
+APP_URL=https://projects.airmenu.net
+DB_DATABASE=air_menu_projects
+MAIL_MAILER=smtp
 ```
 
-### 5. إنشاء قاعدة البيانات وتشغيل Migrations
+## النشر
 
-```bash
-# Create database
-mysql -u root -p -e "CREATE DATABASE air_menu_workspace CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+- في الإنتاج، تُبنى الأصول محليًا ثم تُنشر على الخادم.
+- لا حاجة لـ Node.js على الخادم حسب إعداد المشروع الحالي.
+- بعد النشر شغّل أو حدّث cache/storage حسب بيئة الاستضافة.
 
-# Run migrations
-php artisan migrate
+## بيانات تجريبية
 
-# Seed initial data (Roles, Permissions, Users, etc.)
-php artisan db:seed
-```
-
-### 6. بناء الـ Frontend Assets
-
-```bash
-# Development
-npm run dev
-
-# Production
-npm run build
-```
-
-### 7. تشغيل السيرفر
-
-```bash
-php artisan serve
-```
-
-الآن يمكنك الوصول للنظام عبر: `http://localhost:8000`
-
----
-
-## 🔐 بيانات الدخول التجريبية
-
-بعد تشغيل Seeders، ستتوفر البيانات التالية للدخول:
+بعد `--seed` تتوفر حسابات تجريبية، منها:
 
 | الدور | البريد الإلكتروني | كلمة المرور |
-|-------|-------------------|-------------|
+|---|---|---|
 | Super Admin | admin@airmenu.net | password |
 | Admin | mohamed@airmenu.net | password |
 | Project Manager | sara@airmenu.net | password |
 | Designer | ahmed@airmenu.net | password |
-| Developer | khaled@airmenu.net | password |
+| Developer | dev@workspace.com | password |
 | Finance | fatima@airmenu.net | password |
 
----
+## ملاحظات
 
-## 📚 هيكل المشروع
-
-```
-air-menu-workspace/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   ├── Middleware/
-│   │   └── Requests/
-│   ├── Models/
-│   ├── Services/
-│   ├── Policies/
-│   └── Helpers/
-├── database/
-│   ├── migrations/
-│   ├── seeders/
-│   └── factories/
-├── resources/
-│   ├── views/
-│   ├── lang/
-│   ├── css/
-│   └── js/
-├── routes/
-│   └── web.php
-├── public/
-│   └── uploads/
-└── config/
-    └── workspace.php
-```
-
----
-
-## 🎯 الأدوار والصلاحيات
-
-### Super Admin
-- صلاحيات كاملة على النظام
-- إدارة المستخدمين والصلاحيات
-- إدارة الإعدادات
-
-### Admin
-- جميع الصلاحيات التشغيلية
-- إدارة العملاء والمشاريع والمهام
-- إدارة العروض والفواتير
-
-### Project Manager
-- إدارة المشاريع المسندة له
-- إنشاء وتعيين المهام
-- عرض التقارير
-
-### Team Member
-- عرض المشاريع المسندة
-- إدارة المهام الخاصة به
-- تتبع الوقت
-
-### Finance
-- إدارة العروض والفواتير
-- تسجيل المدفوعات
-- التقارير المالية
-
----
-
-## 🌍 دعم متعدد اللغات
-
-النظام يدعم اللغتين العربية والإنجليزية مع:
-- RTL/LTR تلقائي
-- خطوط مخصصة لكل لغة
-- ترجمة كاملة للواجهات
-
-لتغيير اللغة، استخدم القائمة في الهيدر أو أضف `?lang=ar` أو `?lang=en` في URL.
-
----
-
-## 📊 قاعدة البيانات
-
-النظام يحتوي على 26 جدول رئيسي:
-
-### الجداول الأساسية
-- users
-- roles & permissions (Spatie)
-- clients
-- service_types
-- project_statuses
-- task_statuses
-
-### جداول المشاريع
-- projects
-- project_user (pivot)
-- project_attachments
-- project_workflow_steps
-
-### جداول المهام
-- tasks
-- task_comments
-- task_attachments
-- task_checklists
-- time_logs
-
-### الجداول المالية
-- quotes & quote_items
-- contracts
-- invoices & invoice_items
-- payments
-
-### جداول أخرى
-- change_requests
-- notifications
-- activity_log
-- settings
-
----
-
-## 🔧 التخصيص
-
-### إعدادات النظام
-
-يمكنك تخصيص إعدادات النظام عبر ملف `config/workspace.php`:
-
-```php
-'currency' => [
-    'code' => 'SAR',
-    'symbol' => 'ر.س',
-],
-
-'tax' => [
-    'rate' => 15,
-    'enabled' => true,
-],
-
-'project' => [
-    'number_prefix' => 'PRJ',
-],
-```
-
-### إضافة حالات مخصصة
-
-يمكنك إضافة حالات جديدة للمشاريع والمهام عبر:
-- الإعدادات -> حالات المشاريع
-- الإعدادات -> حالات المهام
-
----
-
-## 📈 التطوير المستقبلي
-
-### المرحلة 1 (قريباً)
-- [ ] Client Portal (بوابة العملاء)
-- [ ] WhatsApp Integration
-- [ ] Email Notifications
-- [ ] Advanced Reports
-
-### المرحلة 2
-- [ ] Mobile App (iOS/Android)
-- [ ] API للتكامل مع أنظمة خارجية
-- [ ] AI-Powered Insights
-- [ ] Resource Management
-
----
-
-## 🐛 المشاكل والدعم
-
-إذا واجهتك أي مشاكل:
-1. تحقق من ملف `.env`
-2. تأكد من تشغيل `composer install` و `npm install`
-3. راجع logs في `storage/logs/laravel.log`
-
----
-
-## 📝 الترخيص
-
-هذا المشروع ملك لـ **Digital Business Solutions** ومحمي بحقوق الملكية.
-
----
-
-## 👥 الفريق
-
-تم تطوير النظام بواسطة فريق Digital Business Solutions
-
----
-
-<div align="center">
-  <p>صُنع بـ ❤️ في السعودية</p>
-  <p>&copy; 2024 Digital Business Solutions. All rights reserved.</p>
-</div>
+- إعدادات البريد موجودة داخل الإعدادات العامة وتُستخدم مع دعوات البوابة وإرسال العروض.
+- الشعار يستخدم داخل ملفات PDF إذا كان معرفًا في الإعدادات.

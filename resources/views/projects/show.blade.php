@@ -26,6 +26,11 @@
         <a href="{{ route('projects.index') }}" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl transition text-sm">
             <i class="fas fa-arrow-right"></i> {{ __('messages.back') }}
         </a>
+        @if(auth()->id() === $project->manager_id && $project->progress_percentage >= 100 && !$project->is_handed_off)
+        <a href="{{ route('projects.handoff', $project) }}" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl transition text-sm">
+            <i class="fas fa-truck"></i> تسليم المشروع
+        </a>
+        @endif
     </div>
 </div>
 
@@ -55,7 +60,7 @@
                 <a href="{{ route('tasks.create') }}?project_id={{ $project->id }}" class="text-sm text-blue-600 hover:underline">+ {{ __('task.add_task') }}</a>
                 @endcan
             </div>
-            @forelse($project->tasks()->whereNull('parent_task_id')->with(['status','assignedUser'])->orderBy('due_date')->take(10)->get() as $task)
+            @forelse($project->rootTasks as $task)
             <div class="flex items-center justify-between py-3 border-b last:border-0">
                 <div class="flex items-center gap-3">
                     <div class="w-3 h-3 rounded-full" style="background:{{ $task->status->color }}"></div>
@@ -89,7 +94,7 @@
                     <i class="fas fa-file text-blue-400"></i>
                     <div>
                         <p class="text-sm font-medium text-gray-700">{{ $att->file_name }}</p>
-                        <p class="text-xs text-gray-400">{{ $att->uploader->name }} · {{ $att->created_at->format('Y-m-d') }}</p>
+                        <p class="text-xs text-gray-400">{{ $att->uploadedBy?->name }} · {{ $att->created_at->format('Y-m-d') }}</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
@@ -145,7 +150,7 @@
         {{-- Workflow Steps --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 class="font-semibold text-gray-700 mb-3 text-sm flex items-center gap-2"><i class="fas fa-sitemap text-purple-500"></i> {{ __('project.workflow') }}</h3>
-            @foreach($project->workflowSteps()->orderBy('step_order')->get() as $step)
+            @foreach($project->workflowSteps as $step)
             <div class="flex items-center gap-3 py-2">
                 @if($step->completed)
                     <i class="fas fa-check-circle text-green-500 text-sm"></i>

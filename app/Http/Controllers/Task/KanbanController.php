@@ -16,11 +16,15 @@ class KanbanController extends Controller
     {
         $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
 
-        $tasks = Task::with(['project', 'assignedUser', 'status'])
+        $query = Task::with(['project', 'assignedUser', 'status'])
             ->whereNull('parent_task_id')
-            ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
-            ->get()
-            ->groupBy('status_id');
+            ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id));
+
+        if (auth()->user()->hasRole('team-member')) {
+            $query->where('assigned_to', auth()->id());
+        }
+
+        $tasks = $query->get()->groupBy('status_id');
 
         return view('tasks.kanban', compact('statuses', 'tasks'));
     }

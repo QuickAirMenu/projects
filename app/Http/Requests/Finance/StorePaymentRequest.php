@@ -17,6 +17,7 @@ class StorePaymentRequest extends FormRequest
             'payment_method'        => 'required|in:bank_transfer,cash,cheque,card,online,other',
             'transaction_reference' => 'nullable|string|max:255',
             'notes'                 => 'nullable|string',
+            'proof_of_payment'      => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,webp',
         ];
     }
 }

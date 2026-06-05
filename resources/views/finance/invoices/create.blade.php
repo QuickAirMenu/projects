@@ -11,24 +11,51 @@
 @include('layouts.components.alert')
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-<form action="{{ route('invoices.store') }}" method="POST">
+@php
+    $isEdit = isset($invoice);
+    $invoiceModel = $invoice ?? null;
+    $formAction = $isEdit ? route('invoices.update', $invoice) : route('invoices.store');
+    $rows = old('items');
+    if (!is_array($rows)) {
+        $rows = $isEdit
+            ? $invoice->items->map(fn($item) => [
+                'description' => $item->description,
+                'quantity' => $item->quantity,
+                'unit_price' => $item->unit_price,
+            ])->toArray()
+            : (!empty($prefillData['items']) ? $prefillData['items'] : [
+                ['description' => '', 'quantity' => 1, 'unit_price' => 0],
+            ])
+        ;
+    }
+@endphp
+<form action="{{ $formAction }}" method="POST">
 @csrf
+@if($isEdit) @method('PUT') @endif
+@if(!empty($prefillData['quote']))
+    <input type="hidden" name="quote_id" value="{{ $prefillData['quote']->id }}">
+@endif
+@if(!empty($prefillData))
+    <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+        تم استيراد بيانات العرض {{ $prefillData['quote']->quote_number }}
+    </div>
+@endif
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('project.project') }} *</label>
         <select name="project_id" required id="projectSelect" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">-- {{ __('messages.select') }} --</option>
             @foreach($projects as $p)
-                <option value="{{ $p->id }}" data-client="{{ $p->client_id }}" {{ old('project_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                <option value="{{ $p->id }}" data-client="{{ $p->client_id }}" {{ old('project_id', $invoiceModel?->project_id ?? $prefillData['project_id'] ?? '') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
             @endforeach
         </select>
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.client') }} *</label>
         <select name="client_id" required id="clientSelect" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">-- {{ __('messages.select') }} --</option>
+                <option value="">-- {{ __('messages.select') }} --</option>
             @foreach($clients as $c)
-                <option value="{{ $c->id }}" {{ old('client_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                <option value="{{ $c->id }}" {{ old('client_id', $invoiceModel?->client_id ?? $prefillData['client_id'] ?? '') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
             @endforeach
         </select>
     </div>
@@ -42,29 +69,41 @@
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.invoice_date') }} *</label>
-        <input type="date" name="invoice_date" value="{{ old('invoice_date', now()->toDateString()) }}" required
-               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="date" name="invoice_date" value="{{ old('invoice_date', $invoiceModel?->invoice_date?->toDateString() ?? now()->toDateString()) }}" required
+                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.due_date') }}</label>
-        <input type="date" name="due_date" value="{{ old('due_date', now()->addDays(30)->toDateString()) }}"
-               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="date" name="due_date" value="{{ old('due_date', $invoiceModel?->due_date?->toDateString() ?? now()->addDays(30)->toDateString()) }}"
+                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.tax') }} %</label>
-        <input type="number" name="tax_percentage" value="{{ old('tax_percentage', 15) }}" step="0.01" min="0" max="100" id="taxInput"
+        <input type="number" name="tax_percentage" value="{{ old('tax_percentage', $isEdit ? $invoiceModel?->tax_percentage : 15) }}" step="0.01" min="0" max="100" id="taxInput"
+               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.discount') }}</label>
+        <input type="number" name="discount_amount" value="{{ old('discount_amount', $isEdit ? $invoiceModel?->discount_amount : 0) }}" step="0.01" min="0"
                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 </div>
 
 <h3 class="font-semibold text-gray-700 mb-3">{{ __('finance.quote_items') }}</h3>
 <div id="items-list" class="space-y-2 mb-3">
+    @foreach($rows as $index => $row)
     <div class="grid grid-cols-12 gap-2 item-row">
-        <div class="col-span-6"><input type="text" name="items[0][description]" placeholder="{{ __('messages.description') }}" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
-        <div class="col-span-2"><input type="number" name="items[0][quantity]" value="1" min="1" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm qty-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
-        <div class="col-span-3"><input type="number" name="items[0][unit_price]" value="0" step="0.01" min="0" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm price-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
-        <div class="col-span-1 flex items-center justify-center"><button type="button" class="text-red-400 hover:text-red-600 remove-row"><i class="fas fa-times"></i></button></div>
-    </div>
+        <div class="col-span-6"><input type="text" name="items[{{ $index }}][description]" value="{{ $row['description'] ?? '' }}" placeholder="{{ __('messages.description') }}" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+        <div class="col-span-2"><input type="number" name="items[{{ $index }}][quantity]" value="{{ $row['quantity'] ?? 1 }}" min="1" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm qty-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+        <div class="col-span-3"><input type="number" name="items[{{ $index }}][unit_price]" value="{{ $row['unit_price'] ?? 0 }}" step="0.01" min="0" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm price-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+            <div class="col-span-1 flex items-center justify-center"><button type="button" class="text-red-400 hover:text-red-600 remove-row"><i class="fas fa-times"></i></button></div>
+        </div>
+        @endforeach
+</div>
+
+<div class="mt-6">
+    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.notes') }}</label>
+    <textarea name="notes" rows="2" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('notes', $invoiceModel?->notes ?? ($prefillData['description'] ?? '')) }}</textarea>
 </div>
 <button type="button" id="add-item" class="text-sm text-blue-600 hover:underline"><i class="fas fa-plus me-1"></i>{{ __('messages.add') }}</button>
 
@@ -87,7 +126,22 @@
 
 @push('scripts')
 <script>
-let idx = 1;
+let idx = {{ count($rows) }};
+const prefillItems = @json(!empty($prefillData['items']) ? $prefillData['items'] : []);
+
+if (prefillItems.length && document.querySelectorAll('.item-row').length === 1) {
+    document.getElementById('items-list').innerHTML = '';
+    prefillItems.forEach((item, index) => {
+        document.getElementById('items-list').insertAdjacentHTML('beforeend', `
+        <div class="grid grid-cols-12 gap-2 item-row">
+            <div class="col-span-6"><input type="text" name="items[${index}][description]" value="${item.description ?? ''}" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+            <div class="col-span-2"><input type="number" name="items[${index}][quantity]" value="${item.quantity ?? 1}" min="1" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm qty-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+            <div class="col-span-3"><input type="number" name="items[${index}][unit_price]" value="${item.unit_price ?? 0}" step="0.01" min="0" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm price-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+            <div class="col-span-1 flex items-center justify-center"><button type="button" class="text-red-400 hover:text-red-600 remove-row"><i class="fas fa-times"></i></button></div>
+        </div>`);
+    });
+}
+
 document.getElementById('add-item').addEventListener('click', () => {
     document.getElementById('items-list').insertAdjacentHTML('beforeend', `
         <div class="grid grid-cols-12 gap-2 item-row">

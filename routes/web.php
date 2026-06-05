@@ -24,6 +24,7 @@ use App\Http\Controllers\Report\ProjectReportController;
 use App\Http\Controllers\Report\TaskReportController;
 use App\Http\Controllers\Report\FinanceReportController;
 use App\Http\Controllers\Report\PerformanceReportController;
+use App\Http\Controllers\Portal\ClientPortalController;
 use App\Http\Controllers\Setting\SettingController;
 use App\Http\Controllers\Settings\ServiceTypeController;
 use App\Http\Controllers\Settings\ProjectStatusController;
@@ -43,6 +44,23 @@ Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['ar', 'en'])) { session(['locale' => $locale]); }
     return redirect()->back();
 })->name('lang.switch');
+
+// Public quotes
+Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->name('quotes.public');
+
+// Client Portal Routes
+Route::prefix('portal')->name('portal.')->group(function () {
+    Route::get('/login', [ClientPortalController::class, 'showLogin'])->name('login');
+    Route::post('/login', [ClientPortalController::class, 'login'])->name('login.post');
+    Route::get('/setup/{token}', [ClientPortalController::class, 'showSetup'])->name('setup');
+    Route::post('/setup/{token}', [ClientPortalController::class, 'completeSetup'])->name('setup.post');
+
+    Route::middleware(['auth:client'])->group(function () {
+        Route::get('/dashboard', [ClientPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/projects/{project}', [ClientPortalController::class, 'projectShow'])->name('projects.show');
+        Route::post('/logout', [ClientPortalController::class, 'logout'])->name('logout');
+    });
+});
 
 // Authenticated
 Route::middleware(['auth', 'set.locale'])->group(function () {
@@ -72,6 +90,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('{client}/edit', [ClientController::class, 'edit'])->name('edit');
         Route::put('{client}', [ClientController::class, 'update'])->name('update');
         Route::delete('{client}', [ClientController::class, 'destroy'])->name('destroy');
+        Route::post('{client}/portal-invite', [ClientController::class, 'resendPortalInvite'])->name('portal-invite');
         Route::post('{client}/communications', [ClientCommunicationController::class, 'store'])->name('communications.store');
         Route::delete('communications/{communication}', [ClientCommunicationController::class, 'destroy'])->name('communications.destroy');
     });
@@ -81,6 +100,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [ProjectController::class, 'index'])->name('index');
         Route::get('board', [ProjectController::class, 'kanban'])->name('board');
         Route::get('create', [ProjectController::class, 'create'])->name('create');
+        Route::get('{project}/handoff', [ProjectController::class, 'handoff'])->name('handoff');
+        Route::post('{project}/handoff', [ProjectController::class, 'completeHandoff'])->name('handoff.complete');
         Route::post('/', [ProjectController::class, 'store'])->name('store');
         Route::get('{project}', [ProjectController::class, 'show'])->name('show');
         Route::get('{project}/edit', [ProjectController::class, 'edit'])->name('edit');
@@ -119,12 +140,14 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [QuoteController::class, 'index'])->name('index');
         Route::get('create', [QuoteController::class, 'create'])->name('create');
         Route::post('/', [QuoteController::class, 'store'])->name('store');
+        Route::get('{quote}/pdf', [QuoteController::class, 'pdf'])->name('pdf');
         Route::get('{quote}', [QuoteController::class, 'show'])->name('show');
         Route::get('{quote}/edit', [QuoteController::class, 'edit'])->name('edit');
         Route::put('{quote}', [QuoteController::class, 'update'])->name('update');
         Route::delete('{quote}', [QuoteController::class, 'destroy'])->name('destroy');
         Route::post('{quote}/send', [QuoteController::class, 'send'])->name('send');
         Route::post('{quote}/convert', [QuoteController::class, 'convertToProject'])->name('convert');
+        Route::post('{quote}/convert-to-invoice', [QuoteController::class, 'convertToInvoice'])->name('convert-to-invoice');
     });
 
     // Contracts
@@ -132,6 +155,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [ContractController::class, 'index'])->name('index');
         Route::get('create', [ContractController::class, 'create'])->name('create');
         Route::post('/', [ContractController::class, 'store'])->name('store');
+        Route::get('{contract}/pdf', [ContractController::class, 'pdf'])->name('pdf');
         Route::get('{contract}', [ContractController::class, 'show'])->name('show');
         Route::get('{contract}/edit', [ContractController::class, 'edit'])->name('edit');
         Route::put('{contract}', [ContractController::class, 'update'])->name('update');
@@ -143,10 +167,12 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [InvoiceController::class, 'index'])->name('index');
         Route::get('create', [InvoiceController::class, 'create'])->name('create');
         Route::post('/', [InvoiceController::class, 'store'])->name('store');
+        Route::get('{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('pdf');
         Route::get('{invoice}', [InvoiceController::class, 'show'])->name('show');
         Route::get('{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit');
         Route::put('{invoice}', [InvoiceController::class, 'update'])->name('update');
         Route::delete('{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
+        Route::post('{invoice}/convert-to-contract', [InvoiceController::class, 'convertToContract'])->name('convert-to-contract');
     });
 
     // Payments
@@ -154,6 +180,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [PaymentController::class, 'index'])->name('index');
         Route::post('/', [PaymentController::class, 'store'])->name('store');
         Route::get('{payment}', [PaymentController::class, 'show'])->name('show');
+        Route::get('{payment}/edit', [PaymentController::class, 'edit'])->name('edit');
+        Route::put('{payment}', [PaymentController::class, 'update'])->name('update');
         Route::delete('{payment}', [PaymentController::class, 'destroy'])->name('destroy');
     });
 
@@ -177,7 +205,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Settings
-    Route::prefix('settings')->name('settings.')->group(function () {
+    Route::prefix('settings')->name('settings.')->middleware('permission:manage-settings')->group(function () {
         Route::get('/', [SettingController::class, 'index'])->name('index');
         Route::put('/', [SettingController::class, 'update'])->name('update');
         Route::prefix('service-types')->name('service-types.')->group(function () {
@@ -185,6 +213,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
             Route::post('/', [ServiceTypeController::class, 'store'])->name('store');
             Route::put('{serviceType}', [ServiceTypeController::class, 'update'])->name('update');
             Route::delete('{serviceType}', [ServiceTypeController::class, 'destroy'])->name('destroy');
+            Route::post('{serviceType}/items', [ServiceTypeController::class, 'storeItem'])->name('items.store');
+            Route::delete('{serviceType}/items/{item}', [ServiceTypeController::class, 'destroyItem'])->name('items.destroy');
         });
         Route::prefix('project-statuses')->name('project-statuses.')->group(function () {
             Route::get('/', [ProjectStatusController::class, 'index'])->name('index');

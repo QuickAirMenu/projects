@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers\Finance;
 
+use App\Mail\QuoteSentMail;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StoreQuoteRequest;
 use App\Models\Client;
+use App\Models\Invoice;
 use App\Models\ProjectStatus;
 use App\Models\Quote;
+use App\Models\Setting;
 use App\Models\ServiceType;
+use App\Services\MailConfigService;
 use App\Services\QuoteService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class QuoteController extends Controller
 {
@@ -23,11 +28,20 @@ class QuoteController extends Controller
         if ($request->client_id) $query->where('client_id', $request->client_id);
         $quotes  = $query->paginate(15)->withQueryString();
         $clients = Client::orderBy('name')->get();
+        $unconvertedQuotes = Quote::whereNull('converted_to_project_id');
         $stats   = [
-            'total'    => Quote::count(),
-            'draft'    => Quote::where('status','draft')->count(),
-            'approved' => Quote::where('status','approved')->count(),
-            'pending'  => Quote::where('status','sent')->count(),
+            'total'                      => Quote::count(),
+            'unconverted_count'          => (clone $unconvertedQuotes)->count(),
+            'unconverted_amount'         => (clone $unconvertedQuotes)->sum('total'),
+            'approved_unconverted_amount' => Quote::approved()
+                ->whereNull('converted_to_project_id')
+                ->sum('total'),
+            'expired_unconverted_count'   => (clone $unconvertedQuotes)
+                ->whereDate('valid_until', '<', now())
+                ->count(),
+            'conversion_rate'            => Quote::count() > 0
+                ? round((Quote::whereNotNull('converted_to_project_id')->count() / Quote::count()) * 100, 1)
+                : 0,
         ];
         return view('finance.quotes.index', compact('quotes','clients','stats'));
     }
@@ -35,7 +49,10 @@ class QuoteController extends Controller
     public function create()
     {
         $clients      = Client::where('status','!=','inactive')->orderBy('name')->get();
-        $serviceTypes = ServiceType::where('is_active',true)->orderBy('sort_order')->get();
+        $serviceTypes = ServiceType::with(['defaultItems' => fn($q) => $q->orderBy('sort_order')])
+            ->where('is_active',true)
+            ->orderBy('sort_order')
+            ->get();
         return view('finance.quotes.create', compact('clients','serviceTypes'));
     }
 
@@ -48,30 +65,44 @@ class QuoteController extends Controller
 
     public function show(Quote $quote)
     {
-        $quote->load(['client','items','creator']);
-        return view('finance.quotes.show', compact('quote'));
+        $quote->load(['client','items.serviceType','creator','invoice']);
+
+        $whatsappUrl = null;
+        $sharePhone = $quote->client?->whatsapp ?: $quote->client?->phone;
+        if ($sharePhone) {
+            $phone = preg_replace('/[^0-9]/', '', $sharePhone);
+            $message = urlencode("مرحباً {$quote->client->name}، يسعدنا مشاركتك عرض الأسعار رقم {$quote->quote_number} بقيمة {$quote->total}. يمكنك الاطلاع عليه هنا: " . route('quotes.public', $quote->public_token));
+            $whatsappUrl = "https://wa.me/{$phone}?text={$message}";
+        }
+
+        return view('finance.quotes.show', compact('quote', 'whatsappUrl'));
+    }
+
+    public function pdf(Quote $quote)
+    {
+        $quote->load(['client', 'items.serviceType', 'createdBy']);
+        $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
+            ->pluck('value', 'key')
+            ->toArray();
+
+        $pdf = Pdf::loadView('pdf.quote', compact('quote', 'settings'));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download("quote-{$quote->quote_number}.pdf");
     }
 
     public function edit(Quote $quote)
     {
+        $quote->load('items');
         $clients      = Client::orderBy('name')->get();
-        $serviceTypes = ServiceType::where('is_active',true)->get();
+        $serviceTypes = ServiceType::with(['defaultItems' => fn($q) => $q->orderBy('sort_order')])->where('is_active',true)->orderBy('sort_order')->get();
         return view('finance.quotes.create', compact('quote','clients','serviceTypes'));
     }
 
     public function update(StoreQuoteRequest $request, Quote $quote)
     {
-        $quote->items()->delete();
-        $quote->update(array_diff_key($request->validated(), ['items'=>'']));
-        foreach ($request->items as $i => $item) {
-            $quote->items()->create([
-                'description' => $item['description'],
-                'quantity'    => $item['quantity'],
-                'unit_price'  => $item['unit_price'],
-                'total'       => $item['quantity'] * $item['unit_price'],
-                'sort_order'  => $i,
-            ]);
-        }
+        $quote = $this->quoteService->updateQuote($quote, $request->validated());
+
         return redirect()->route('quotes.show', $quote)
             ->with('success', __('messages.updated_successfully'));
     }
@@ -86,18 +117,58 @@ class QuoteController extends Controller
     public function send(Quote $quote)
     {
         $quote->update(['status' => 'sent', 'sent_at' => now()]);
+
+        $message = 'تم تحديث حالة العرض';
+        if ($quote->client?->email) {
+            try {
+                app(MailConfigService::class)->applyDynamicMailConfig();
+                if (config('mail.mailers.smtp.host')) {
+                    Mail::to($quote->client->email)->send(new QuoteSentMail($quote->fresh(['client', 'items'])));
+                    $message = 'تم إرسال العرض بنجاح';
+                }
+            } catch (\Throwable $e) {
+                report($e);
+                $message = 'تم تغيير الحالة إلى "مُرسل" لكن تعذر إرسال الإيميل، يرجى المحاولة لاحقاً';
+            }
+        }
+
         return redirect()->route('quotes.show', $quote)
-            ->with('success', 'تم إرسال العرض بنجاح');
+            ->with('success', $message);
+    }
+
+    public function convertToInvoice(Quote $quote)
+    {
+        abort_unless($quote->status === 'approved', 403);
+
+        if ($quote->invoice) {
+            return redirect()->route('invoices.show', $quote->invoice)
+                ->with('success', 'هذا العرض مرتبط بفاتورة بالفعل');
+        }
+
+        return redirect()->route('invoices.create', [
+            'quote_id' => $quote->id,
+            'client_id' => $quote->client_id,
+            'description' => $quote->subject,
+        ]);
+    }
+
+    public function publicShow(string $token)
+    {
+        $quote = Quote::with(['client', 'items.serviceType'])->where('public_token', $token)->firstOrFail();
+
+        abort_if($quote->status === 'draft', 404);
+
+        return view('finance.quotes.public', compact('quote'));
     }
 
     public function convertToProject(Request $request, Quote $quote)
     {
-        $request->validate([
+        $data = $request->validate([
             'status_id'       => 'required|exists:project_statuses,id',
             'service_type_id' => 'required|exists:service_types,id',
             'manager_id'      => 'required|exists:users,id',
         ]);
-        $project = $this->quoteService->convertToProject($quote, $request->all());
+        $project = $this->quoteService->convertToProject($quote, $data);
         $quote->update(['status' => 'approved', 'approved_at' => now()]);
         return redirect()->route('projects.show', $project)
             ->with('success', 'تم تحويل العرض إلى مشروع بنجاح');

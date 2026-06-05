@@ -64,6 +64,11 @@ class ChangeRequest extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function creator()
+    {
+        return $this->createdBy();
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', 'pending');

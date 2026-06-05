@@ -93,7 +93,10 @@ class DemoClientSeeder extends Seeder
         foreach ($clients as $data) {
             $data['assigned_to'] = $admin?->id;
             $data['created_by']  = $admin?->id ?? 1;
-            Client::create($data);
+            Client::updateOrCreate(
+                ['email' => $data['email']],
+                $data
+            );
         }
     }
 }
