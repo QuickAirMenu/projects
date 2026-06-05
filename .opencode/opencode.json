@@ -1,5 +1,51 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "default_agent": "dragon",
-  "instructions": ["PROJECT_PLAN.md"]
+  "instructions": ["PROJECT_PLAN.md"],
+  "provider": {
+    "openrouter": {
+      "models": {
+        "lion-coder": {
+          "name": "Lion Coder (Qwen3 -> GLM -> Qwen-Next)",
+          "options": {
+            "models": [
+              "qwen/qwen3-coder:free",
+              "z-ai/glm-4.5-air:free",
+              "qwen/qwen3-next-80b-a3b-instruct:free"
+            ]
+          }
+        },
+        "eagle-deploy": {
+          "name": "Eagle Deploy (GLM -> Qwen3 -> Llama)",
+          "options": {
+            "models": [
+              "z-ai/glm-4.5-air:free",
+              "qwen/qwen3-coder:free",
+              "meta-llama/llama-3.3-70b-instruct:free"
+            ]
+          }
+        },
+        "wolf-agentic": {
+          "name": "Wolf Agentic (Kimi -> Qwen-Next -> GLM)",
+          "options": {
+            "models": [
+              "moonshotai/kimi-k2.6:free",
+              "qwen/qwen3-next-80b-a3b-instruct:free",
+              "z-ai/glm-4.5-air:free"
+            ]
+          }
+        },
+        "fox-tester": {
+          "name": "Fox Tester (Llama3.3 -> Qwen-Next -> GLM)",
+          "options": {
+            "models": [
+              "meta-llama/llama-3.3-70b-instruct:free",
+              "qwen/qwen3-next-80b-a3b-instruct:free",
+              "z-ai/glm-4.5-air:free"
+            ]
+          }
+        }
+      }
+    }
+  }
 }

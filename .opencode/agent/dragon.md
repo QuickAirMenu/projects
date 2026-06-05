@@ -35,3 +35,8 @@ permission:
 ## قواعد
 - لا تنفّذ `git push` أو حذفاً نهائياً قبل مراجعة السلحفاة.
 - حدّث `PROJECT_PLAN.md` بعد كل مرحلة.
+
+## الموديل والبديل
+- **الأساسي:** `anthropic/claude-sonnet-4-5` (مدفوع محدود — استخدم بحذر).
+- **بديل يدوي عند نفاد الرصيد:** بدّل عبر `/models` إلى `google/gemini-3-pro-preview` أو `openrouter/qwen/qwen3-next-80b-a3b-instruct:free`.
+- opencode لا يبدّل تلقائياً بين المزوّدات — التبديل يدوي.

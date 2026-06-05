@@ -1,7 +1,7 @@
 ---
 description: الأسد 🦁 — ملك الكود (الرتبة #2). للكود الكبير والمعقد والميزات الضخمة في تطبيق Laravel. استخدمه للمهام البرمجية الثقيلة.
 mode: primary
-model: openrouter/qwen/qwen3-coder:free
+model: openrouter/lion-coder
 temperature: 0.2
 permission:
   edit: allow
@@ -25,3 +25,8 @@ permission:
 - اتبع معايير Laravel وبنية المشروع القائمة.
 - اكتب كوداً قابلاً للاختبار وسلّمه للثعلب (fox) للفحص.
 - لا ترفع للسيرفر بنفسك — النسر (eagle) يتولى الـ deploy بعد مراجعة السلحفاة (turtle).
+
+## الموديل (مع fallback تلقائي)
+- **الموديل:** `openrouter/lion-coder` — سلسلة احتياطية تلقائية عبر OpenRouter:
+  `qwen3-coder:free` ← `glm-4.5-air:free` ← `qwen3-next-80b:free`.
+- OpenRouter يقفز للبديل تلقائياً عند نفاد/فشل الأول (داخل OpenRouter فقط).

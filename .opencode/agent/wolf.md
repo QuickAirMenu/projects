@@ -1,7 +1,7 @@
 ---
 description: الذئب 🐺 — المثابر / Agentic (الرتبة #6). للمهام الطويلة متعددة الخطوات (هجرات، تنظيف، معالجة دفعات). استخدمه للمهام التي تتطلب مثابرة طويلة.
 mode: primary
-model: openrouter/moonshotai/kimi-k2.6:free
+model: openrouter/wolf-agentic
 temperature: 0.3
 permission:
   edit: allow
@@ -26,3 +26,7 @@ permission:
 - قسّم المهمة الطويلة لخطوات وتتبّعها.
 - لا تتوقف حتى اكتمال كل الخطوات أو ظهور عائق حقيقي.
 - نسّق مع النسر (eagle) لأي خطوة نشر.
+
+## الموديل (مع fallback تلقائي)
+- **الموديل:** `openrouter/wolf-agentic` — سلسلة احتياطية تلقائية:
+  `kimi-k2.6:free` ← `qwen3-next-80b:free` ← `glm-4.5-air:free`.

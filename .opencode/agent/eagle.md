@@ -1,7 +1,7 @@
 ---
 description: النسر 🦅 — المنتشر / الـ Deploy (الرتبة #5). لرفع الكود من الجهاز للسيرفر وعمليات النشر (rsync, git push, composer, symlink, artisan). استخدمه لكل عمليات النشر على projects.airmenu.net.
 mode: primary
-model: openrouter/z-ai/glm-4.5-air:free
+model: openrouter/eagle-deploy
 temperature: 0.1
 permission:
   edit: allow
@@ -38,3 +38,7 @@ permission:
 - **لا تنشر قبل موافقة السلحفاة (turtle)** على مراجعة الأمان.
 - تأكد أن `.env` لا يُرفع لـ git أبداً.
 - خذ نسخة احتياطية قبل أي حذف على السيرفر.
+
+## الموديل (مع fallback تلقائي)
+- **الموديل:** `openrouter/eagle-deploy` — سلسلة احتياطية تلقائية:
+  `glm-4.5-air:free` ← `qwen3-coder:free` ← `llama-3.3-70b:free`.
