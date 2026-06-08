@@ -36,6 +36,7 @@ window.showNotification = function(message, type = 'success') {
 window.confirmDelete = function(form) {
     window._deleteForm = form;
     window.dispatchEvent(new CustomEvent('open-delete-modal'));
+    return false;
 };
 
 // Format Currency
