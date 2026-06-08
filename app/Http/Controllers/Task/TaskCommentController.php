@@ -12,6 +12,8 @@ class TaskCommentController extends Controller
 {
     public function store(Request $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $request->validate([
             'comment'     => 'required|string|max:5000',
             'is_internal' => 'boolean',

@@ -34,6 +34,8 @@ class KanbanController extends Controller
      */
     public function updateStatus(Request $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $request->validate([
             'status_id'  => 'required|exists:task_statuses,id',
             'sort_order' => 'nullable|integer',

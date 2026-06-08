@@ -15,6 +15,8 @@ class ClientCommunicationController extends Controller
      */
     public function store(Request $request, Client $client)
     {
+        $this->authorize('update', $client);
+
         $request->validate([
             'type'             => 'required|in:call,email,meeting,whatsapp,other',
             'subject'          => 'nullable|string|max:255',
@@ -41,6 +43,8 @@ class ClientCommunicationController extends Controller
      */
     public function destroy(ClientCommunication $communication)
     {
+        $this->authorize('update', $communication->client);
+
         $clientId = $communication->client_id;
         $communication->delete();
 

@@ -78,6 +78,7 @@
                 </td>
                 <td class="px-5 py-3 text-end">
                     <div class="flex items-center justify-end gap-1">
+                        <a href="{{ route('users.show', $user) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i class="fas fa-eye"></i></a>
                         <a href="{{ route('users.edit', $user) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition"><i class="fas fa-edit"></i></a>
                         @if(is_null($user->email_verified_at))
                         <form action="{{ route('users.invite', $user) }}" method="POST">

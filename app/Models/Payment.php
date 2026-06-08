@@ -50,7 +50,7 @@ class Payment extends Model
 
         static::creating(function ($payment) {
             if (!$payment->payment_number) {
-                $lastPayment = self::latest('id')->first();
+                $lastPayment = self::withTrashed()->latest('id')->first();
                 $lastNumber = $lastPayment ? (int) substr($lastPayment->payment_number, -4) : 0;
                 $payment->payment_number = generate_number(
                     workspace_config('payment.number_prefix', 'PAY'),
@@ -73,6 +73,26 @@ class Payment extends Model
             }
             
             $invoice->save();
+        });
+
+        static::deleted(function (Payment $payment) {
+            if ($payment->invoice) {
+                $paid = $payment->invoice->payments()->sum('amount');
+                $payment->invoice->update([
+                    'paid_amount' => $paid,
+                    'remaining_amount' => $payment->invoice->total - $paid,
+                ]);
+            }
+        });
+
+        static::restored(function (Payment $payment) {
+            if ($payment->invoice) {
+                $paid = $payment->invoice->payments()->sum('amount');
+                $payment->invoice->update([
+                    'paid_amount' => $paid,
+                    'remaining_amount' => $payment->invoice->total - $paid,
+                ]);
+            }
         });
     }
 

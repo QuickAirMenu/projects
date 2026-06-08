@@ -163,8 +163,8 @@ class ProjectController extends Controller
                 if (config('mail.mailers.smtp.host')) {
                     Mail::to($project->client->email)->send(new ProjectHandoffMail($project->fresh(['client', 'manager', 'teamMembers'])));
                 }
-            } catch (\Throwable) {
-                // Keep handoff successful even if email fails.
+            } catch (\Throwable $e) {
+                report($e);
             }
         }
 

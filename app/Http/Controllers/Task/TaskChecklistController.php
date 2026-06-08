@@ -12,6 +12,8 @@ class TaskChecklistController extends Controller
 {
     public function store(Request $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $request->validate(['item' => 'required|string|max:500']);
 
         $item = $task->checklists()->create([
@@ -28,6 +30,8 @@ class TaskChecklistController extends Controller
 
     public function update(Request $request, TaskChecklist $item)
     {
+        $this->authorize('update', $item->task);
+
         $request->validate([
             'is_completed' => 'boolean',
             'item'         => 'nullable|string|max:500',
@@ -54,6 +58,8 @@ class TaskChecklistController extends Controller
 
     public function destroy(TaskChecklist $item)
     {
+        $this->authorize('update', $item->task);
+
         $taskId = $item->task_id;
         $item->delete();
 

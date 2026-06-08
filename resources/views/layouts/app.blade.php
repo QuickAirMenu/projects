@@ -51,12 +51,16 @@
          x-on:open-delete-modal.window="open = true"
          x-show="open"
          x-cloak
+         role="alertdialog"
+         aria-modal="true"
+         aria-labelledby="delete-modal-title"
+         aria-describedby="delete-modal-desc"
          class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="fixed inset-0 bg-black/50" @click="open = false"></div>
         <div class="relative z-10 bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 p-6 text-center">
             <div class="text-red-500 text-5xl mb-4"><i class="fas fa-exclamation-triangle"></i></div>
-            <h3 class="text-lg font-bold text-gray-800 mb-2">تأكيد الحذف</h3>
-            <p class="text-gray-500 mb-6">هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <h3 id="delete-modal-title" class="text-lg font-bold text-gray-800 mb-2">تأكيد الحذف</h3>
+            <p id="delete-modal-desc" class="text-gray-500 mb-6">هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.</p>
             <div class="flex gap-3 justify-center">
                 <button @click="open = false" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium">إلغاء</button>
                 <button @click="open = false; if(window._deleteForm) { window._deleteForm.submit(); window._deleteForm = null; }" class="px-6 py-2.5 bg-red-600 text-white rounded-xl font-medium">حذف</button>

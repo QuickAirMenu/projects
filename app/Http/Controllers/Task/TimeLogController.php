@@ -12,6 +12,8 @@ class TimeLogController extends Controller
 {
     public function store(Request $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $request->validate([
             'hours'       => 'required|numeric|min:0.25|max:24',
             'logged_date' => 'required|date|before_or_equal:today',
@@ -40,6 +42,7 @@ class TimeLogController extends Controller
     public function destroy(TimeLog $log)
     {
         $task   = $log->task;
+        $this->authorize('update', $task);
         $taskId = $log->task_id;
         $log->delete();
 

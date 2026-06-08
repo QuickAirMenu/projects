@@ -16,6 +16,8 @@ class ProjectAttachmentController extends Controller
      */
     public function store(Request $request, Project $project)
     {
+        $this->authorize('update', $project);
+
         $request->validate([
             'file'        => 'required|file|max:20480', // 20MB max
             'description' => 'nullable|string|max:500',
@@ -42,6 +44,8 @@ class ProjectAttachmentController extends Controller
      */
     public function destroy(ProjectAttachment $attachment)
     {
+        $this->authorize('update', $attachment->project);
+
         Storage::disk('public')->delete($attachment->file_path);
         $projectId = $attachment->project_id;
         $attachment->delete();

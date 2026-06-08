@@ -5,7 +5,7 @@
 <div class="mb-5 flex flex-wrap items-start justify-between gap-3">
     <div>
         <div class="flex items-center gap-2 mb-1">
-            <a href="{{ route('projects.show', $task->project) }}" class="text-sm text-blue-600 hover:underline">{{ $task->project->name }}</a>
+            <a href="{{ route('projects.show', $task->project) }}" class="text-sm text-blue-600 hover:underline">{{ $task->project?->name }}</a>
             <span class="text-gray-300">/</span>
             <span class="text-sm text-gray-500">{{ __('task.tasks') }}</span>
         </div>
@@ -137,7 +137,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 text-sm space-y-3">
             <div class="flex justify-between items-center">
                 <span class="text-gray-500">{{ __('task.status') }}</span>
-                <span class="px-2 py-1 rounded-full text-xs font-medium" style="background:{{ $task->status->color }}20; color:{{ $task->status->color }}">{{ $task->status->name }}</span>
+                <span class="px-2 py-1 rounded-full text-xs font-medium" style="background:{{ $task->status?->color }}20; color:{{ $task->status?->color }}">{{ $task->status->name }}</span>
             </div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.priority') }}</span><span class="font-medium">{{ __('project.priority_'.$task->priority) }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('task.assigned_to') }}</span><span class="font-medium">{{ $task->assignedUser?->name ?? '-' }}</span></div>

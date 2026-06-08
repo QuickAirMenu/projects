@@ -5,7 +5,7 @@
 <div class="mb-5 flex items-center justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-800">{{ $invoice->invoice_number }}</h1>
-        <p class="text-gray-500 text-sm">{{ $invoice->client->name }} · {{ $invoice->project->name }}</p>
+        <p class="text-gray-500 text-sm">{{ $invoice->client?->name }} · {{ $invoice->project?->name }}</p>
     </div>
     <div class="flex gap-2">
         <a href="{{ route('invoices.pdf', $invoice) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>تحميل PDF</a>

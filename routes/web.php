@@ -37,7 +37,7 @@ use App\Http\Controllers\User\PermissionController;
 // Guest
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [LoginController::class, 'login']);
+    Route::post('login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 });
 
 // Language switch
@@ -47,13 +47,13 @@ Route::get('lang/{locale}', function ($locale) {
 })->name('lang.switch');
 
 // Public quotes
-Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->name('quotes.public');
-Route::get('/q/{token}/pdf', [QuoteController::class, 'publicPdf'])->name('quotes.public-pdf');
+Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->middleware('throttle:30,1')->name('quotes.public');
+Route::get('/q/{token}/pdf', [QuoteController::class, 'publicPdf'])->middleware('throttle:30,1')->name('quotes.public-pdf');
 
 // Client Portal Routes
 Route::prefix('portal')->name('portal.')->group(function () {
     Route::get('/login', [ClientPortalController::class, 'showLogin'])->name('login');
-    Route::post('/login', [ClientPortalController::class, 'login'])->name('login.post');
+    Route::post('/login', [ClientPortalController::class, 'login'])->middleware('throttle:5,1')->name('login.post');
     Route::get('/setup/{token}', [ClientPortalController::class, 'showSetup'])->name('setup');
     Route::post('/setup/{token}', [ClientPortalController::class, 'completeSetup'])->name('setup.post');
 
@@ -65,8 +65,8 @@ Route::prefix('portal')->name('portal.')->group(function () {
 });
 
 // User Invitation (public - no auth required)
-Route::get('/invitation/{token}', [UserInvitationController::class, 'showSetup'])->name('invitation.setup');
-Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSetup'])->name('invitation.setup.post');
+Route::get('/invitation/{token}', [UserInvitationController::class, 'showSetup'])->middleware('throttle:10,1')->name('invitation.setup');
+Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSetup'])->middleware('throttle:10,1')->name('invitation.setup.post');
 
 // Authenticated
 Route::middleware(['auth', 'set.locale'])->group(function () {
@@ -88,7 +88,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Clients
-    Route::prefix('clients')->name('clients.')->group(function () {
+    Route::prefix('clients')->name('clients.')->middleware('permission:view-clients')->group(function () {
         Route::get('/', [ClientController::class, 'index'])->name('index');
         Route::get('create', [ClientController::class, 'create'])->name('create');
         Route::post('/', [ClientController::class, 'store'])->name('store');
@@ -142,7 +142,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Quotes
-    Route::prefix('quotes')->name('quotes.')->group(function () {
+    Route::prefix('quotes')->name('quotes.')->middleware('permission:view-quotes')->group(function () {
         Route::get('/', [QuoteController::class, 'index'])->name('index');
         Route::get('create', [QuoteController::class, 'create'])->name('create');
         Route::post('/', [QuoteController::class, 'store'])->name('store');
@@ -158,7 +158,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Contracts
-    Route::prefix('contracts')->name('contracts.')->group(function () {
+    Route::prefix('contracts')->name('contracts.')->middleware('permission:view-contracts')->group(function () {
         Route::get('/', [ContractController::class, 'index'])->name('index');
         Route::get('create', [ContractController::class, 'create'])->name('create');
         Route::post('/', [ContractController::class, 'store'])->name('store');
@@ -171,7 +171,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Invoices
-    Route::prefix('invoices')->name('invoices.')->group(function () {
+    Route::prefix('invoices')->name('invoices.')->middleware('permission:view-invoices')->group(function () {
         Route::get('/', [InvoiceController::class, 'index'])->name('index');
         Route::get('create', [InvoiceController::class, 'create'])->name('create');
         Route::post('/', [InvoiceController::class, 'store'])->name('store');
@@ -185,7 +185,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Payments
-    Route::prefix('payments')->name('payments.')->group(function () {
+    Route::prefix('payments')->name('payments.')->middleware('permission:view-payments')->group(function () {
         Route::get('/', [PaymentController::class, 'index'])->name('index');
         Route::post('/', [PaymentController::class, 'store'])->name('store');
         Route::get('{payment}', [PaymentController::class, 'show'])->name('show');
@@ -206,7 +206,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Reports
-    Route::prefix('reports')->name('reports.')->group(function () {
+    Route::prefix('reports')->name('reports.')->middleware('permission:view-reports')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('projects', [ProjectReportController::class, 'index'])->name('projects');
         Route::get('tasks', [TaskReportController::class, 'index'])->name('tasks');
@@ -241,7 +241,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Users
-    Route::prefix('users')->name('users.')->group(function () {
+    Route::prefix('users')->name('users.')->middleware('permission:manage-users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('create', [UserController::class, 'create'])->name('create');
         Route::post('/', [UserController::class, 'store'])->name('store');
@@ -252,7 +252,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('{user}/invite', [UserController::class, 'invite'])->name('invite');
     });
-    Route::prefix('roles')->name('roles.')->group(function () {
+    Route::prefix('roles')->name('roles.')->middleware('permission:manage-roles')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('index');
         Route::get('create', [RoleController::class, 'create'])->name('create');
         Route::post('/', [RoleController::class, 'store'])->name('store');
@@ -260,7 +260,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::put('{role}', [RoleController::class, 'update'])->name('update');
         Route::delete('{role}', [RoleController::class, 'destroy'])->name('destroy');
     });
-    Route::prefix('permissions')->name('permissions.')->group(function () {
+    Route::prefix('permissions')->name('permissions.')->middleware('permission:manage-roles')->group(function () {
         Route::get('/', [PermissionController::class, 'index'])->name('index');
         Route::post('/', [PermissionController::class, 'store'])->name('store');
         Route::delete('{permission}', [PermissionController::class, 'destroy'])->name('destroy');

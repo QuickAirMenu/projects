@@ -40,7 +40,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users,email',
+            'email'     => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
             'job_title' => 'nullable|string|max:100',
             'phone'     => 'nullable|string|max:20',
             'role'      => 'required|exists:roles,name',

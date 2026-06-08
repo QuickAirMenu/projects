@@ -6,7 +6,7 @@
     <div>
         <div class="flex items-center gap-3">
             <span class="text-xs font-mono bg-gray-100 text-gray-500 px-2 py-1 rounded">{{ $project->project_number }}</span>
-            <span class="px-3 py-1 rounded-full text-xs font-medium" style="background:{{ $project->status->color }}20; color:{{ $project->status->color }}">
+            <span class="px-3 py-1 rounded-full text-xs font-medium" style="background:{{ $project->status?->color }}20; color:{{ $project->status?->color }}">
                 {{ $project->status->name }}
             </span>
             @php $priorityColors = ['low'=>'blue','medium'=>'yellow','high'=>'orange','urgent'=>'red']; @endphp
@@ -15,7 +15,7 @@
             </span>
         </div>
         <h1 class="text-2xl font-bold text-gray-800 mt-1">{{ $project->name }}</h1>
-        <p class="text-gray-500 text-sm">{{ $project->client->name }}</p>
+        <p class="text-gray-500 text-sm">{{ $project->client?->name }}</p>
     </div>
     <div class="flex gap-2">
         @can('update', $project)
@@ -113,9 +113,9 @@
     {{-- Sidebar --}}
     <div class="space-y-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 text-sm">
-            <div class="flex justify-between"><span class="text-gray-500">{{ __('client.client') }}</span><span class="font-medium">{{ $project->client->name }}</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">{{ __('project.service_type') }}</span><span class="font-medium">{{ $project->serviceType->name }}</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">{{ __('project.manager') }}</span><span class="font-medium">{{ $project->manager->name }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('client.client') }}</span><span class="font-medium">{{ $project->client?->name }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('project.service_type') }}</span><span class="font-medium">{{ $project->serviceType?->name }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('project.manager') }}</span><span class="font-medium">{{ $project->manager?->name }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.start_date') }}</span><span class="font-medium">{{ $project->start_date?->format('Y-m-d') ?? '-' }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.deadline') }}</span>
                 <span class="font-medium {{ $project->deadline?->isPast() && !in_array($project->status->slug, ['completed','closed','cancelled']) ? 'text-red-500' : '' }}">

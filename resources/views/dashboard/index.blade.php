@@ -132,12 +132,12 @@
                                             <p class="text-sm text-gray-500">{{ $project->project_number }}</p>
                                         </div>
                                     </td>
-                                    <td>{{ $project->client->name }}</td>
-                                    <td>{{ $project->status->name_ar }}</td>
+                                    <td>{{ $project->client?->name }}</td>
+                                    <td>{{ $project->status?->name_ar }}</td>
                                     <td>
                                         <div class="flex items-center">
-                                            <img src="{{ $project->manager->avatar_url }}" alt="{{ $project->manager->name }}" class="w-8 h-8 rounded-full {{ is_rtl() ? 'ml-2' : 'mr-2' }}">
-                                            <span class="text-sm">{{ $project->manager->name }}</span>
+                                            <img src="{{ $project->manager?->avatar_url }}" alt="{{ $project->manager?->name }}" class="w-8 h-8 rounded-full {{ is_rtl() ? 'ml-2' : 'mr-2' }}">
+                                            <span class="text-sm">{{ $project->manager?->name }}</span>
                                         </div>
                                     </td>
                                     <td>
@@ -179,7 +179,7 @@
                         <div class="p-4 border-b border-gray-100 hover:bg-gray-50">
                             <div class="flex items-start justify-between mb-2">
                                 <p class="font-medium text-gray-900">{{ $task->title }}</p>
-                                {!! $task->priority_badge !!}
+                                {{ $task->priority_badge }}
                             </div>
                             <p class="text-sm text-gray-600 mb-2">
                                 <i class="fas fa-briefcase {{ is_rtl() ? 'ml-1' : 'mr-1' }}"></i>
