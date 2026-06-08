@@ -150,6 +150,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('{quote}', [QuoteController::class, 'show'])->name('show');
         Route::get('{quote}/edit', [QuoteController::class, 'edit'])->name('edit');
         Route::put('{quote}', [QuoteController::class, 'update'])->name('update');
+        Route::post('{quote}/restore', [QuoteController::class, 'restore'])->withTrashed()->name('restore');
         Route::delete('{quote}', [QuoteController::class, 'destroy'])->name('destroy');
         Route::post('{quote}/send', [QuoteController::class, 'send'])->name('send');
         Route::post('{quote}/convert', [QuoteController::class, 'convertToProject'])->name('convert');
@@ -165,6 +166,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('{contract}', [ContractController::class, 'show'])->name('show');
         Route::get('{contract}/edit', [ContractController::class, 'edit'])->name('edit');
         Route::put('{contract}', [ContractController::class, 'update'])->name('update');
+        Route::post('{contract}/restore', [ContractController::class, 'restore'])->withTrashed()->name('restore');
         Route::delete('{contract}', [ContractController::class, 'destroy'])->name('destroy');
     });
 
@@ -177,6 +179,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('{invoice}', [InvoiceController::class, 'show'])->name('show');
         Route::get('{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit');
         Route::put('{invoice}', [InvoiceController::class, 'update'])->name('update');
+        Route::post('{invoice}/restore', [InvoiceController::class, 'restore'])->withTrashed()->name('restore');
         Route::delete('{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
         Route::post('{invoice}/convert-to-contract', [InvoiceController::class, 'convertToContract'])->name('convert-to-contract');
     });
@@ -188,6 +191,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('{payment}', [PaymentController::class, 'show'])->name('show');
         Route::get('{payment}/edit', [PaymentController::class, 'edit'])->name('edit');
         Route::put('{payment}', [PaymentController::class, 'update'])->name('update');
+        Route::post('{payment}/restore', [PaymentController::class, 'restore'])->withTrashed()->name('restore');
         Route::delete('{payment}', [PaymentController::class, 'destroy'])->name('destroy');
     });
 

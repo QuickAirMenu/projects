@@ -9,6 +9,16 @@
     </div>
 </div>
 
+<div class="flex gap-2 mb-4">
+    <a href="{{ route('payments.index') }}" 
+       class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <i class="fas fa-file-alt me-1"></i>الكل
+    </a>
+    <a href="{{ route('payments.index', ['trashed' => 1]) }}" 
+       class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <i class="fas fa-archive me-1"></i>الأرشيف
+    </a>
+</div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
@@ -66,6 +76,15 @@
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ $payment->payment_date->format('Y-m-d') }}</td>
                 <td class="px-5 py-3">
                     <div class="flex items-center justify-end gap-2">
+                        @if($trashed)
+                        <form action="{{ route('payments.restore', $payment) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition" title="استعادة">
+                                <i class="fas fa-undo"></i>
+                                استعادة
+                            </button>
+                        </form>
+                        @else
                         <a href="{{ route('payments.edit', $payment) }}" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
                             <i class="fas fa-pen"></i>
                             {{ __('messages.edit') ?? 'تعديل' }}
@@ -78,6 +97,7 @@
                                 {{ __('messages.delete') ?? 'حذف' }}
                             </button>
                         </form>
+                        @endif
                     </div>
                 </td>
             </tr>

@@ -26,6 +26,7 @@ class QuoteController extends Controller
         $query = Quote::with(['client','creator'])->latest();
         if ($request->status)    $query->where('status', $request->status);
         if ($request->client_id) $query->where('client_id', $request->client_id);
+        if ($request->trashed) $query->onlyTrashed();
         $quotes  = $query->paginate(15)->withQueryString();
         $clients = Client::orderBy('name')->get();
         $unconvertedQuotes = Quote::whereNull('converted_to_project_id');
@@ -43,7 +44,8 @@ class QuoteController extends Controller
                 ? round((Quote::whereNotNull('converted_to_project_id')->count() / Quote::count()) * 100, 1)
                 : 0,
         ];
-        return view('finance.quotes.index', compact('quotes','clients','stats'));
+        $trashed = $request->has('trashed');
+        return view('finance.quotes.index', compact('quotes','clients','stats','trashed'));
     }
 
     public function create()
@@ -138,6 +140,12 @@ class QuoteController extends Controller
         $quote->delete();
         return redirect()->route('quotes.index')
             ->with('success', __('messages.deleted_successfully'));
+    }
+
+    public function restore(Quote $quote)
+    {
+        $quote->restore();
+        return redirect()->route('quotes.index')->with('success', 'تمت استعادة عنصر من الأرشيف');
     }
 
     public function send(Quote $quote)

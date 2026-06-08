@@ -18,13 +18,16 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
-        $payments = Payment::with(['invoice.client','invoice.project','receiver'])->latest()->paginate(20);
+        $query = Payment::with(['invoice.client','invoice.project','receiver'])->latest();
+        if ($request->trashed) $query->onlyTrashed();
+        $payments = $query->paginate(20);
         $stats = [
             'total_received'  => Payment::sum('amount'),
             'this_month'      => Payment::whereMonth('payment_date', now()->month)->sum('amount'),
             'count'           => Payment::count(),
         ];
-        return view('finance.payments.index', compact('payments','stats'));
+        $trashed = $request->has('trashed');
+        return view('finance.payments.index', compact('payments','stats','trashed'));
     }
 
     public function store(StorePaymentRequest $request)
@@ -112,6 +115,14 @@ class PaymentController extends Controller
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', __('messages.deleted_successfully'));
+    }
+
+    public function restore(Payment $payment)
+    {
+        $invoice = $payment->invoice;
+        $payment->restore();
+        $this->recalculateInvoiceTotals($invoice);
+        return redirect()->route('payments.index')->with('success', 'تمت استعادة عنصر من الأرشيف');
     }
 
     protected function recalculateInvoiceTotals(Invoice $invoice): void

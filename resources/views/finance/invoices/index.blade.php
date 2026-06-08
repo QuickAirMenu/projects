@@ -9,6 +9,16 @@
     </a>
 </div>
 
+<div class="flex gap-2 mb-4">
+    <a href="{{ route('invoices.index') }}" 
+       class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <i class="fas fa-file-alt me-1"></i>الكل
+    </a>
+    <a href="{{ route('invoices.index', ['trashed' => 1]) }}" 
+       class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <i class="fas fa-archive me-1"></i>الأرشيف
+    </a>
+</div>
 
 {{-- Financial Summary --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -83,11 +93,20 @@
                 <td class="px-5 py-3 text-end">
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('invoices.show', $invoice) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
+                        @if($trashed)
+                        <form action="{{ route('invoices.restore', $invoice) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="استعادة">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </form>
+                        @else
                         <a href="{{ route('invoices.edit', $invoice) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
                         <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
                         </form>
+                        @endif
                     </div>
                 </td>
             </tr>

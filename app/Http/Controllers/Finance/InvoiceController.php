@@ -24,6 +24,7 @@ class InvoiceController extends Controller
         if ($request->payment_status) $query->where('payment_status', $request->payment_status);
         if ($request->client_id)      $query->where('client_id', $request->client_id);
         if ($request->invoice_type)   $query->where('invoice_type', $request->invoice_type);
+        if ($request->trashed) $query->onlyTrashed();
 
         $invoices = $query->paginate(15)->withQueryString();
         $clients  = Client::orderBy('name')->get();
@@ -33,7 +34,8 @@ class InvoiceController extends Controller
             'unpaid'         => Invoice::where('payment_status','unpaid')->sum('remaining_amount'),
             'overdue'        => Invoice::where('payment_status','overdue')->count(),
         ];
-        return view('finance.invoices.index', compact('invoices','clients','stats'));
+        $trashed = $request->has('trashed');
+        return view('finance.invoices.index', compact('invoices','clients','stats','trashed'));
     }
 
     public function create()
@@ -106,6 +108,12 @@ class InvoiceController extends Controller
         $invoice->delete();
         return redirect()->route('invoices.index')
             ->with('success', __('messages.deleted_successfully'));
+    }
+
+    public function restore(Invoice $invoice)
+    {
+        $invoice->restore();
+        return redirect()->route('invoices.index')->with('success', 'تمت استعادة عنصر من الأرشيف');
     }
 
     public function convertToContract(Invoice $invoice)

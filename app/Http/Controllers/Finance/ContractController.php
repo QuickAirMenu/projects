@@ -17,14 +17,17 @@ class ContractController extends Controller
 {
     public function index(Request $request)
     {
-        $contracts = Contract::with(['project','client','creator'])->latest()->paginate(15);
+        $query = Contract::with(['project','client','creator'])->latest();
+        if ($request->trashed) $query->onlyTrashed();
+        $contracts = $query->paginate(15);
         $stats = [
             'active_value' => Contract::where('status', 'active')->sum('contract_value'),
             'ended_count' => Contract::whereIn('status', ['completed', 'terminated'])->count(),
             'signed_count' => Contract::where('signed_by_client', true)->count(),
         ];
 
-        return view('finance.contracts.index', compact('contracts', 'stats'));
+        $trashed = $request->has('trashed');
+        return view('finance.contracts.index', compact('contracts', 'stats', 'trashed'));
     }
 
     public function create()
@@ -142,6 +145,12 @@ class ContractController extends Controller
         $contract->delete();
         return redirect()->route('contracts.index')
             ->with('success', __('messages.deleted_successfully'));
+    }
+
+    public function restore(Contract $contract)
+    {
+        $contract->restore();
+        return redirect()->route('contracts.index')->with('success', 'تمت استعادة عنصر من الأرشيف');
     }
 
     public function pdf(Contract $contract)

@@ -9,6 +9,16 @@
     </a>
 </div>
 
+<div class="flex gap-2 mb-4">
+    <a href="{{ route('quotes.index') }}" 
+       class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <i class="fas fa-file-alt me-1"></i>الكل
+    </a>
+    <a href="{{ route('quotes.index', ['trashed' => 1]) }}" 
+       class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <i class="fas fa-archive me-1"></i>الأرشيف
+    </a>
+</div>
 
 {{-- KPIs --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
@@ -62,6 +72,14 @@
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('quotes.show', $quote) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
                         <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="الرابط العام"><i class="fas fa-link"></i></a>
+                        @if($trashed)
+                        <form action="{{ route('quotes.restore', $quote) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="استعادة">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </form>
+                        @else
                         @if($quote->status === 'draft')
                         <a href="{{ route('quotes.edit', $quote) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
                         <form action="{{ route('quotes.send', $quote) }}" method="POST">
@@ -73,6 +91,7 @@
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
                         </form>
+                        @endif
                     </div>
                 </td>
             </tr>
