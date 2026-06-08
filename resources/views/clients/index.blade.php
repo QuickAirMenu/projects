@@ -14,7 +14,6 @@
     @endcan
 </div>
 
-@include('layouts.components.alert')
 
 {{-- Stats --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -100,7 +99,7 @@
                         <a href="{{ route('clients.edit', $client) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition"><i class="fas fa-edit"></i></a>
                         @endcan
                         @can('delete', $client)
-                        <form action="{{ route('clients.destroy', $client) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('clients.destroy', $client) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash"></i></button>
                         </form>

@@ -10,7 +10,6 @@
     <a href="{{ route('payments.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition">{{ __('messages.back') }}</a>
 </div>
 
-@include('layouts.components.alert')
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-3xl">
     <form action="{{ route('payments.update', $payment) }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">

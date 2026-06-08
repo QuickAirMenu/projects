@@ -122,7 +122,7 @@
                         <a href="{{ route('tasks.edit', $task) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition"><i class="fas fa-edit"></i></a>
                         @endcan
                         @can('delete', $task)
-                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash"></i></button>
                         </form>

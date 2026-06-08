@@ -8,7 +8,7 @@
         <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
     </a>
 </div>
-@include('layouts.components.alert')
+
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
     @forelse($roles as $role)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">

@@ -7,7 +7,6 @@
         <i class="fas fa-plus me-2"></i>{{ __('finance.add_contract') }}
     </a>
 </div>
-@include('layouts.components.alert')
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     @foreach([
@@ -57,7 +56,7 @@
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('contracts.show', $contract) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
                         <a href="{{ route('contracts.edit', $contract) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
-                        <form action="{{ route('contracts.destroy', $contract) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('contracts.destroy', $contract) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
                         </form>

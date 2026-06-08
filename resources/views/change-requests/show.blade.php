@@ -12,7 +12,6 @@
     </a>
 </div>
 
-@include('layouts.components.alert')
 
 @php
     $statusColors = ['pending'=>'yellow','approved'=>'green','rejected'=>'red','implemented'=>'blue'];

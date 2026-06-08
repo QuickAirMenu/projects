@@ -9,7 +9,6 @@
     </div>
 </div>
 
-@include('layouts.components.alert')
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
@@ -71,7 +70,7 @@
                             <i class="fas fa-pen"></i>
                             {{ __('messages.edit') ?? 'تعديل' }}
                         </a>
-                        <form action="{{ route('payments.destroy', $payment) }}" method="POST" onsubmit="return confirm('هل تريد حذف هذه الدفعة؟')">
+                        <form action="{{ route('payments.destroy', $payment) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition">

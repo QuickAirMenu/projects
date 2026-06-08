@@ -7,7 +7,7 @@
         <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
     </a>
 </div>
-@include('layouts.components.alert')
+
 <div class="max-w-xl bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
     <p class="text-gray-500 text-sm mb-5">لتسجيل دفعة، يرجى الذهاب إلى صفحة الفاتورة المرتبطة وتسجيل الدفعة من هناك.</p>
     <a href="{{ route('invoices.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition">

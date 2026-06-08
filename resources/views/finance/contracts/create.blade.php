@@ -5,7 +5,7 @@
     <h1 class="text-2xl font-bold text-gray-800">{{ isset($contract) ? 'تعديل العقد' : __('finance.add_contract') }}</h1>
     <a href="{{ route('contracts.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
 </div>
-@include('layouts.components.alert')
+
 <div class="max-w-3xl bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
 <form action="{{ isset($contract) ? route('contracts.update', $contract) : route('contracts.store') }}" method="POST" enctype="multipart/form-data">
     @csrf

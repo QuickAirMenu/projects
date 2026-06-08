@@ -6,7 +6,6 @@
     <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.settings') }}</h1>
 </div>
 
-@include('layouts.components.alert')
 
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 

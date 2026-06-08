@@ -9,7 +9,6 @@
     </a>
 </div>
 
-@include('layouts.components.alert')
 
 {{-- KPIs --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
@@ -70,7 +69,7 @@
                             <button type="submit" class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg" title="إرسال"><i class="fas fa-paper-plane"></i></button>
                         </form>
                         @endif
-                        <form action="{{ route('quotes.destroy', $quote) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('quotes.destroy', $quote) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
                         </form>

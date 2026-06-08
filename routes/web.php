@@ -30,6 +30,7 @@ use App\Http\Controllers\Settings\ServiceTypeController;
 use App\Http\Controllers\Settings\ProjectStatusController;
 use App\Http\Controllers\Settings\TaskStatusController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Auth\UserInvitationController;
 use App\Http\Controllers\User\RoleController;
 use App\Http\Controllers\User\PermissionController;
 
@@ -47,6 +48,7 @@ Route::get('lang/{locale}', function ($locale) {
 
 // Public quotes
 Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->name('quotes.public');
+Route::get('/q/{token}/pdf', [QuoteController::class, 'publicPdf'])->name('quotes.public-pdf');
 
 // Client Portal Routes
 Route::prefix('portal')->name('portal.')->group(function () {
@@ -61,6 +63,10 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::post('/logout', [ClientPortalController::class, 'logout'])->name('logout');
     });
 });
+
+// User Invitation (public - no auth required)
+Route::get('/invitation/{token}', [UserInvitationController::class, 'showSetup'])->name('invitation.setup');
+Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSetup'])->name('invitation.setup.post');
 
 // Authenticated
 Route::middleware(['auth', 'set.locale'])->group(function () {
@@ -240,6 +246,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::put('{user}', [UserController::class, 'update'])->name('update');
         Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
         Route::post('{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('{user}/invite', [UserController::class, 'invite'])->name('invite');
     });
     Route::prefix('roles')->name('roles.')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('index');

@@ -8,7 +8,7 @@
         <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
     </a>
 </div>
-@include('layouts.components.alert')
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     {{-- Add Form --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
@@ -61,7 +61,7 @@
                         </span>
                     </td>
                     <td class="px-5 py-3 text-end">
-                        <form action="{{ route('settings.service-types.destroy', $type) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('settings.service-types.destroy', $type) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-trash"></i></button>
                         </form>
@@ -82,7 +82,7 @@
                                             <p class="font-medium text-gray-800">{{ $item->description }}</p>
                                             <p class="text-xs text-gray-500">{{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</p>
                                         </div>
-                                        <form action="{{ route('settings.service-types.items.destroy', [$type, $item]) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                                        <form action="{{ route('settings.service-types.items.destroy', [$type, $item]) }}" method="POST" onsubmit="return confirmDelete(this)">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-trash"></i></button>
                                         </form>

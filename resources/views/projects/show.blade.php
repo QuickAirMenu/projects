@@ -34,7 +34,6 @@
     </div>
 </div>
 
-@include('layouts.components.alert')
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -99,7 +98,7 @@
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ Storage::url($att->file_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-download"></i></a>
-                    <form action="{{ route('projects.attachments.destroy', $att) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                    <form action="{{ route('projects.attachments.destroy', $att) }}" method="POST" onsubmit="return confirmDelete(this)">
                         @csrf @method('DELETE')
                         <button type="submit" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-trash"></i></button>
                     </form>

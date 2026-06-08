@@ -12,7 +12,7 @@
         <a href="{{ route('contracts.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
     </div>
 </div>
-@include('layouts.components.alert')
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div class="grid grid-cols-2 gap-5 text-sm mb-5">

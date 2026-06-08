@@ -114,7 +114,7 @@
                         </a>
                         @endcan
                         @can('delete', $project)
-                        <form action="{{ route('projects.destroy', $project) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('projects.destroy', $project) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition" title="{{ __('messages.delete') }}">
                                 <i class="fas fa-trash"></i>

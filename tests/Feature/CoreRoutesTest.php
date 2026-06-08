@@ -238,6 +238,7 @@ class CoreRoutesTest extends TestCase
         $this->get(route('quotes.show', $this->convertibleQuote))
             ->assertOk()
             ->assertSee('إرسال عبر WhatsApp')
+            ->assertSee('https://wa.me/966500000000?text=', false)
             ->assertSee(route('quotes.pdf', $this->convertibleQuote), false)
             ->assertSee('convert-to-invoice', false);
 
@@ -289,7 +290,8 @@ class CoreRoutesTest extends TestCase
 
         $this->get(route('quotes.show', $draftQuote))
             ->assertOk()
-            ->assertSee('إرسال عبر WhatsApp');
+            ->assertSee('إرسال عبر WhatsApp')
+            ->assertSee('https://wa.me/966551234567?text=', false);
 
         $this->get(route('quotes.public', $draftQuote->public_token))
             ->assertNotFound();

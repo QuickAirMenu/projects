@@ -8,7 +8,6 @@
         <i class="fas fa-arrow-right"></i> {{ __('messages.back') }}
     </a>
 </div>
-@include('layouts.components.alert')
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
 @php

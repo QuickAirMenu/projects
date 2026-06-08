@@ -7,7 +7,7 @@
         <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
     </a>
 </div>
-@include('layouts.components.alert')
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <h3 class="font-semibold text-gray-700 mb-4">إضافة حالة جديدة</h3>
@@ -50,7 +50,7 @@
                     <td class="px-4 py-3"><div class="w-6 h-6 rounded-lg" style="background:{{ $status->color }}"></div></td>
                     <td class="px-4 py-3 text-gray-500">{{ $status->sort_order }}</td>
                     <td class="px-5 py-3 text-end">
-                        <form action="{{ route('settings.project-statuses.destroy', $status) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('settings.project-statuses.destroy', $status) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-trash"></i></button>
                         </form>

@@ -9,7 +9,6 @@
     </a>
 </div>
 
-@include('layouts.components.alert')
 
 {{-- Financial Summary --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -85,7 +84,7 @@
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('invoices.show', $invoice) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
                         <a href="{{ route('invoices.edit', $invoice) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
-                        <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
                         </form>

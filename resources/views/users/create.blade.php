@@ -7,8 +7,12 @@
         <i class="fas fa-arrow-right"></i> {{ __('messages.back') }}
     </a>
 </div>
-@include('layouts.components.alert')
+
 <div class="max-w-2xl bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-3 mb-6 text-sm">
+        <i class="fas fa-info-circle me-2"></i>
+        سيتم إرسال دعوة عبر البريد الإلكتروني للمستخدم لتحديد كلمة المرور الخاصة به.
+    </div>
     <form action="{{ route('users.store') }}" method="POST">
         @csrf
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -21,14 +25,6 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني *</label>
                 <input type="email" name="email" value="{{ old('email') }}" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور *</label>
-                <input type="password" name="password" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">تأكيد كلمة المرور *</label>
-                <input type="password" name="password_confirmation" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">الدور *</label>
@@ -57,7 +53,7 @@
         </div>
         <div class="flex gap-3 mt-6">
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-xl transition">
-                <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
+                <i class="fas fa-paper-plane me-2"></i>إرسال الدعوة
             </button>
             <a href="{{ route('users.index') }}" class="bg-gray-100 text-gray-700 font-medium px-6 py-2.5 rounded-xl transition">{{ __('messages.cancel') }}</a>
         </div>

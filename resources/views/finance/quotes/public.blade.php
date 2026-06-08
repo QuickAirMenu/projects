@@ -12,6 +12,7 @@
         .muted{color:#64748b}
         .btn{display:inline-block;background:#2563eb;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none}
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <div class="card">
@@ -36,6 +37,13 @@
         </tbody>
     </table>
     <p><strong>الإجمالي:</strong> {{ number_format($quote->total, 2) }}</p>
+</div>
+<div style="text-align:center;margin-top:16px;">
+    <a href="{{ route('quotes.public-pdf', $quote->public_token) }}"
+       style="display:inline-block;background:#2563eb;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-size:15px;">
+        <i class="fas fa-file-pdf" style="margin-left:8px;"></i>
+        تحميل PDF
+    </a>
 </div>
 </body>
 </html>

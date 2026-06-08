@@ -14,7 +14,6 @@
     </div>
 </div>
 
-@include('layouts.components.alert')
 
 {{-- Filters --}}
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
@@ -80,6 +79,14 @@
                 <td class="px-5 py-3 text-end">
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('users.edit', $user) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition"><i class="fas fa-edit"></i></a>
+                        @if(is_null($user->email_verified_at))
+                        <form action="{{ route('users.invite', $user) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="p-1.5 text-indigo-400 hover:bg-indigo-50 rounded-lg transition" title="إرسال الدعوة">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                        @endif
                         <form action="{{ route('users.toggle-status', $user) }}" method="POST">
                             @csrf
                             <button type="submit" class="p-1.5 {{ $user->is_active ? 'text-orange-400 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50' }} rounded-lg transition"
@@ -88,7 +95,7 @@
                             </button>
                         </form>
                         @if($user->id !== auth()->id())
-                        <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirmDelete(this)">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash"></i></button>
                         </form>

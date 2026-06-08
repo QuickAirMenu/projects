@@ -9,7 +9,6 @@
     </a>
 </div>
 
-@include('layouts.components.alert')
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
 @php
@@ -29,7 +28,15 @@
         'id' => $serviceType->id,
         'name' => $serviceType->name,
     ])->values()->all();
-    $defaultServiceTypeId = $isEdit ? null : ($serviceTypes->first(fn($serviceType) => !empty($serviceTypeDefaults[$serviceType->id]))?->id);
+    $defaultServiceTypeId = null;
+    if (! $isEdit) {
+        foreach ($serviceTypes as $serviceType) {
+            if (! empty($serviceTypeDefaults[$serviceType->id])) {
+                $defaultServiceTypeId = $serviceType->id;
+                break;
+            }
+        }
+    }
     $rows = old('items');
     if (!is_array($rows)) {
         $rows = $isEdit

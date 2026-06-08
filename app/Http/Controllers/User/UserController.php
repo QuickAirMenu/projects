@@ -3,13 +3,22 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Mail\UserInvitationMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:manage-users')->except(['index', 'show']);
+    }
+
     public function index(Request $request)
     {
         $query = User::with('roles')->latest();
@@ -32,7 +41,6 @@ class UserController extends Controller
         $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email',
-            'password'  => 'required|min:8|confirmed',
             'job_title' => 'nullable|string|max:100',
             'phone'     => 'nullable|string|max:20',
             'role'      => 'required|exists:roles,name',
@@ -40,18 +48,37 @@ class UserController extends Controller
         ]);
 
         $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-            'job_title' => $request->job_title,
-            'phone'     => $request->phone,
-            'language'  => $request->language ?? 'ar',
-            'is_active' => true,
+            'name'       => $request->name,
+            'email'      => $request->email,
+            'password'   => Hash::make(Str::random(32)),
+            'job_title'  => $request->job_title,
+            'phone'      => $request->phone,
+            'language'   => $request->language ?? 'ar',
+            'is_active'  => true,
         ]);
         $user->assignRole($request->role);
 
+        // Generate invitation token
+        $token = Str::random(64);
+        $user->update([
+            'invitation_token' => $token,
+            'invitation_expires_at' => now()->addDays(7),
+        ]);
+
+        // Send invitation email
+        try {
+            app(\App\Services\MailConfigService::class)->applyDynamicMailConfig();
+            if (config('mail.mailers.smtp.host')) {
+                Mail::to($user->email)->send(
+                    new UserInvitationMail($user, route('invitation.setup', $token))
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::error('User invitation email failed: ' . $e->getMessage());
+        }
+
         return redirect()->route('users.index')
-            ->with('success', __('messages.created_successfully'));
+            ->with('success', 'تم إرسال الدعوة للبريد الإلكتروني بنجاح');
     }
 
     public function show(User $user)
@@ -74,6 +101,7 @@ class UserController extends Controller
             'job_title' => 'nullable|string|max:100',
             'phone'     => 'nullable|string|max:20',
             'role'      => 'required|exists:roles,name',
+            'language'  => 'nullable|in:ar,en',
         ]);
 
         $user->update($request->only(['name','email','job_title','phone','language']));
@@ -89,6 +117,32 @@ class UserController extends Controller
         if ($user->id === auth()->id()) return back()->with('error','لا يمكن حذف حسابك الخاص');
         $user->delete();
         return redirect()->route('users.index')->with('success', __('messages.deleted_successfully'));
+    }
+
+    public function invite(User $user)
+    {
+        if ($user->email_verified_at) {
+            return back()->with('error', 'هذا المستخدم فعّل حسابه بالفعل');
+        }
+
+        $token = Str::random(64);
+        $user->update([
+            'invitation_token' => $token,
+            'invitation_expires_at' => now()->addDays(7),
+        ]);
+
+        try {
+            app(\App\Services\MailConfigService::class)->applyDynamicMailConfig();
+            if (config('mail.mailers.smtp.host')) {
+                Mail::to($user->email)->send(
+                    new UserInvitationMail($user, route('invitation.setup', $token))
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::error('User invitation resend failed: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'تم إعادة إرسال الدعوة');
     }
 
     public function toggleStatus(User $user)

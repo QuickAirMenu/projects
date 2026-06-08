@@ -70,12 +70,38 @@ class QuoteController extends Controller
         $whatsappUrl = null;
         $sharePhone = $quote->client?->whatsapp ?: $quote->client?->phone;
         if ($sharePhone) {
-            $phone = preg_replace('/[^0-9]/', '', $sharePhone);
-            $message = urlencode("مرحباً {$quote->client->name}، يسعدنا مشاركتك عرض الأسعار رقم {$quote->quote_number} بقيمة {$quote->total}. يمكنك الاطلاع عليه هنا: " . route('quotes.public', $quote->public_token));
-            $whatsappUrl = "https://wa.me/{$phone}?text={$message}";
+            $phone = $this->normalizeWhatsAppNumber($sharePhone);
+            $message = rawurlencode(
+                "مرحباً {$quote->client->name}\n"
+                . "عرض السعر رقم {$quote->quote_number}\n"
+                . 'الإجمالي: ' . format_currency($quote->total) . "\n"
+                . 'الرابط: ' . route('quotes.public', $quote->public_token)
+            );
+            if ($phone) {
+                $whatsappUrl = "https://wa.me/{$phone}?text={$message}";
+            }
         }
 
         return view('finance.quotes.show', compact('quote', 'whatsappUrl'));
+    }
+
+    private function normalizeWhatsAppNumber(string $phone): ?string
+    {
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '966')) {
+            return $digits;
+        }
+
+        if (preg_match('/^0?5\d{8}$/', $digits)) {
+            return '966' . ltrim($digits, '0');
+        }
+
+        return $digits;
     }
 
     public function pdf(Quote $quote)
@@ -159,6 +185,25 @@ class QuoteController extends Controller
         abort_if($quote->status === 'draft', 404);
 
         return view('finance.quotes.public', compact('quote'));
+    }
+
+    public function publicPdf(string $token)
+    {
+        $quote = Quote::with(['client', 'items.serviceType', 'createdBy'])
+            ->where('public_token', $token)
+            ->firstOrFail();
+
+        abort_if($quote->status === 'draft', 404);
+
+        $settings = Setting::whereIn('key', [
+            'company_name','company_name_ar','company_logo',
+            'company_email','company_phone','company_address','currency_symbol'
+        ])->pluck('value', 'key')->toArray();
+
+        $pdf = Pdf::loadView('pdf.quote', compact('quote', 'settings'));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download("quote-{$quote->quote_number}.pdf");
     }
 
     public function convertToProject(Request $request, Quote $quote)

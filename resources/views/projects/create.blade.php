@@ -12,7 +12,6 @@
     </a>
 </div>
 
-@include('layouts.components.alert')
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
     <form action="{{ route('projects.store') }}" method="POST">
