@@ -34,9 +34,8 @@ window.showNotification = function(message, type = 'success') {
 
 // Confirm Delete
 window.confirmDelete = function(form) {
-    if (confirm('هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.')) {
-        form.submit();
-    }
+    window._deleteForm = form;
+    window.dispatchEvent(new CustomEvent('open-delete-modal'));
 };
 
 // Format Currency
