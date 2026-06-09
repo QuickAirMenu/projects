@@ -31,7 +31,7 @@
 @if(auth()->check())
 <div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-2xl">
     <h2 class="font-bold text-lg text-gray-800 mb-4">{{ __('support.send_message') }}</h2>
-    <form method="POST" class="space-y-4">
+    <form method="POST" action="{{ route('support.send') }}" class="space-y-4">
         @csrf
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('support.subject') }}</label>

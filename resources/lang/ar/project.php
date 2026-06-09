@@ -74,4 +74,5 @@ return [
     'status_implemented'    => 'منفّذ',
     'scope_in_scope'        => 'ضمن النطاق',
     'scope_out_of_scope'    => 'خارج النطاق',
+    'budget_help'           => 'الميزانية التقديرية للمشروع بالريال السعودي.',
 ];

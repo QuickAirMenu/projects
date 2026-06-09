@@ -43,4 +43,5 @@ return [
     'overdue_only'          => 'متأخرة فقط',
     'blocked_tasks'         => 'محجوبة',
     'assigned_to_label'     => 'المسند إليه',
+    'estimated_hours_help'  => 'عدد الساعات المتوقعة لإنجاز هذه المهمة.',
 ];

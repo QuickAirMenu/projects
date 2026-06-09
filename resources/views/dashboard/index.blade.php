@@ -16,8 +16,7 @@
 @endsection
 
 @section('content')
-    @if($stats['total_projects'] == 0 && (!isset($financialStats['total_clients']) || $financialStats['total_clients'] == 0))
-    <div x-data="{ show: true }" x-show="show" class="mb-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
+    <div x-data="{ show: localStorage.getItem('onboarding_dismissed') !== 'true' }" x-show="show" class="mb-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
         <div class="flex items-start justify-between">
             <div>
                 <h2 class="text-xl font-bold mb-2">{{ __('dashboard.welcome_onboard', ['app' => config('app.name')]) }}</h2>
@@ -34,10 +33,9 @@
                     </a>
                 </div>
             </div>
-            <button @click="show = false" class="text-blue-200 hover:text-white"><i class="fas fa-times"></i></button>
+            <button @click="show = false; localStorage.setItem('onboarding_dismissed', 'true')" class="text-blue-200 hover:text-white"><i class="fas fa-times"></i></button>
         </div>
     </div>
-    @endif
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

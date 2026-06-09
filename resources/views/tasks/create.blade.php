@@ -78,7 +78,10 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('task.estimated_hours') }}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ __('task.estimated_hours') }}
+                    <i class="fas fa-circle-question text-gray-400 cursor-help" title="{{ __('task.estimated_hours_help') }}"></i>
+                </label>
                 <input type="number" name="estimated_hours" value="{{ old('estimated_hours') }}" step="0.5" min="0"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('estimated_hours')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror

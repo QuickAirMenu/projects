@@ -23,8 +23,14 @@
             <i class="fas fa-edit"></i> {{ __('messages.edit') }}
         </a>
         @endcan
+        <a href="{{ route('projects.workflow.show', $project) }}" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition text-sm">
+            <i class="fas fa-diagram-project me-2"></i>{{ __('project.workflow') }}
+        </a>
         <a href="{{ route('projects.index') }}" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl transition text-sm">
             <i class="fas fa-arrow-right"></i> {{ __('messages.back') }}
+        </a>
+        <a href="{{ route('projects.handoff', $project) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm transition font-medium">
+            <i class="fas fa-check-circle me-2"></i>تسليم المشروع
         </a>
         @if(auth()->id() === $project->manager_id && $project->progress_percentage >= 100 && !$project->is_handed_off)
         <a href="{{ route('projects.handoff', $project) }}" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl transition text-sm">

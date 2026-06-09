@@ -108,7 +108,10 @@
 
     <!-- Support -->
     <div class="px-4 py-3 border-t border-gray-200">
-        <p class="text-xs font-semibold text-gray-400 uppercase mb-2">الدعم</p>
+        <p class="text-xs font-semibold text-gray-400 uppercase mb-2">{{ __('support.title') }}</p>
+        <a href="{{ route('support') }}" class="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 py-1">
+            <i class="fas fa-headset text-blue-500"></i> {{ __('support.contact_us') }}
+        </a>
         <a href="https://wa.me/966500000000" target="_blank" class="flex items-center gap-2 text-sm text-gray-600 hover:text-green-600 py-1">
             <i class="fab fa-whatsapp text-green-500"></i> WhatsApp
         </a>

@@ -12,4 +12,6 @@
     'subject' => 'Subject',
     'message' => 'Message',
     'send' => 'Send',
+    'contact_us' => 'Contact Us',
+    'message_sent' => 'Your message has been sent. We will contact you soon.',
 ];

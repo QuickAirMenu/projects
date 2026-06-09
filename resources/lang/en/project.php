@@ -71,4 +71,5 @@ return [
     'status_implemented'    => 'Implemented',
     'scope_in_scope'        => 'In Scope',
     'scope_out_of_scope'    => 'Out of Scope',
+    'budget_help'           => 'Estimated project budget in SAR.',
 ];

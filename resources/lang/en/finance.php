@@ -134,4 +134,6 @@ return [
     'record_from_invoice'       => 'To record a payment, please go to the related invoice and record the payment from there.',
     'payment_status'            => 'Payment Status',
     'project'                   => 'Project',
+    'tax_help'                  => 'Tax percentage added to subtotal. Default is 15%.',
+    'discount_help'             => 'Discount amount in currency subtracted from final total.',
 ];

@@ -76,6 +76,18 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/help', fn() => view('help'))->name('help');
     Route::get('/support', fn() => view('support'))->name('support');
+    Route::post('/support', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
+        ]);
+        \Illuminate\Support\Facades\Log::info('Support message', [
+            'user' => auth()->user()->email,
+            'subject' => $request->subject,
+            'message' => $request->message,
+        ]);
+        return back()->with('success', __('support.message_sent'));
+    })->name('support.send');
 
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {

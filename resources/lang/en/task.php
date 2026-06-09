@@ -43,4 +43,5 @@ return [
     'overdue_only'          => 'Overdue Only',
     'blocked_tasks'         => 'Blocked',
     'assigned_to_label'     => 'Assigned To',
+    'estimated_hours_help'  => 'Estimated hours to complete this task.',
 ];

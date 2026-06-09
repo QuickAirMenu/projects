@@ -26,4 +26,5 @@ return [
     'arabic'                    => 'Arabic',
     'no_users'                  => 'No users found',
     'roles'                     => 'Roles',
+    'role_help'                 => 'The role determines what permissions the user has in the platform.',
 ];

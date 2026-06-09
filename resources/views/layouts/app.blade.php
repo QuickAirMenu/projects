@@ -41,8 +41,8 @@
                 @yield('content')
             </main>
         </div>
-    </div>
     @include('layouts.partials.footer')
+    </div>
 
     <!-- Delete Confirmation Modal -->
     <div x-data="{ open: false }"
