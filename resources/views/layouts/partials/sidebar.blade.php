@@ -97,9 +97,25 @@
                 <span>{{ __('common.settings') }}</span>
             </a>
             @endcan
+
+            <a href="{{ route('help') }}" class="sidebar-link {{ request()->routeIs('help') ? 'active' : '' }}">
+                <i class="fas fa-circle-question {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                <span>مركز المساعدة</span>
+            </a>
         </div>
         @endcanany
     </nav>
+
+    <!-- Support -->
+    <div class="px-4 py-3 border-t border-gray-200">
+        <p class="text-xs font-semibold text-gray-400 uppercase mb-2">الدعم</p>
+        <a href="https://wa.me/966500000000" target="_blank" class="flex items-center gap-2 text-sm text-gray-600 hover:text-green-600 py-1">
+            <i class="fab fa-whatsapp text-green-500"></i> WhatsApp
+        </a>
+        <a href="mailto:support@airmenu.net" class="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 py-1">
+            <i class="fas fa-envelope text-blue-500"></i> support@airmenu.net
+        </a>
+    </div>
 
     <!-- User Info at Bottom -->
     <div class="absolute bottom-0 w-full p-4 border-t border-gray-200 bg-gray-50">

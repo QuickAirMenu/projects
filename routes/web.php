@@ -40,6 +40,8 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 });
 
+Route::get('/welcome', fn() => view('welcome'))->name('welcome');
+
 // Language switch
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['ar', 'en'])) { session(['locale' => $locale]); }
@@ -72,6 +74,7 @@ Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSe
 Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::post('logout', [LogoutController::class, 'logout'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/help', fn() => view('help'))->name('help');
 
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {

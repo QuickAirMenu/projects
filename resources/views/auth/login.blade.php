@@ -73,6 +73,13 @@
                 </form>
             </div>
 
+            <!-- Welcome link -->
+            <div class="text-center mt-4">
+                <a href="{{ route('welcome') }}" class="text-sm text-blue-600 hover:underline">
+                    <i class="fas fa-home me-1"></i>الصفحة الرئيسية
+                </a>
+            </div>
+
             <!-- Footer -->
             <div class="mt-6 text-center">
                 @if(app()->getLocale() == 'ar')
