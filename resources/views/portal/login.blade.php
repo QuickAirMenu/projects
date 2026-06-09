@@ -1,6 +1,6 @@
 @extends('portal.layouts.app')
 
-@section('title', 'Login')
+@section('title', 'دخول')
 
 @section('content')
     <div class="mx-auto max-w-md py-12">
@@ -13,14 +13,14 @@
             <form method="POST" action="{{ route('portal.login.post') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="mb-2 block text-sm text-slate-300" for="email">Email</label>
+                    <label class="mb-2 block text-sm text-slate-300" for="email">البريد الإلكتروني</label>
                     <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
                         class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white placeholder-slate-500 outline-none ring-0 focus:border-emerald-400"
                         placeholder="name@example.com">
                 </div>
 
                 <div>
-                    <label class="mb-2 block text-sm text-slate-300" for="password">Password</label>
+                    <label class="mb-2 block text-sm text-slate-300" for="password">كلمة المرور</label>
                     <input id="password" name="password" type="password" required
                         class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white placeholder-slate-500 outline-none ring-0 focus:border-emerald-400"
                         placeholder="********">
