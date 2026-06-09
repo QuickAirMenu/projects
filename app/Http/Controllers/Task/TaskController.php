@@ -97,18 +97,16 @@ class TaskController extends Controller
             ->with('success', __('messages.deleted_successfully'));
     }
 
-    public function calendar()
+    public function calendar(Request $request)
     {
         $user  = Auth::user();
-        $query = Task::with(['status','project'])->whereNotNull('due_date');
+        $month = $request->month ?? now()->month;
+        $year  = $request->year ?? now()->year;
+        $query = Task::with(['status','project'])->whereNotNull('due_date')
+            ->whereMonth('due_date', $month)
+            ->whereYear('due_date', $year);
         if ($user->hasRole('team-member')) $query->where('assigned_to', $user->id);
-        $tasks = $query->get()->map(fn($t) => [
-            'id'    => $t->id,
-            'title' => $t->title,
-            'start' => $t->due_date->toDateString(),
-            'color' => $t->status->color ?? '#3B82F6',
-            'url'   => route('tasks.show', $t->id),
-        ]);
-        return view('tasks.calendar', compact('tasks'));
+        $tasks = $query->get();
+        return view('tasks.calendar', compact('tasks', 'month', 'year'));
     }
 }

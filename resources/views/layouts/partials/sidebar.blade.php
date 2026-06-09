@@ -27,6 +27,10 @@
             <i class="fas fa-briefcase {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
             <span>{{ __('common.projects') }}</span>
         </a>
+        <a href="{{ route('projects.board') }}" class="sidebar-link {{ request()->routeIs('projects.board') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-4' : 'ml-4' }}">
+            <i class="fas fa-columns mr-3"></i>
+            <span>Kanban</span>
+        </a>
         @endcan
 
         @can('view-tasks')
@@ -34,6 +38,14 @@
         <a href="{{ route('tasks.index') }}" class="sidebar-link {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
             <i class="fas fa-tasks {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
             <span>{{ __('common.tasks') }}</span>
+        </a>
+        <a href="{{ route('tasks.kanban') }}" class="sidebar-link {{ request()->routeIs('tasks.kanban') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-4' : 'ml-4' }}">
+            <i class="fas fa-columns mr-3"></i>
+            <span>Kanban</span>
+        </a>
+        <a href="{{ route('tasks.calendar') }}" class="sidebar-link {{ request()->routeIs('tasks.calendar') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-4' : 'ml-4' }}">
+            <i class="fas fa-calendar-alt mr-3"></i>
+            <span>Calendar</span>
         </a>
         @endcan
 
