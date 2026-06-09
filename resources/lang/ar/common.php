@@ -32,6 +32,7 @@ return [
     'profile' => 'الملف الشخصي',
     'logout' => 'تسجيل الخروج',
     'coming_soon' => 'هذا القسم قيد التطوير. قريباً!',
+    'priority'      => 'الأولوية',
     'created_successfully' => 'تم الإنشاء بنجاح',
     'updated_successfully' => 'تم التحديث بنجاح',
     'deleted_successfully' => 'تم الحذف بنجاح',

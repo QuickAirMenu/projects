@@ -32,6 +32,7 @@ return [
     'profile' => 'Profile',
     'logout' => 'Logout',
     'coming_soon' => 'This module is under development. Coming soon!',
+    'priority'      => 'Priority',
     'created_successfully' => 'Created successfully',
     'updated_successfully' => 'Updated successfully',
     'deleted_successfully' => 'Deleted successfully',
