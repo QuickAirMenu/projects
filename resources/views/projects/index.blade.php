@@ -18,10 +18,10 @@
 {{-- Stats Cards --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     @foreach([
-        ['label' => 'الإجمالي',   'val' => $stats['total'],     'color' => 'blue',   'icon' => 'fa-folder'],
-        ['label' => 'جارية',       'val' => $stats['active'],    'color' => 'green',  'icon' => 'fa-play-circle'],
-        ['label' => 'متأخرة',      'val' => $stats['overdue'],   'color' => 'red',    'icon' => 'fa-exclamation-circle'],
-        ['label' => 'مكتملة',      'val' => $stats['completed'], 'color' => 'purple', 'icon' => 'fa-check-circle'],
+        ['label' => __('project.total'),   'val' => $stats['total'],     'color' => 'blue',   'icon' => 'fa-folder'],
+        ['label' => __('project.active_projects'),       'val' => $stats['active'],    'color' => 'green',  'icon' => 'fa-play-circle'],
+        ['label' => __('project.overdue'),      'val' => $stats['overdue'],   'color' => 'red',    'icon' => 'fa-exclamation-circle'],
+        ['label' => __('project.completed'),      'val' => $stats['completed'], 'color' => 'purple', 'icon' => 'fa-check-circle'],
     ] as $card)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4">
         <div class="w-12 h-12 rounded-xl bg-{{ $card['color'] }}-100 flex items-center justify-center">

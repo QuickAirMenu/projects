@@ -37,4 +37,5 @@ return [
     'deleted_successfully' => 'Deleted successfully',
     'approved_successfully' => 'Approved successfully',
     'rejected_successfully' => 'Rejected successfully',
+    'progress' => 'Progress',
 ];

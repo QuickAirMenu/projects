@@ -12,7 +12,7 @@
         <form action="{{ route('clients.portal-invite', $client) }}" method="POST">
             @csrf
             <button type="submit" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl transition">
-                <i class="fas fa-envelope"></i> دعوة البوابة
+                <i class="fas fa-envelope"></i> {{ __('client.portal_invite') }}
             </button>
         </form>
         @endif
@@ -68,12 +68,12 @@
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div class="flex items-center justify-between">
-                <h3 class="font-semibold text-gray-800">بوابة العميل</h3>
+                <h3 class="font-semibold text-gray-800">{{ __('client.client_portal') }}</h3>
                 <span class="text-xs px-2 py-1 rounded-full {{ $client->portalAccount?->email_verified_at ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
-                    {{ $client->portalAccount?->email_verified_at ? 'مفعلة' : 'بانتظار الإعداد' }}
+                    {{ $client->portalAccount?->email_verified_at ? __('client.activated') : __('client.pending_setup') }}
                 </span>
             </div>
-            <p class="mt-3 text-sm text-gray-500">{{ $client->email ? 'يمكن إرسال رابط إعداد الحساب مباشرة إلى بريد العميل.' : 'أضف بريدًا إلكترونيًا لإرسال دعوة البوابة.' }}</p>
+            <p class="mt-3 text-sm text-gray-500">{{ $client->email ? __('client.portal_setup_message') : __('client.portal_setup_no_email') }}</p>
         </div>
 
         {{-- Stats --}}

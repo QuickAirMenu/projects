@@ -36,4 +36,11 @@ return [
     'no_tasks'              => 'لا يوجد مهام',
     'calendar'              => 'التقويم',
     'kanban'                => 'كانبان',
+    'total'                 => 'الإجمالي',
+    'my_tasks'              => 'مهامي',
+    'overdue'               => 'متأخرة',
+    'completed'             => 'مكتملة',
+    'overdue_only'          => 'متأخرة فقط',
+    'blocked_tasks'         => 'محجوبة',
+    'assigned_to_label'     => 'المسند إليه',
 ];

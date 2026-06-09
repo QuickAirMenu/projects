@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'تقرير المشاريع')
+@section('title', __('messages.projects_report'))
 
 @section('content')
 <div class="mb-6 flex items-center justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">تقرير المشاريع</h1>
-        <p class="text-gray-500 text-sm mt-1">حسب الحالة والأولوية</p>
+        <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.projects_report') }}</h1>
+        <p class="text-gray-500 text-sm mt-1">{{ __('messages.by_status_priority') }}</p>
     </div>
     <a href="{{ route('reports.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition">
         <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
@@ -15,10 +15,10 @@
 {{-- Summary Stats --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     @foreach([
-        ['label' => 'الإجمالي',  'val' => $stats['total'],     'color' => 'blue',  'icon' => 'fa-folder'],
-        ['label' => 'جارية',     'val' => $stats['in_progress'],'color' => 'green', 'icon' => 'fa-play-circle'],
-        ['label' => 'متأخرة',    'val' => $stats['overdue'],   'color' => 'red',   'icon' => 'fa-clock'],
-        ['label' => 'مكتملة',    'val' => $stats['completed'], 'color' => 'purple','icon' => 'fa-check-circle'],
+        ['label' => __('project.total'),  'val' => $stats['total'],     'color' => 'blue',  'icon' => 'fa-folder'],
+        ['label' => __('project.active_projects'),     'val' => $stats['in_progress'],'color' => 'green', 'icon' => 'fa-play-circle'],
+        ['label' => __('project.overdue'),    'val' => $stats['overdue'],   'color' => 'red',   'icon' => 'fa-clock'],
+        ['label' => __('project.completed'),    'val' => $stats['completed'], 'color' => 'purple','icon' => 'fa-check-circle'],
     ] as $c)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4">
         <div class="w-11 h-11 rounded-xl bg-{{ $c['color'] }}-100 flex items-center justify-center">
@@ -36,7 +36,7 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
     <form method="GET" class="flex flex-wrap gap-3">
         <select name="status_id" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">الحالة</option>
+            <option value="">{{ __('messages.status') }}</option>
             @foreach($statuses as $s)
                 <option value="{{ $s->id }}" {{ request('status_id') == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
             @endforeach
@@ -54,12 +54,12 @@
     <table class="w-full text-sm">
         <thead>
             <tr class="bg-gray-50 border-b">
-                <th class="text-start px-5 py-3 font-semibold text-gray-600">المشروع</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">العميل</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600">الحالة</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">الإنجاز</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">الميزانية</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">الموعد</th>
+                <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('project.project') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('client.client') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('project.status') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('project.progress') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('project.budget_label') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('project.deadline') }}</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
@@ -89,7 +89,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="py-12 text-center text-gray-400">لا توجد بيانات</td></tr>
+            <tr><td colspan="6" class="py-12 text-center text-gray-400">{{ __('messages.no_data_found') }}</td></tr>
             @endforelse
         </tbody>
     </table>

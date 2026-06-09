@@ -18,10 +18,10 @@
 {{-- Stats --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     @foreach([
-        ['label' => 'الإجمالي',  'val' => $stats['total'],    'color' => 'blue',   'icon' => 'fa-users'],
-        ['label' => 'نشطون',     'val' => $stats['active'],   'color' => 'green',  'icon' => 'fa-user-check'],
-        ['label' => 'VIP',       'val' => $stats['vip'],      'color' => 'yellow', 'icon' => 'fa-star'],
-        ['label' => 'محتملون',   'val' => $stats['potential'],'color' => 'purple', 'icon' => 'fa-user-clock'],
+        ['label' => __('client.total'),  'val' => $stats['total'],    'color' => 'blue',   'icon' => 'fa-users'],
+        ['label' => __('client.active_clients'),     'val' => $stats['active'],   'color' => 'green',  'icon' => 'fa-user-check'],
+        ['label' => __('client.vip_clients'),       'val' => $stats['vip'],      'color' => 'yellow', 'icon' => 'fa-star'],
+        ['label' => __('client.potential_clients'),   'val' => $stats['potential'],'color' => 'purple', 'icon' => 'fa-user-clock'],
     ] as $c)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4">
         <div class="w-12 h-12 rounded-xl bg-{{ $c['color'] }}-100 flex items-center justify-center">

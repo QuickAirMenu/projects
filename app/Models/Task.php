@@ -189,11 +189,17 @@ class Task extends Model
 
     public function getCompletedChecklistsCountAttribute()
     {
+        if ($this->relationLoaded('checklists')) {
+            return $this->checklists->where('is_completed', true)->count();
+        }
         return $this->checklists()->where('is_completed', true)->count();
     }
 
     public function getTotalChecklistsCountAttribute()
     {
+        if ($this->relationLoaded('checklists')) {
+            return $this->checklists->count();
+        }
         return $this->checklists()->count();
     }
 
@@ -209,6 +215,9 @@ class Task extends Model
 
     public function getTotalLoggedHoursAttribute()
     {
+        if ($this->relationLoaded('timeLogs')) {
+            return $this->timeLogs->sum('hours');
+        }
         return $this->timeLogs()->sum('hours');
     }
 }

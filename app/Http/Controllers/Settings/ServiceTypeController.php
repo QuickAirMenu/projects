@@ -83,6 +83,21 @@ class ServiceTypeController extends Controller
         return back()->with('success', __('common.created_successfully'));
     }
 
+    public function updateItem(Request $request, ServiceType $serviceType, ServiceTypeItem $item)
+    {
+        abort_unless($item->service_type_id === $serviceType->id, 404);
+
+        $data = $request->validate([
+            'description' => 'required|string',
+            'quantity'    => 'required|integer|min:1',
+            'unit_price'  => 'required|numeric|min:0',
+        ]);
+
+        $item->update($data);
+
+        return back()->with('success', __('common.updated_successfully'));
+    }
+
     public function destroyItem(ServiceType $serviceType, ServiceTypeItem $item)
     {
         abort_unless($item->service_type_id === $serviceType->id, 404);

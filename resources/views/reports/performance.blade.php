@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'تقرير الأداء')
+@section('title', __('messages.performance_report'))
 
 @section('content')
 <div class="mb-6 flex items-center justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">تقرير الأداء</h1>
+        <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.performance_report') }}</h1>
         <p class="text-gray-500 text-sm mt-1">{{ $from }} — {{ $to }}</p>
     </div>
     <a href="{{ route('reports.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition">
@@ -16,11 +16,11 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
     <form method="GET" class="flex flex-wrap gap-3">
         <div>
-            <label class="block text-xs text-gray-500 mb-1">من</label>
+            <label class="block text-xs text-gray-500 mb-1">{{ __('messages.date_from') }}</label>
             <input type="date" name="from" value="{{ $from }}" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
-            <label class="block text-xs text-gray-500 mb-1">إلى</label>
+            <label class="block text-xs text-gray-500 mb-1">{{ __('messages.date_to') }}</label>
             <input type="date" name="to" value="{{ $to }}" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div class="flex items-end">
@@ -48,19 +48,19 @@
 
         <div class="space-y-3">
             <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المهام الإجمالية</span>
+                <span class="text-gray-500">{{ __('messages.total_tasks_label') }}</span>
                 <span class="font-semibold text-gray-800">{{ $member->total_tasks }}</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المكتملة</span>
+                <span class="text-gray-500">{{ __('messages.completed_label') }}</span>
                 <span class="font-semibold text-green-600">{{ $member->completed_tasks }}</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المتأخرة</span>
+                <span class="text-gray-500">{{ __('messages.overdue_label') }}</span>
                 <span class="font-semibold {{ $member->overdue_tasks > 0 ? 'text-red-500' : 'text-gray-400' }}">{{ $member->overdue_tasks }}</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-gray-500">ساعات مسجّلة</span>
+                <span class="text-gray-500">{{ __('messages.logged_hours_label') }}</span>
                 <span class="font-semibold text-purple-600">{{ number_format($member->logged_hours, 1) }}h</span>
             </div>
         </div>
@@ -68,7 +68,7 @@
         {{-- Completion Rate Bar --}}
         <div class="mt-4">
             <div class="flex justify-between text-xs text-gray-500 mb-1">
-                <span>نسبة الإنجاز</span>
+                <span>{{ __('messages.completion_rate_label') }}</span>
                 <span>{{ $completionRate }}%</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2">
@@ -80,7 +80,7 @@
     @empty
     <div class="col-span-3 py-16 text-center text-gray-400">
         <i class="fas fa-chart-bar text-5xl mb-3 block text-gray-200"></i>
-        لا توجد بيانات أداء
+        {{ __('messages.no_performance_data') }}
     </div>
     @endforelse
 </div>

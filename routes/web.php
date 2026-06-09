@@ -224,6 +224,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
             Route::put('{serviceType}', [ServiceTypeController::class, 'update'])->name('update');
             Route::delete('{serviceType}', [ServiceTypeController::class, 'destroy'])->name('destroy');
             Route::post('{serviceType}/items', [ServiceTypeController::class, 'storeItem'])->name('items.store');
+            Route::put('{serviceType}/items/{item}', [ServiceTypeController::class, 'updateItem'])->name('items.update');
             Route::delete('{serviceType}/items/{item}', [ServiceTypeController::class, 'destroyItem'])->name('items.destroy');
         });
         Route::prefix('project-statuses')->name('project-statuses.')->group(function () {

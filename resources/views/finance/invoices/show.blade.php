@@ -8,7 +8,7 @@
         <p class="text-gray-500 text-sm">{{ $invoice->client?->name }} · {{ $invoice->project?->name }}</p>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('invoices.pdf', $invoice) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>تحميل PDF</a>
+        <a href="{{ route('invoices.pdf', $invoice) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
         <a href="{{ route('invoices.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
     </div>
 </div>
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <table class="w-full text-sm mb-6">
-                <thead><tr class="bg-gray-50"><th class="text-start p-3 rounded-s-lg">{{ __('messages.description') }}</th><th class="text-center p-3">كمية</th><th class="text-end p-3 rounded-e-lg">{{ __('finance.total') }}</th></tr></thead>
+                <thead><tr class="bg-gray-50"><th class="text-start p-3 rounded-s-lg">{{ __('messages.description') }}</th><th class="text-center p-3">{{ __('finance.quantity') }}</th><th class="text-end p-3 rounded-e-lg">{{ __('finance.total') }}</th></tr></thead>
                 <tbody>
                 @foreach($invoice->items as $item)
                 <tr class="border-b"><td class="p-3">{{ $item->description }}</td><td class="p-3 text-center">{{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</td><td class="p-3 text-end font-medium">{{ number_format($item->total, 2) }}</td></tr>
@@ -59,7 +59,7 @@
                     <i class="fas fa-plus me-1"></i>{{ __('finance.add_payment') }}
                 </button>
                 <input type="file" name="proof_of_payment" accept=".pdf,.jpg,.jpeg,.png,.webp" class="col-span-4 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <p class="col-span-4 text-xs text-gray-400 -mt-1">{{ __('finance.payment_proof') }}. سيتم ضغط الصور تلقائياً قبل الرفع.</p>
+                <p class="col-span-4 text-xs text-gray-400 -mt-1">{{ __('finance.payment_proof') }}. {{ __('finance.image_compression_notice') }}</p>
                 <div id="payment-form-error" class="hidden col-span-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
             </form>
             @endif
@@ -77,7 +77,7 @@
                 <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">{{ $payment->payment_number }}</span>
             </div>
             @empty
-            <p class="text-gray-400 text-sm text-center py-3">لا توجد دفعات مسجلة</p>
+            <p class="text-gray-400 text-sm text-center py-3">{{ __('finance.no_payments_recorded') }}</p>
             @endforelse
         </div>
     </div>
@@ -94,7 +94,7 @@
             <div class="flex justify-between border-t pt-2"><span class="font-semibold">{{ __('finance.remaining') }}</span><span class="font-bold text-red-500">{{ number_format($invoice->remaining_amount, 2) }}</span></div>
             @if($invoice->contract)
             <div class="border-t pt-2">
-                <a href="{{ route('contracts.show', $invoice->contract) }}" class="text-blue-600 hover:underline text-sm">عرض العقد المرتبط</a>
+                <a href="{{ route('contracts.show', $invoice->contract) }}" class="text-blue-600 hover:underline text-sm">{{ __('finance.view_linked_contract') }}</a>
             </div>
             @endif
         </div>
@@ -157,7 +157,7 @@
         if (submitButton) {
             submitButton.disabled = true;
             submitButton.classList.add('opacity-70', 'cursor-not-allowed');
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>جاري الرفع...';
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ __('finance.uploading') }}';
         }
 
         try {
@@ -183,23 +183,23 @@
             if (response.status === 422) {
                 const data = await response.json();
                 const firstError = data?.errors ? Object.values(data.errors).flat()[0] : null;
-                showError(firstError || 'تعذر رفع الإيصال. تحقق من البيانات ثم أعد المحاولة.');
+                showError(firstError || '{{ __('finance.upload_failed_check_data') }}');
                 return;
             }
 
             if (response.status === 419) {
-                showError('انتهت الجلسة، أعد تحميل الصفحة ثم حاول مرة أخرى.');
+                showError('{{ __('finance.session_expired_reload') }}');
                 return;
             }
 
             if (!response.ok) {
-                showError('تعذر رفع الإيصال الآن. أعد المحاولة بعد قليل.');
+                showError('{{ __('finance.upload_failed_try_later') }}');
                 return;
             }
 
             window.location.href = response.url || form.action;
         } catch (error) {
-            showError('فشل الاتصال أثناء رفع الإيصال. تم تقليل الصورة تلقائياً، جرّب مرة أخرى.');
+            showError('{{ __('finance.upload_connection_failed') }}');
         } finally {
             if (submitButton) {
                 submitButton.disabled = false;

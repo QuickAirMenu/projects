@@ -7,17 +7,17 @@
         <p class="text-gray-500 text-sm">{{ $quote->client?->name }}</p>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('quotes.pdf', $quote) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>تحميل PDF</a>
-        <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-link me-2"></i>الرابط العام</a>
+        <a href="{{ route('quotes.pdf', $quote) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
+        <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-link me-2"></i>{{ __('messages.public_link') }}</a>
         @if($quote->status === 'draft')
-        <a href="{{ route('quotes.edit', $quote) }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-edit me-2"></i>تعديل</a>
+        <a href="{{ route('quotes.edit', $quote) }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-edit me-2"></i>{{ __('messages.edit') }}</a>
         <form action="{{ route('quotes.send', $quote) }}" method="POST">
             @csrf
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-paper-plane me-2"></i>إرسال</button>
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-paper-plane me-2"></i>{{ __('messages.send') }}</button>
         </form>
         @endif
         @if($whatsappUrl)
-        <a href="{{ $whatsappUrl }}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fab fa-whatsapp me-2"></i>إرسال عبر WhatsApp</a>
+        <a href="{{ $whatsappUrl }}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fab fa-whatsapp me-2"></i>{{ __('finance.send_via_whatsapp') }}</a>
         @endif
         <a href="{{ route('quotes.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
     </div>
@@ -40,7 +40,7 @@
             </div>
             <h3 class="font-semibold text-gray-700 mb-3">{{ $quote->subject }}</h3>
             <table class="w-full text-sm mb-5">
-                <thead><tr class="bg-gray-50"><th class="text-start p-3 rounded-s-lg">{{ __('messages.description') }}</th><th class="text-center p-3">الكمية × السعر</th><th class="text-end p-3 rounded-e-lg">{{ __('finance.total') }}</th></tr></thead>
+                <thead><tr class="bg-gray-50"><th class="text-start p-3 rounded-s-lg">{{ __('messages.description') }}</th><th class="text-center p-3">{{ __('finance.qty_x_price') }}</th><th class="text-end p-3 rounded-e-lg">{{ __('finance.total') }}</th></tr></thead>
                 <tbody>
                 @foreach($quote->items as $item)
                 <tr class="border-b"><td class="p-3">{{ $item->description }}</td><td class="p-3 text-center">{{ $item->quantity }} × {{ number_format($item->unit_price,2) }}</td><td class="p-3 text-end font-medium">{{ number_format($item->total,2) }}</td></tr>
@@ -50,7 +50,7 @@
                     <tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.subtotal') }}</td><td class="p-3 text-end">{{ number_format($quote->subtotal,2) }}</td></tr>
                     @if($quote->tax_amount > 0)<tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.tax') }} ({{ $quote->tax_percentage }}%)</td><td class="p-3 text-end">{{ number_format($quote->tax_amount,2) }}</td></tr>@endif
                     @if($quote->discount_amount > 0)<tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.discount') }}</td><td class="p-3 text-end text-red-500">-{{ number_format($quote->discount_amount,2) }}</td></tr>@endif
-                    <tr class="border-t"><td colspan="2" class="p-3 text-end font-bold">{{ __('finance.total') }}</td><td class="p-3 text-end font-bold text-blue-600 text-lg">{{ number_format($quote->total,2) }} ر.س</td></tr>
+                    <tr class="border-t"><td colspan="2" class="p-3 text-end font-bold">{{ __('finance.total') }}</td><td class="p-3 text-end font-bold text-blue-600 text-lg">{{ number_format($quote->total,2) }} {{ __('messages.currency') }}</td></tr>
                 </tfoot>
             </table>
             @if($quote->notes)<div class="p-4 bg-gray-50 rounded-xl text-sm text-gray-600"><p class="font-semibold mb-1">{{ __('messages.notes') }}</p>{{ $quote->notes }}</div>@endif
@@ -59,20 +59,20 @@
     <div class="space-y-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 text-sm space-y-3">
             @php $sc = ['draft'=>'gray','sent'=>'blue','approved'=>'green','rejected'=>'red'][$quote->status]??'gray' @endphp
-            <div class="flex justify-between"><span class="text-gray-500">الحالة</span><span class="px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $sc }}-100 text-{{ $sc }}-700">{{ ucfirst($quote->status) }}</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">الإجمالي</span><span class="font-bold text-blue-600">{{ number_format($quote->total,2) }} ر.س</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.status') }}</span><span class="px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $sc }}-100 text-{{ $sc }}-700">{{ ucfirst($quote->status) }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.total') }}</span><span class="font-bold text-blue-600">{{ number_format($quote->total,2) }} {{ __('messages.currency') }}</span></div>
             @if($quote->status === 'approved' && !$quote->converted_to_project_id)
             <div class="border-t pt-3">
-                <p class="text-gray-500 text-xs mb-2">تحويل العرض إلى مشروع</p>
+                <p class="text-gray-500 text-xs mb-2">{{ __('finance.convert_quote_to_project_label') }}</p>
                 <a href="{{ route('projects.create') }}?quote_id={{ $quote->id }}&client_id={{ $quote->client_id }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-xl text-sm transition">{{ __('finance.convert_to_project') }}</a>
             </div>
             @endif
             @if($quote->status === 'approved' && !$quote->invoice)
             <div class="border-t pt-3">
-                <p class="text-gray-500 text-xs mb-2">تحويل العرض إلى فاتورة</p>
+                <p class="text-gray-500 text-xs mb-2">{{ __('finance.convert_quote_to_invoice_label') }}</p>
                 <form action="{{ route('quotes.convert-to-invoice', $quote) }}" method="POST">
                     @csrf
-                    <button type="submit" class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-2 rounded-xl text-sm transition">إنشاء فاتورة</button>
+                    <button type="submit" class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-2 rounded-xl text-sm transition">{{ __('finance.create_invoice') }}</button>
                 </form>
             </div>
             @endif

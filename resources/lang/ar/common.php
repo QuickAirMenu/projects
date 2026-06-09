@@ -37,4 +37,5 @@ return [
     'deleted_successfully' => 'تم الحذف بنجاح',
     'approved_successfully' => 'تم الاعتماد بنجاح',
     'rejected_successfully' => 'تم الرفض بنجاح',
+    'progress' => 'نسبة الإنجاز',
 ];

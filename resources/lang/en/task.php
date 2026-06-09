@@ -36,4 +36,11 @@ return [
     'no_tasks'              => 'No tasks found',
     'calendar'              => 'Calendar',
     'kanban'                => 'Kanban',
+    'total'                 => 'Total',
+    'my_tasks'              => 'My Tasks',
+    'overdue'               => 'Overdue',
+    'completed'             => 'Completed',
+    'overdue_only'          => 'Overdue Only',
+    'blocked_tasks'         => 'Blocked',
+    'assigned_to_label'     => 'Assigned To',
 ];

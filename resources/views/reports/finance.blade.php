@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'التقرير المالي')
+@section('title', __('messages.finance_report'))
 
 @section('content')
 <div class="mb-6 flex items-center justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">التقرير المالي</h1>
-        <p class="text-gray-500 text-sm mt-1">الفواتير والمدفوعات</p>
+        <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.finance_report') }}</h1>
+        <p class="text-gray-500 text-sm mt-1">{{ __('messages.invoices_payments') }}</p>
     </div>
     <a href="{{ route('reports.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition">
         <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
@@ -15,10 +15,10 @@
 {{-- Financial KPIs --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     @foreach([
-        ['label' => 'إجمالي الفواتير', 'val' => number_format($stats['total_invoiced'],2).' ر.س', 'color' => 'blue', 'icon' => 'fa-file-invoice-dollar'],
-        ['label' => 'المحصّل',          'val' => number_format($stats['total_paid'],2).' ر.س',    'color' => 'green','icon' => 'fa-money-bill-wave'],
-        ['label' => 'غير مدفوع',        'val' => number_format($stats['total_unpaid'],2).' ر.س',  'color' => 'red',  'icon' => 'fa-exclamation'],
-        ['label' => 'متأخرة',           'val' => $stats['overdue_count'],                          'color' => 'orange','icon' => 'fa-clock'],
+        ['label' => __('finance.total_invoiced'), 'val' => number_format($stats['total_invoiced'],2).' '. __('messages.currency'), 'color' => 'blue', 'icon' => 'fa-file-invoice-dollar'],
+        ['label' => __('messages.collected_label'),          'val' => number_format($stats['total_paid'],2).' '. __('messages.currency'),    'color' => 'green','icon' => 'fa-money-bill-wave'],
+        ['label' => __('messages.unpaid_label'),        'val' => number_format($stats['total_unpaid'],2).' '. __('messages.currency'),  'color' => 'red',  'icon' => 'fa-exclamation'],
+        ['label' => __('messages.overdue_label'),           'val' => $stats['overdue_count'],                          'color' => 'orange','icon' => 'fa-clock'],
     ] as $c)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <div class="w-10 h-10 rounded-xl bg-{{ $c['color'] }}-100 flex items-center justify-center mb-3">
@@ -33,14 +33,14 @@
 {{-- Monthly Chart Data --}}
 @if($monthlyData->count())
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
-    <h3 class="font-semibold text-gray-700 mb-4">الأداء الشهري {{ now()->year }}</h3>
+    <h3 class="font-semibold text-gray-700 mb-4">{{ __('messages.monthly_performance') }} {{ now()->year }}</h3>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead><tr class="border-b">
-                <th class="text-start py-2 text-gray-500">الشهر</th>
-                <th class="text-end py-2 text-gray-500">إجمالي الفواتير</th>
-                <th class="text-end py-2 text-gray-500">المحصّل</th>
-                <th class="text-end py-2 text-gray-500">نسبة التحصيل</th>
+                <th class="text-start py-2 text-gray-500">{{ __('messages.month') }}</th>
+                <th class="text-end py-2 text-gray-500">{{ __('finance.total_invoiced') }}</th>
+                <th class="text-end py-2 text-gray-500">{{ __('messages.collected_label') }}</th>
+                <th class="text-end py-2 text-gray-500">{{ __('messages.collection_rate') }}</th>
             </tr></thead>
             <tbody>
                 @foreach($monthlyData as $row)
@@ -68,9 +68,9 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
     <form method="GET" class="flex flex-wrap gap-3">
         <select name="payment_status" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">حالة الدفع</option>
-            @foreach(['unpaid'=>'غير مدفوع','partially_paid'=>'جزئي','paid'=>'مدفوع','overdue'=>'متأخر'] as $v=>$l)
-                <option value="{{ $v }}" {{ request('payment_status') === $v ? 'selected' : '' }}>{{ $l }}</option>
+            <option value="">{{ __('finance.payment_status') }}</option>
+            @foreach(['unpaid'=>'unpaid','partially_paid'=>'partially_paid','paid'=>'paid','overdue'=>'overdue'] as $v=>$l)
+                <option value="{{ $v }}" {{ request('payment_status') === $v ? 'selected' : '' }}>{{ __('finance.status_'.$v) }}</option>
             @endforeach
         </select>
         <input type="date" name="from" value="{{ request('from') }}" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -83,12 +83,12 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <table class="w-full text-sm">
         <thead><tr class="bg-gray-50 border-b">
-            <th class="text-start px-5 py-3 font-semibold text-gray-600">الفاتورة</th>
-            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">العميل</th>
-            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">الإجمالي</th>
-            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">المدفوع</th>
-            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">المتبقي</th>
-            <th class="text-start px-4 py-3 font-semibold text-gray-600">الحالة</th>
+            <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('finance.invoice') }}</th>
+            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('client.client') }}</th>
+            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('messages.total') }}</th>
+            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('finance.paid_amount') }}</th>
+            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.remaining') }}</th>
+            <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('messages.status') }}</th>
         </tr></thead>
         <tbody class="divide-y divide-gray-50">
             @forelse($invoices as $inv)
@@ -107,7 +107,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="py-12 text-center text-gray-400">لا توجد فواتير</td></tr>
+            <tr><td colspan="6" class="py-12 text-center text-gray-400">{{ __('messages.no_invoices') }}</td></tr>
             @endforelse
         </tbody>
     </table>

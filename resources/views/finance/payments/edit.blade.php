@@ -52,7 +52,7 @@
         </div>
 
         <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.notes') ?? 'ملاحظات' }}</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.notes') }}</label>
             <textarea name="notes" rows="4" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('notes') border-red-400 @enderror">{{ old('notes', $payment->notes) }}</textarea>
             @error('notes')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
@@ -60,7 +60,7 @@
         <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('finance.payment_proof') }}</label>
             <input type="file" name="proof_of_payment" accept=".pdf,.jpg,.jpeg,.png,.webp" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('proof_of_payment') border-red-400 @enderror">
-            <p class="text-xs text-gray-500 mt-2">{{ __('finance.payment_proof') }}. سيتم ضغط الصور تلقائياً قبل الرفع.</p>
+            <p class="text-xs text-gray-500 mt-2">{{ __('finance.payment_proof') }}. {{ __('finance.image_compression_notice') }}</p>
             @if($payment->proof_file_path)
                 <a href="{{ Storage::url($payment->proof_file_path) }}" target="_blank" class="inline-block mt-2 text-sm text-blue-600 hover:underline">{{ $payment->proof_file_name }}</a>
             @endif

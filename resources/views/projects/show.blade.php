@@ -28,7 +28,7 @@
         </a>
         @if(auth()->id() === $project->manager_id && $project->progress_percentage >= 100 && !$project->is_handed_off)
         <a href="{{ route('projects.handoff', $project) }}" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl transition text-sm">
-            <i class="fas fa-truck"></i> تسليم المشروع
+            <i class="fas fa-truck"></i> {{ __('project.handoff_project') }}
         </a>
         @endif
     </div>

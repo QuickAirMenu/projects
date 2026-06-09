@@ -25,10 +25,10 @@
 {{-- Stats --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     @foreach([
-        ['label' => 'الإجمالي',   'val' => $stats['total'],   'color' => 'blue',   'icon' => 'fa-tasks'],
-        ['label' => 'مهامي',       'val' => $stats['my_open'], 'color' => 'purple', 'icon' => 'fa-user-check'],
-        ['label' => 'متأخرة',      'val' => $stats['overdue'], 'color' => 'red',    'icon' => 'fa-clock'],
-        ['label' => 'مكتملة',      'val' => $stats['done'],    'color' => 'green',  'icon' => 'fa-check-circle'],
+        ['label' => __('task.total'),   'val' => $stats['total'],   'color' => 'blue',   'icon' => 'fa-tasks'],
+        ['label' => __('task.my_tasks'),       'val' => $stats['my_open'], 'color' => 'purple', 'icon' => 'fa-user-check'],
+        ['label' => __('task.overdue'),      'val' => $stats['overdue'], 'color' => 'red',    'icon' => 'fa-clock'],
+        ['label' => __('task.completed'),      'val' => $stats['done'],    'color' => 'green',  'icon' => 'fa-check-circle'],
     ] as $c)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4">
         <div class="w-12 h-12 rounded-xl bg-{{ $c['color'] }}-100 flex items-center justify-center">
@@ -67,7 +67,7 @@
         </select>
         <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
             <input type="checkbox" name="overdue" value="1" {{ request('overdue') ? 'checked' : '' }} class="rounded">
-            {{ __('متأخرة فقط') }}
+            {{ __('task.overdue_only') }}
         </label>
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm transition">
             <i class="fas fa-search me-1"></i>{{ __('messages.filter') }}

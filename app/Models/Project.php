@@ -241,6 +241,9 @@ class Project extends Model
 
     public function getTotalTasksCountAttribute()
     {
+        if ($this->relationLoaded('tasks')) {
+            return $this->tasks->count();
+        }
         return $this->tasks()->count();
     }
 }
