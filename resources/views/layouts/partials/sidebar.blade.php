@@ -27,9 +27,9 @@
             <i class="fas fa-briefcase {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
             <span>{{ __('common.projects') }}</span>
         </a>
-        <a href="{{ route('projects.board') }}" class="sidebar-link {{ request()->routeIs('projects.board') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-4' : 'ml-4' }}">
-            <i class="fas fa-columns mr-3"></i>
-            <span>Kanban</span>
+        <a href="{{ route('projects.board') }}" class="sidebar-link {{ request()->routeIs('projects.board') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-5' : 'ml-5' }}">
+            <i class="fas fa-columns {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+            <span>{{ __('project.kanban') }}</span>
         </a>
         @endcan
 
@@ -39,18 +39,18 @@
             <i class="fas fa-tasks {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
             <span>{{ __('common.tasks') }}</span>
         </a>
-        <a href="{{ route('tasks.kanban') }}" class="sidebar-link {{ request()->routeIs('tasks.kanban') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-4' : 'ml-4' }}">
-            <i class="fas fa-columns mr-3"></i>
-            <span>Kanban</span>
+        <a href="{{ route('tasks.kanban') }}" class="sidebar-link {{ request()->routeIs('tasks.kanban') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-5' : 'ml-5' }}">
+            <i class="fas fa-columns {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+            <span>{{ __('task.kanban') }}</span>
         </a>
-        <a href="{{ route('tasks.calendar') }}" class="sidebar-link {{ request()->routeIs('tasks.calendar') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-4' : 'ml-4' }}">
-            <i class="fas fa-calendar-alt mr-3"></i>
-            <span>Calendar</span>
+        <a href="{{ route('tasks.calendar') }}" class="sidebar-link {{ request()->routeIs('tasks.calendar') ? 'active' : '' }} text-sm {{ is_rtl() ? 'mr-5' : 'ml-5' }}">
+            <i class="fas fa-calendar-alt {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+            <span>{{ __('task.calendar') }}</span>
         </a>
         @endcan
 
         <!-- Finance Section -->
-        @canany(['view-quotes', 'view-invoices', 'view-payments'])
+        @canany(['view-quotes', 'view-invoices', 'view-payments', 'view-contracts'])
         <div class="pt-4 mt-4 border-t border-gray-200">
             <p class="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase">{{ __('common.finance') }}</p>
             
@@ -109,13 +109,14 @@
                 <span>{{ __('common.settings') }}</span>
             </a>
             @endcan
-
-            <a href="{{ route('help') }}" class="sidebar-link {{ request()->routeIs('help') ? 'active' : '' }}">
-                <i class="fas fa-circle-question {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
-                <span>مركز المساعدة</span>
-            </a>
         </div>
         @endcanany
+
+        <!-- Help -->
+        <a href="{{ route('help') }}" class="sidebar-link {{ request()->routeIs('help') ? 'active' : '' }}">
+            <i class="fas fa-circle-question {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+            <span>{{ __('help.title') }}</span>
+        </a>
     </nav>
 
     <!-- Support -->

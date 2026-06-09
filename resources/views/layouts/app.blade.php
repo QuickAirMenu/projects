@@ -27,7 +27,7 @@
             @include('layouts.partials.header')
 
             <!-- Page Content -->
-            <main class="p-6">
+            <main class="p-6 flex-1">
                 @include('layouts.components.alert')
 
                 <!-- Page Header -->
@@ -40,8 +40,10 @@
                 <!-- Main Content -->
                 @yield('content')
             </main>
+
+            <!-- Footer -->
+            @include('layouts.partials.footer')
         </div>
-    @include('layouts.partials.footer')
     </div>
 
     <!-- Delete Confirmation Modal -->
