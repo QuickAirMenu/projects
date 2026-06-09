@@ -1,17 +1,17 @@
 @extends('layouts.app')
-@section('title', 'مركز المساعدة')
+@section('title', __('help.title'))
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">مركز المساعدة</h1>
-    <p class="text-gray-500 mt-1">دليل استخدام شامل لمنصة {{ config('app.name') }}</p>
+    <h1 class="text-2xl font-bold text-gray-800">{{ __('help.title') }}</h1>
+    <p class="text-gray-500 mt-1">{{ __('help.subtitle', ['app' => config('app.name')]) }}</p>
 </div>
 
 <!-- Search -->
 <div class="mb-8 max-w-2xl">
     <div class="relative">
         <i class="fas fa-search absolute {{ is_rtl() ? 'right-3' : 'left-3' }} top-1/2 -translate-y-1/2 text-gray-400"></i>
-        <input type="text" id="helpSearch" placeholder="ابحث في الدليل..."
+        <input type="text" id="helpSearch" placeholder="{{ __('help.search_placeholder') }}"
                class="w-full {{ is_rtl() ? 'pr-10' : 'pl-10' }} border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 </div>
@@ -19,42 +19,42 @@
 <!-- Help Sections Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="helpSections">
     @php $sections = [
-        ['id' => 'getting-started', 'icon' => 'fa-rocket', 'color' => 'blue', 'title' => 'البدء السريع',
+        ['id' => 'getting-started', 'icon' => 'fa-rocket', 'color' => 'blue', 'title' => __('help.getting_started'),
          'items' => [
-             ['q' => 'كيف أبدأ استخدام المنصة؟', 'a' => 'ابدأ بإنشاء عميل من قسم "العملاء"، ثم أنشئ مشروعاً من قسم "المشاريع"، وادعُ فريقك من قسم "المستخدمون".'],
-             ['q' => 'كيف أدعو فريقي؟', 'a' => 'اذهب إلى "المستخدمون" → "إضافة مستخدم"، أدخل اسم وبريد العضو الجديد، وسيتم إرسال دعوة انضمام عبر البريد الإلكتروني.'],
-             ['q' => 'ما هي الصلاحيات المتاحة؟', 'a' => 'توجد صلاحيات متعددة: super-admin (كل الصلاحيات)، admin (إدارة)، team-member (تنفيذ المهام). يمكن تخصيص صلاحيات الأدوار من قسم "الإعدادات".'],
+             ['q' => __('help.gs_q1'), 'a' => __('help.gs_a1')],
+             ['q' => __('help.gs_q2'), 'a' => __('help.gs_a2')],
+             ['q' => __('help.gs_q3'), 'a' => __('help.gs_a3')],
          ]],
-        ['id' => 'clients', 'icon' => 'fa-users', 'color' => 'green', 'title' => 'العملاء',
+        ['id' => 'clients', 'icon' => 'fa-users', 'color' => 'green', 'title' => __('help.clients'),
          'items' => [
-             ['q' => 'كيف أضيف عميلاً جديداً؟', 'a' => 'من قائمة "العملاء"، اضغط "إضافة عميل"، أدخل البيانات المطلوبة (الاسم، الإيميل، الهاتف)، ثم احفظ.'],
-             ['q' => 'كيف أرسل دعوة بوابة العميل؟', 'a' => 'من صفحة تفاصيل العميل، اضغط "إرسال دعوة البوابة". سيصله إيميل لإنشاء كلمة مرور والدخول لبوابته الخاصة.'],
-             ['q' => 'ماذا يرى العميل في بوابته؟', 'a' => 'يرى العميل مشاريعه، الفواتير، حالة المشروع، ويمكنه التواصل مع الفريق من خلال البوابة.'],
+             ['q' => __('help.clients_q1'), 'a' => __('help.clients_a1')],
+             ['q' => __('help.clients_q2'), 'a' => __('help.clients_a2')],
+             ['q' => __('help.clients_q3'), 'a' => __('help.clients_a3')],
          ]],
-        ['id' => 'projects', 'icon' => 'fa-briefcase', 'color' => 'purple', 'title' => 'المشاريع',
+        ['id' => 'projects', 'icon' => 'fa-briefcase', 'color' => 'purple', 'title' => __('help.projects'),
          'items' => [
-             ['q' => 'كيف أنشئ مشروعاً؟', 'a' => 'من قسم "المشاريع"، اضغط "مشروع جديد"، اختر العميل ونوع الخدمة والمدير والميزانية، ثم احفظ.'],
-             ['q' => 'ما هو سير العمل (Workflow)؟', 'a' => 'كل مشروع له سير عمل مخصص حسب نوع الخدمة. يمكنك إكمال الخطوات أو التراجع عنها من صفحة المشروع.'],
-             ['q' => 'كيف أسلم المشروع للعميل؟', 'a' => 'من صفحة المشروع، اضغط "تسليم المشروع"، سيتم إرسال إشعار للعميل بأن المشروع جاهز للتسليم.'],
+             ['q' => __('help.projects_q1'), 'a' => __('help.projects_a1')],
+             ['q' => __('help.projects_q2'), 'a' => __('help.projects_a2')],
+             ['q' => __('help.projects_q3'), 'a' => __('help.projects_a3')],
          ]],
-        ['id' => 'tasks', 'icon' => 'fa-tasks', 'color' => 'amber', 'title' => 'المهام',
+        ['id' => 'tasks', 'icon' => 'fa-tasks', 'color' => 'amber', 'title' => __('help.tasks'),
          'items' => [
-             ['q' => 'كيف أدير المهام؟', 'a' => 'استخدم لوحة كانبان لسحب وإفلات المهام بين الحالات المختلفة. يمكنك أيضاً عرض المهام كقائمة أو تقويم.'],
-             ['q' => 'كيف أسجل وقت العمل؟', 'a' => 'من صفحة المهمة، أضف تسجيل وقت (Time Log) بالساعات والتاريخ والوصف.'],
-             ['q' => 'ما هي قوائم المراجعة (Checklists)؟', 'a' => 'داخل كل مهمة، يمكنك إضافة قائمة مراجعة بخطوات فرعية لتتبع التقدم بدقة.'],
+             ['q' => __('help.tasks_q1'), 'a' => __('help.tasks_a1')],
+             ['q' => __('help.tasks_q2'), 'a' => __('help.tasks_a2')],
+             ['q' => __('help.tasks_q3'), 'a' => __('help.tasks_a3')],
          ]],
-        ['id' => 'finance', 'icon' => 'fa-file-invoice', 'color' => 'emerald', 'title' => 'النظام المالي',
+        ['id' => 'finance', 'icon' => 'fa-file-invoice', 'color' => 'emerald', 'title' => __('help.finance'),
          'items' => [
-             ['q' => 'كيف أنشئ عرض سعر؟', 'a' => 'من "عروض الأسعار" → "إنشاء عرض سعر"، اختر العميل ونوع الخدمة، أضف البنود، ثم احفظ. يمكنك إرساله للعميل عبر الإيميل أو WhatsApp.'],
-             ['q' => 'كيف أحول عرض سعر إلى فاتورة؟', 'a' => 'بعد اعتماد العرض، اضغط "تحويل إلى فاتورة" من صفحة العرض. سيتم إنشاء فاتورة بالبيانات تلقائياً.'],
-             ['q' => 'كيف أسجل دفعة؟', 'a' => 'من صفحة الفاتورة، اضغط "تسجيل دفعة"، أدخل المبلغ وطريقة الدفع والتاريخ، ثم احفظ.'],
-             ['q' => 'كيف أحمّل PDF؟', 'a' => 'كل من عروض الأسعار والفواتير والعقود تدعم تحميل نسخة PDF من صفحة التفاصيل أو من الرابط العام.'],
-             ['q' => 'ما هو الأرشيف؟', 'a' => 'عند حذف أي عنصر مالي، ينتقل إلى "الأرشيف" ويمكن استعادته لاحقاً. زر "الأرشيف" موجود في كل صفحة.'],
+             ['q' => __('help.finance_q1'), 'a' => __('help.finance_a1')],
+             ['q' => __('help.finance_q2'), 'a' => __('help.finance_a2')],
+             ['q' => __('help.finance_q3'), 'a' => __('help.finance_a3')],
+             ['q' => __('help.finance_q4'), 'a' => __('help.finance_a4')],
+             ['q' => __('help.finance_q5'), 'a' => __('help.finance_a5')],
          ]],
-        ['id' => 'reports', 'icon' => 'fa-chart-bar', 'color' => 'rose', 'title' => 'التقارير',
+        ['id' => 'reports', 'icon' => 'fa-chart-bar', 'color' => 'rose', 'title' => __('help.reports'),
          'items' => [
-             ['q' => 'ما التقارير المتاحة؟', 'a' => 'توجد 4 أنواع: تقارير المشاريع، تقارير المهام، التقارير المالية، وتقارير الأداء.'],
-             ['q' => 'كيف أطلع على الأداء المالي؟', 'a' => 'من "التقارير" → "المالية"، يمكنك رؤية الإيرادات، الأرباح، الفواتير غير المدفوعة، والمدفوعات الشهرية.'],
+             ['q' => __('help.reports_q1'), 'a' => __('help.reports_a1')],
+             ['q' => __('help.reports_q2'), 'a' => __('help.reports_a2')],
          ]],
     ]; @endphp
 

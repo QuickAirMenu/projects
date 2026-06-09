@@ -24,26 +24,15 @@
         <!-- Right Side -->
         <div class="flex items-center space-x-4 {{ is_rtl() ? 'space-x-reverse' : '' }}">
             <!-- Language Switcher -->
-            <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" class="flex items-center text-gray-700 hover:text-gray-900">
-                    <i class="fas fa-language {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
-                    <span class="text-sm">{{ app()->getLocale() === 'ar' ? 'العربية' : 'English' }}</span>
-                    <i class="fas fa-chevron-down text-xs {{ is_rtl() ? 'mr-2' : 'ml-2' }}"></i>
-                </button>
-
-                <div x-show="open" 
-                     @click.away="open = false"
-                     x-transition
-                     class="absolute {{ is_rtl() ? 'left-0' : 'right-0' }} mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-                    <a href="{{ route('lang.switch', 'ar') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <i class="fas fa-check {{ app()->getLocale() === 'ar' ? '' : 'invisible' }} {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
-                        العربية
-                    </a>
-                    <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <i class="fas fa-check {{ app()->getLocale() === 'en' ? '' : 'invisible' }} {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
-                        English
-                    </a>
-                </div>
+            <div class="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+                <a href="{{ route('lang.switch', 'ar') }}" 
+                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition {{ app()->getLocale() === 'ar' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700' }}">
+                    <i class="fas fa-globe me-1"></i>عربي
+                </a>
+                <a href="{{ route('lang.switch', 'en') }}" 
+                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition {{ app()->getLocale() === 'en' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700' }}">
+                    EN
+                </a>
             </div>
 
             <!-- User Menu -->
@@ -58,11 +47,11 @@
                      @click.away="open = false"
                      x-transition
                      class="absolute {{ is_rtl() ? 'left-0' : 'right-0' }} mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-user {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                         {{ __('common.profile') }}
                     </a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <a href="{{ route('settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-cog {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                         {{ __('common.settings') }}
                     </a>

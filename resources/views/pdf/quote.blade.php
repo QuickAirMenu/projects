@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body{font-family:DejaVu Sans,sans-serif;font-size:12px;color:#1f2937;margin:0}
+        body{font-family:'dejavusans',sans-serif;font-size:12px;color:#1f2937;margin:0}
         .page{padding:28px}
         .header{display:table;width:100%;margin-bottom:18px}
         .header > div{display:table-cell;vertical-align:top;width:50%}

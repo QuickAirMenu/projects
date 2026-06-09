@@ -79,7 +79,7 @@ class Quote extends Model
             }
 
             if (!$quote->public_token) {
-                $quote->public_token = (string) Str::uuid();
+                $quote->public_token = Str::random(10);
             }
 
             // Set default valid until date

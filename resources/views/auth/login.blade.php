@@ -16,7 +16,7 @@
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-lg mb-4">
                     <i class="fas fa-rocket text-4xl text-primary-600"></i>
                 </div>
-                <h1 class="text-3xl font-bold text-white mb-2">Air Menu | Workspace</h1>
+                <h1 class="text-3xl font-bold text-white mb-2">{{ config('app.name') }}</h1>
                 <p class="text-primary-100">{{ __('auth.welcome_back') }}</p>
             </div>
 

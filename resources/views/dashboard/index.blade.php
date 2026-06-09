@@ -20,17 +20,17 @@
     <div x-data="{ show: true }" x-show="show" class="mb-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
         <div class="flex items-start justify-between">
             <div>
-                <h2 class="text-xl font-bold mb-2">مرحباً بك في {{ config('app.name') }} 🎉</h2>
-                <p class="text-blue-100 mb-4">لتبدأ رحلتك، اتبع هذه الخطوات السريعة:</p>
+                <h2 class="text-xl font-bold mb-2">{{ __('dashboard.welcome_onboard', ['app' => config('app.name')]) }}</h2>
+                <p class="text-blue-100 mb-4">{{ __('dashboard.get_started') }}</p>
                 <div class="flex flex-wrap gap-3">
                     <a href="{{ route('clients.create') }}" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-sm font-medium transition">
-                        <i class="fas fa-user-plus me-2"></i>إنشاء أول عميل
+                        <i class="fas fa-user-plus me-2"></i>{{ __('dashboard.create_first_client') }}
                     </a>
                     <a href="{{ route('projects.create') }}" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-sm font-medium transition">
-                        <i class="fas fa-briefcase me-2"></i>إنشاء أول مشروع
+                        <i class="fas fa-briefcase me-2"></i>{{ __('dashboard.create_first_project') }}
                     </a>
                     <a href="{{ route('users.create') }}" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-sm font-medium transition">
-                        <i class="fas fa-user-plus me-2"></i>دعوة فريق العمل
+                        <i class="fas fa-user-plus me-2"></i>{{ __('dashboard.invite_team') }}
                     </a>
                 </div>
             </div>
@@ -202,7 +202,7 @@
                         <div class="p-4 border-b border-gray-100 hover:bg-gray-50">
                             <div class="flex items-start justify-between mb-2">
                                 <p class="font-medium text-gray-900">{{ $task->title }}</p>
-                                {{ $task->priority_badge }}
+                                {!! $task->priority_badge !!}
                             </div>
                             <p class="text-sm text-gray-600 mb-2">
                                 <i class="fas fa-briefcase {{ is_rtl() ? 'ml-1' : 'mr-1' }}"></i>

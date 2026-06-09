@@ -6,7 +6,7 @@
             {{ __('common.all_rights_reserved') }}
         </p>
         <p>
-            <span class="text-primary-600 font-semibold">Air Menu | Workspace</span> v1.0.0
+            <span class="text-primary-600 font-semibold">{{ config('app.name') }}</span> v1.0.0
         </p>
     </div>
 </footer>

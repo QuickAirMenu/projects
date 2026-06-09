@@ -2,7 +2,7 @@
 <aside id="sidebar" class="fixed top-0 {{ is_rtl() ? 'right-0' : 'left-0' }} z-40 w-64 h-screen transition-transform bg-white border-{{ is_rtl() ? 'l' : 'r' }} border-gray-200 custom-scrollbar overflow-y-auto">
     <!-- Logo -->
     <div class="flex items-center justify-center h-16 border-b border-gray-200 bg-gradient-to-r from-primary-600 to-primary-700">
-        <h1 class="text-xl font-bold text-white">Air Menu | Workspace</h1>
+        <h1 class="text-xl font-bold text-white">{{ config('app.name') }}</h1>
     </div>
 
     <!-- Navigation -->

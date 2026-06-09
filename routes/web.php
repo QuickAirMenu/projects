@@ -75,6 +75,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::post('logout', [LogoutController::class, 'logout'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/help', fn() => view('help'))->name('help');
+    Route::get('/support', fn() => view('support'))->name('support');
 
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {

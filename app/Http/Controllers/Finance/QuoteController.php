@@ -13,7 +13,7 @@ use App\Models\Setting;
 use App\Models\ServiceType;
 use App\Services\MailConfigService;
 use App\Services\QuoteService;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Mpdf\Mpdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -74,10 +74,12 @@ class QuoteController extends Controller
         if ($sharePhone) {
             $phone = $this->normalizeWhatsAppNumber($sharePhone);
             $message = rawurlencode(
-                "مرحباً {$quote->client->name}\n"
-                . "عرض السعر رقم {$quote->quote_number}\n"
-                . 'الإجمالي: ' . format_currency($quote->total) . "\n"
-                . 'الرابط: ' . route('quotes.public', $quote->public_token)
+                "مرحباً {$quote->client->name}،\n\n"
+                . "تجدون مرفقاً عرض السعر رقم {$quote->quote_number}\n"
+                . "الإجمالي: " . format_currency($quote->total) . "\n\n"
+                . "للاطلاع على التفاصيل وتحميل نسخة PDF:\n"
+                . route('quotes.public', $quote->public_token) . "\n\n"
+                . "مع تحيات فريق " . config('app.name')
             );
             if ($phone) {
                 $whatsappUrl = "https://wa.me/{$phone}?text={$message}";
@@ -113,10 +115,17 @@ class QuoteController extends Controller
             ->pluck('value', 'key')
             ->toArray();
 
-        $pdf = Pdf::loadView('pdf.quote', compact('quote', 'settings'));
-        $pdf->setPaper('a4', 'portrait');
-
-        return $pdf->download("quote-{$quote->quote_number}.pdf");
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'default_font' => 'dejavusans',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+        ]);
+        $html = view('pdf.quote', compact('quote', 'settings'))->render();
+        $mpdf->WriteHTML($html);
+        return response($mpdf->Output("quote-{$quote->quote_number}.pdf", 'S'), 200)
+            ->header('Content-Type', 'application/pdf');
     }
 
     public function edit(Quote $quote)
@@ -208,10 +217,17 @@ class QuoteController extends Controller
             'company_email','company_phone','company_address','currency_symbol'
         ])->pluck('value', 'key')->toArray();
 
-        $pdf = Pdf::loadView('pdf.quote', compact('quote', 'settings'));
-        $pdf->setPaper('a4', 'portrait');
-
-        return $pdf->download("quote-{$quote->quote_number}.pdf");
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'default_font' => 'dejavusans',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+        ]);
+        $html = view('pdf.quote', compact('quote', 'settings'))->render();
+        $mpdf->WriteHTML($html);
+        return response($mpdf->Output("quote-{$quote->quote_number}.pdf", 'S'), 200)
+            ->header('Content-Type', 'application/pdf');
     }
 
     public function convertToProject(Request $request, Quote $quote)

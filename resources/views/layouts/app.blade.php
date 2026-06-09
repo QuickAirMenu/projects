@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Air Menu | Workspace') }} - @yield('title', 'Dashboard')</title>
+    <title>{{ config('app.name', 'Air Menu') }} - @yield('title', 'Dashboard')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,12 +17,12 @@
     @stack('styles')
 </head>
 <body class="antialiased">
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 flex flex-col">
         <!-- Sidebar -->
         @include('layouts.partials.sidebar')
 
         <!-- Main Content Area -->
-        <div class="{{ is_rtl() ? 'mr-64' : 'ml-64' }} min-h-screen transition-all duration-300">
+        <div class="{{ is_rtl() ? 'mr-64' : 'ml-64' }} min-h-screen transition-all duration-300 flex-1 flex flex-col">
             <!-- Header -->
             @include('layouts.partials.header')
 
@@ -40,11 +40,9 @@
                 <!-- Main Content -->
                 @yield('content')
             </main>
-
-            <!-- Footer -->
-            @include('layouts.partials.footer')
         </div>
     </div>
+    @include('layouts.partials.footer')
 
     <!-- Delete Confirmation Modal -->
     <div x-data="{ open: false }"

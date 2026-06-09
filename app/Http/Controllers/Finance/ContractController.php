@@ -8,7 +8,7 @@ use App\Models\Contract;
 use App\Models\Project;
 use App\Models\Invoice;
 use App\Models\Setting;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Mpdf\Mpdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -160,9 +160,16 @@ class ContractController extends Controller
             ->pluck('value', 'key')
             ->toArray();
 
-        $pdf = Pdf::loadView('pdf.contract', compact('contract', 'settings'));
-        $pdf->setPaper('a4', 'portrait');
-
-        return $pdf->download("contract-{$contract->contract_number}.pdf");
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'default_font' => 'dejavusans',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+        ]);
+        $html = view('pdf.contract', compact('contract', 'settings'))->render();
+        $mpdf->WriteHTML($html);
+        return response($mpdf->Output("contract-{$contract->contract_number}.pdf", 'S'), 200)
+            ->header('Content-Type', 'application/pdf');
     }
 }

@@ -10,7 +10,7 @@ use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\Quote;
 use App\Models\Setting;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Mpdf\Mpdf;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 
@@ -81,10 +81,17 @@ class InvoiceController extends Controller
             ->pluck('value', 'key')
             ->toArray();
 
-        $pdf = Pdf::loadView('pdf.invoice', compact('invoice', 'settings'));
-        $pdf->setPaper('a4', 'portrait');
-
-        return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'default_font' => 'dejavusans',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+        ]);
+        $html = view('pdf.invoice', compact('invoice', 'settings'))->render();
+        $mpdf->WriteHTML($html);
+        return response($mpdf->Output("invoice-{$invoice->invoice_number}.pdf", 'S'), 200)
+            ->header('Content-Type', 'application/pdf');
     }
 
     public function edit(Invoice $invoice)
