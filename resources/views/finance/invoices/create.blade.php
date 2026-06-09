@@ -36,7 +36,7 @@
 @endif
 @if(!empty($prefillData))
     <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-        تم استيراد بيانات العرض {{ $prefillData['quote']->quote_number }}
+        {{ __('finance.imported_quote_data', ['number' => $prefillData['quote']->quote_number]) }}
     </div>
 @endif
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
@@ -48,6 +48,7 @@
                 <option value="{{ $p->id }}" data-client="{{ $p->client_id }}" {{ old('project_id', $invoiceModel?->project_id ?? $prefillData['project_id'] ?? '') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
             @endforeach
         </select>
+        @error('project_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.client') }} *</label>
@@ -57,6 +58,7 @@
                 <option value="{{ $c->id }}" {{ old('client_id', $invoiceModel?->client_id ?? $prefillData['client_id'] ?? '') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
             @endforeach
         </select>
+        @error('client_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.invoice_type') }} *</label>
@@ -70,11 +72,13 @@
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.invoice_date') }} *</label>
         <input type="date" name="invoice_date" value="{{ old('invoice_date', $invoiceModel?->invoice_date?->toDateString() ?? now()->toDateString()) }}" required
                 class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('invoice_date')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.due_date') }}</label>
         <input type="date" name="due_date" value="{{ old('due_date', $invoiceModel?->due_date?->toDateString() ?? now()->addDays(30)->toDateString()) }}"
                 class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('due_date')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.tax') }} %</label>
@@ -92,9 +96,9 @@
 <div id="items-list" class="space-y-2 mb-3">
     @foreach($rows as $index => $row)
     <div class="grid grid-cols-12 gap-2 item-row">
-        <div class="col-span-6"><input type="text" name="items[{{ $index }}][description]" value="{{ $row['description'] ?? '' }}" placeholder="{{ __('messages.description') }}" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
-        <div class="col-span-2"><input type="number" name="items[{{ $index }}][quantity]" value="{{ $row['quantity'] ?? 1 }}" min="1" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm qty-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
-        <div class="col-span-3"><input type="number" name="items[{{ $index }}][unit_price]" value="{{ $row['unit_price'] ?? 0 }}" step="0.01" min="0" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm price-input focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+        <div class="col-span-6"><input type="text" name="items[{{ $index }}][description]" value="{{ $row['description'] ?? '' }}" placeholder="{{ __('messages.description') }}" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">@error("items.{$index}.description")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
+        <div class="col-span-2"><input type="number" name="items[{{ $index }}][quantity]" value="{{ $row['quantity'] ?? 1 }}" min="1" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm qty-input focus:outline-none focus:ring-2 focus:ring-blue-500">@error("items.{$index}.quantity")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
+        <div class="col-span-3"><input type="number" name="items[{{ $index }}][unit_price]" value="{{ $row['unit_price'] ?? 0 }}" step="0.01" min="0" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm price-input focus:outline-none focus:ring-2 focus:ring-blue-500">@error("items.{$index}.unit_price")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
             <div class="col-span-1 flex items-center justify-center"><button type="button" class="text-red-400 hover:text-red-600 remove-row"><i class="fas fa-times"></i></button></div>
         </div>
         @endforeach

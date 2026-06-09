@@ -9,7 +9,7 @@
             <i class="fas fa-shield-alt me-2"></i>{{ __('messages.roles') }}
         </a>
         <a href="{{ route('users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
-            <i class="fas fa-plus me-2"></i>إضافة مستخدم
+            <i class="fas fa-plus me-2"></i>{{ __('users.add_user') }}
         </a>
     </div>
 </div>
@@ -27,9 +27,9 @@
             @endforeach
         </select>
         <select name="status" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">الحالة</option>
-            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>نشط</option>
-            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>غير نشط</option>
+            <option value="">{{ __('messages.status') }}</option>
+            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>{{ __('users.active') }}</option>
+            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>{{ __('users.inactive') }}</option>
         </select>
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm transition">
             <i class="fas fa-search me-1"></i>{{ __('messages.filter') }}
@@ -42,11 +42,11 @@
     <table class="w-full text-sm">
         <thead>
             <tr class="bg-gray-50 border-b border-gray-100">
-                <th class="text-start px-5 py-3 font-semibold text-gray-600">المستخدم</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">البريد</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">الدور</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">المسمى</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600">الحالة</th>
+                <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('users.user') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('users.email') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('users.role') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('users.job_title') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('messages.status') }}</th>
                 <th class="text-end px-5 py-3 font-semibold text-gray-600">{{ __('messages.actions') }}</th>
             </tr>
         </thead>
@@ -73,7 +73,7 @@
                 <td class="px-4 py-3 hidden lg:table-cell text-gray-500">{{ $user->job_title ?? '-' }}</td>
                 <td class="px-4 py-3">
                     <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600' }}">
-                        {{ $user->is_active ? 'نشط' : 'معطل' }}
+                        {{ $user->is_active ? __('users.active') : __('users.inactive') }}
                     </span>
                 </td>
                 <td class="px-5 py-3 text-end">
@@ -83,7 +83,7 @@
                         @if(is_null($user->email_verified_at))
                         <form action="{{ route('users.invite', $user) }}" method="POST">
                             @csrf
-                            <button type="submit" class="p-1.5 text-indigo-400 hover:bg-indigo-50 rounded-lg transition" title="إرسال الدعوة">
+                            <button type="submit" class="p-1.5 text-indigo-400 hover:bg-indigo-50 rounded-lg transition" title="{{ __('users.send_invitation') }}">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </form>
@@ -91,7 +91,7 @@
                         <form action="{{ route('users.toggle-status', $user) }}" method="POST">
                             @csrf
                             <button type="submit" class="p-1.5 {{ $user->is_active ? 'text-orange-400 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50' }} rounded-lg transition"
-                                    title="{{ $user->is_active ? 'تعطيل' : 'تفعيل' }}">
+                                    title="{{ $user->is_active ? __('users.deactivate') : __('users.activate') }}">
                                 <i class="fas fa-{{ $user->is_active ? 'ban' : 'check' }}"></i>
                             </button>
                         </form>
@@ -107,7 +107,7 @@
             @empty
             <tr><td colspan="6" class="py-16 text-center text-gray-400">
                 <i class="fas fa-users text-5xl mb-3 block text-gray-200"></i>
-                لا يوجد مستخدمون
+                {{ __('users.no_users') }}
             </td></tr>
             @endforelse
         </tbody>

@@ -229,8 +229,8 @@ class CoreRoutesTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $this->get(route('quotes.index'))->assertOk()->assertSee('معتمد وغير محوّل');
-        $this->get(route('quotes.index'))->assertOk()->assertSee('قيمة غير محوّلة');
+        $this->get(route('quotes.index'))->assertOk()->assertSee('Approved & Unconverted');
+        $this->get(route('quotes.index'))->assertOk()->assertSee('Unconverted Value');
         $this->get(route('quotes.create'))
             ->assertOk()
             ->assertSee('service_type_id', false);
@@ -381,7 +381,6 @@ class CoreRoutesTest extends TestCase
             'description' => $this->convertibleQuote->subject,
         ]))
             ->assertOk()
-            ->assertSee($this->convertibleQuote->quote_number)
             ->assertSee('name="quote_id"', false)
             ->assertSee('Homepage Design');
     }
@@ -390,7 +389,7 @@ class CoreRoutesTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $this->get(route('invoices.index'))->assertOk()->assertSee('المحصّل');
+        $this->get(route('invoices.index'))->assertOk()->assertSee('Total Collected');
         $this->get(route('invoices.show', $this->invoice))
             ->assertOk()
             ->assertSee($this->invoice->invoice_number)

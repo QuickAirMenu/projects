@@ -64,26 +64,31 @@
                 <option value="{{ $c->id }}" {{ old('client_id', $quoteModel?->client_id) == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
             @endforeach
         </select>
+        @error('client_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.description') }} *</label>
         <input type="text" name="subject" value="{{ old('subject', $quoteModel?->subject ?? '') }}" required
                 class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('subject')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.valid_until') }}</label>
         <input type="date" name="valid_until" value="{{ old('valid_until', $quoteModel?->valid_until?->toDateString() ?? now()->addDays(30)->toDateString()) }}"
                 class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('valid_until')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.tax') }} %</label>
         <input type="number" name="tax_percentage" value="{{ old('tax_percentage', $isEdit ? $quoteModel?->tax_percentage : 15) }}" step="0.01" min="0" max="100"
                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" id="taxInput">
+        @error('tax_percentage')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.discount') }} %</label>
         <input type="number" name="discount_percentage" value="{{ old('discount_percentage', $isEdit ? $quoteModel?->discount_percentage : 0) }}" step="0.01" min="0" max="100"
                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('discount_percentage')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
 </div>
 
@@ -101,9 +106,9 @@
         @foreach($rows as $index => $row)
         @php $rowServiceTypeId = $row['service_type_id'] ?? ''; @endphp
         <div class="grid grid-cols-12 gap-2 mb-2 item-row">
-            <div class="col-span-4"><input type="text" name="items[{{ $index }}][description]" value="{{ $row['description'] ?? '' }}" placeholder="{{ __('messages.description') }}" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
-            <div class="col-span-2"><input type="number" name="items[{{ $index }}][quantity]" value="{{ $row['quantity'] ?? 1 }}" min="1" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 qty-input"></div>
-            <div class="col-span-2"><input type="number" name="items[{{ $index }}][unit_price]" value="{{ $row['unit_price'] ?? 0 }}" min="0" step="0.01" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 price-input"></div>
+            <div class="col-span-4"><input type="text" name="items[{{ $index }}][description]" value="{{ $row['description'] ?? '' }}" placeholder="{{ __('messages.description') }}" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">@error("items.{$index}.description")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
+            <div class="col-span-2"><input type="number" name="items[{{ $index }}][quantity]" value="{{ $row['quantity'] ?? 1 }}" min="1" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 qty-input">@error("items.{$index}.quantity")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
+            <div class="col-span-2"><input type="number" name="items[{{ $index }}][unit_price]" value="{{ $row['unit_price'] ?? 0 }}" min="0" step="0.01" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 price-input">@error("items.{$index}.unit_price")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror</div>
             <div class="col-span-3">
                 <select name="items[{{ $index }}][service_type_id]" class="service-type-select w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">-- {{ __('messages.select') }} --</option>
@@ -133,6 +138,7 @@
 <div class="mt-6">
     <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.notes') }}</label>
         <textarea name="notes" rows="2" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('notes', $quoteModel?->notes ?? '') }}</textarea>
+        @error('notes')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
 </div>
 
 <div class="flex gap-3 mt-6">

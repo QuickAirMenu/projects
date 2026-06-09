@@ -119,6 +119,13 @@
             </div>
             @endif
         </div>
+
+        <form action="{{ route('change-requests.destroy', $changeRequest) }}" method="POST" onsubmit="return confirmDelete(this)" class="inline">
+            @csrf @method('DELETE')
+            <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-sm">
+                <i class="fas fa-trash me-1"></i>حذف
+            </button>
+        </form>
     </div>
 </div>
 @endsection

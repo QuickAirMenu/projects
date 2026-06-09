@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'company_info'              => 'معلومات الشركة',
+    'company_name_ar'           => 'اسم الشركة (عربي)',
+    'company_name_en'           => 'اسم الشركة (إنجليزي)',
+    'company_logo'              => 'شعار الشركة',
+    'current_logo'              => 'الشعار الحالي',
+    'logo_replacement_note'     => 'اختر ملفاً لاستبدال الشعار الحالي',
+    'logo_requirements'         => 'الصيغ المدعومة: JPG, PNG, SVG. الحجم الأقصى: 2MB',
+    'address'                   => 'العنوان',
+    'website'                   => 'الموقع الإلكتروني',
+    'currency_code'             => 'رمز العملة',
+    'currency_symbol'           => 'رمز العملة (مثال: ر.س)',
+    'default_tax_rate'          => 'نسبة الضريبة الافتراضية',
+    'mail_settings'             => 'إعدادات البريد',
+    'finance_settings'          => 'الإعدادات المالية',
+    'bank_account_name'         => 'اسم الحساب البنكي',
+    'bank_iban'                 => 'رقم الآيبان',
+    'general_settings'          => 'إعدادات عامة',
+    'service_types'             => 'أنواع الخدمات',
+    'project_statuses'          => 'حالات المشاريع',
+    'task_statuses'             => 'حالات المهام',
+    'roles_permissions'         => 'الأدوار والصلاحيات',
+    'leave_blank_to_keep'       => 'اتركه فارغاً للإبقاء على القيمة الحالية',
+];

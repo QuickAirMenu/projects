@@ -19,6 +19,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('task.task') }} *</label>
                 <input type="text" name="title" value="{{ old('title') }}" required
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('title')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -29,6 +30,7 @@
                         <option value="{{ $p->id }}" {{ old('project_id', request('project_id')) == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
                     @endforeach
                 </select>
+                @error('project_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -39,6 +41,7 @@
                         <option value="{{ $u->id }}" {{ old('assigned_to') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
                     @endforeach
                 </select>
+                @error('assigned_to')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -48,6 +51,7 @@
                         <option value="{{ $s->id }}" {{ old('status_id') == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
                     @endforeach
                 </select>
+                @error('status_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -57,6 +61,7 @@
                         <option value="{{ $p }}" {{ old('priority','medium') === $p ? 'selected' : '' }}>{{ __('project.priority_'.$p) }}</option>
                     @endforeach
                 </select>
+                @error('priority')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -69,12 +74,14 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('task.due_date') }}</label>
                 <input type="date" name="due_date" value="{{ old('due_date') }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('due_date')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('task.estimated_hours') }}</label>
                 <input type="number" name="estimated_hours" value="{{ old('estimated_hours') }}" step="0.5" min="0"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('estimated_hours')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div class="md:col-span-2">

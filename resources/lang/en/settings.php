@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'company_info'              => 'Company Information',
+    'company_name_ar'           => 'Company Name (Arabic)',
+    'company_name_en'           => 'Company Name (English)',
+    'company_logo'              => 'Company Logo',
+    'current_logo'              => 'Current Logo',
+    'logo_replacement_note'     => 'Choose a file to replace the current logo',
+    'logo_requirements'         => 'Supported formats: JPG, PNG, SVG. Max size: 2MB',
+    'address'                   => 'Address',
+    'website'                   => 'Website',
+    'currency_code'             => 'Currency Code',
+    'currency_symbol'           => 'Currency Symbol',
+    'default_tax_rate'          => 'Default Tax Rate',
+    'mail_settings'             => 'Mail Settings',
+    'finance_settings'          => 'Finance Settings',
+    'bank_account_name'         => 'Bank Account Name',
+    'bank_iban'                 => 'IBAN Number',
+    'general_settings'          => 'General Settings',
+    'service_types'             => 'Service Types',
+    'project_statuses'          => 'Project Statuses',
+    'task_statuses'             => 'Task Statuses',
+    'roles_permissions'         => 'Roles & Permissions',
+    'leave_blank_to_keep'       => 'Leave blank to keep current value',
+];

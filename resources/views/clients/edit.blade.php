@@ -21,26 +21,31 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.name') }} *</label>
                 <input type="text" name="name" value="{{ old('name', $client->name) }}" required
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.company_name') }}</label>
                 <input type="text" name="company_name" value="{{ old('company_name', $client->company_name) }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('company_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.email') }}</label>
                 <input type="email" name="email" value="{{ old('email', $client->email) }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.phone') }}</label>
                 <input type="text" name="phone" value="{{ old('phone', $client->phone) }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('phone')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.whatsapp') }}</label>
                 <input type="text" name="whatsapp" value="{{ old('whatsapp', $client->whatsapp) }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('whatsapp')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.status') }} *</label>
@@ -49,21 +54,25 @@
                         <option value="{{ $s }}" {{ old('status', $client->status) == $s ? 'selected' : '' }}>{{ __('client.status_'.$s) }}</option>
                     @endforeach
                 </select>
+                @error('status')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.city') }}</label>
                 <input type="text" name="city" value="{{ old('city', $client->city) }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('city')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.industry') }}</label>
                 <input type="text" name="industry" value="{{ old('industry', $client->industry) }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('industry')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.notes') }}</label>
                 <textarea name="notes" rows="3"
                           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('notes', $client->notes) }}</textarea>
+                @error('notes')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
         <div class="flex gap-3 mt-6">

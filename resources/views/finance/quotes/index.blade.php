@@ -12,21 +12,21 @@
 <div class="flex gap-2 mb-4">
     <a href="{{ route('quotes.index') }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-file-alt me-1"></i>الكل
+        <i class="fas fa-file-alt me-1"></i>{{ __('messages.all') }}
     </a>
     <a href="{{ route('quotes.index', ['trashed' => 1]) }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-archive me-1"></i>الأرشيف
+        <i class="fas fa-archive me-1"></i>{{ __('messages.archive') }}
     </a>
 </div>
 
 {{-- KPIs --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
     @foreach([
-        ['label' => 'الإجمالي', 'val' => $stats['total'], 'meta' => 'كل عروض الأسعار', 'icon' => 'fa-file-alt', 'chip' => 'bg-blue-50 text-blue-600'],
-        ['label' => 'قيمة غير محوّلة', 'val' => number_format($stats['unconverted_amount'], 2) . ' ' . __('messages.currency'), 'meta' => $stats['unconverted_count'] . ' عرض', 'icon' => 'fa-file-invoice', 'chip' => 'bg-amber-50 text-amber-600'],
-        ['label' => 'معتمد وغير محوّل', 'val' => number_format($stats['approved_unconverted_amount'], 2) . ' ' . __('messages.currency'), 'meta' => $stats['expired_unconverted_count'] . ' منتهية الصلاحية', 'icon' => 'fa-clock', 'chip' => 'bg-emerald-50 text-emerald-600'],
-        ['label' => 'نسبة التحويل', 'val' => $stats['conversion_rate'] . '%', 'meta' => 'من إجمالي العروض', 'icon' => 'fa-exchange-alt', 'chip' => 'bg-slate-100 text-slate-600'],
+        ['label' => __('messages.total'), 'val' => $stats['total'], 'meta' => __('finance.all_quotes'), 'icon' => 'fa-file-alt', 'chip' => 'bg-blue-50 text-blue-600'],
+        ['label' => __('finance.unconverted_value'), 'val' => number_format($stats['unconverted_amount'], 2) . ' ' . __('messages.currency'), 'meta' => $stats['unconverted_count'] . ' ' . __('finance.quote_count'), 'icon' => 'fa-file-invoice', 'chip' => 'bg-amber-50 text-amber-600'],
+        ['label' => __('finance.approved_unconverted'), 'val' => number_format($stats['approved_unconverted_amount'], 2) . ' ' . __('messages.currency'), 'meta' => $stats['expired_unconverted_count'] . ' ' . __('finance.expired_ones'), 'icon' => 'fa-clock', 'chip' => 'bg-emerald-50 text-emerald-600'],
+        ['label' => __('finance.conversion_rate'), 'val' => $stats['conversion_rate'] . '%', 'meta' => __('finance.of_total_quotes'), 'icon' => 'fa-exchange-alt', 'chip' => 'bg-slate-100 text-slate-600'],
     ] as $card)
     <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
         <div class="flex items-start justify-between gap-3">
@@ -71,11 +71,11 @@
                 <td class="px-5 py-3 text-end">
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('quotes.show', $quote) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
-                        <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="الرابط العام"><i class="fas fa-link"></i></a>
+                        <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="{{ __('messages.public_link') }}"><i class="fas fa-link"></i></a>
                         @if($trashed)
                         <form action="{{ route('quotes.restore', $quote) }}" method="POST">
                             @csrf
-                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="استعادة">
+                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="{{ __('messages.restore') }}">
                                 <i class="fas fa-undo"></i>
                             </button>
                         </form>
@@ -84,7 +84,7 @@
                         <a href="{{ route('quotes.edit', $quote) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
                         <form action="{{ route('quotes.send', $quote) }}" method="POST">
                             @csrf
-                            <button type="submit" class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg" title="إرسال"><i class="fas fa-paper-plane"></i></button>
+                            <button type="submit" class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg" title="{{ __('messages.send') }}"><i class="fas fa-paper-plane"></i></button>
                         </form>
                         @endif
                         <form action="{{ route('quotes.destroy', $quote) }}" method="POST" onsubmit="return confirmDelete(this)">
@@ -98,7 +98,7 @@
             @empty
             <tr><td colspan="6" class="py-16 text-center text-gray-400">
                 <i class="fas fa-file-alt text-5xl mb-3 block text-gray-200"></i>
-                لا توجد عروض أسعار
+                {{ __('finance.no_quotes') }}
             </td></tr>
             @endforelse
         </tbody>

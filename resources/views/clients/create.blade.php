@@ -27,16 +27,19 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.company_name') }}</label>
                 <input type="text" name="company_name" value="{{ old('company_name') }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('company_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.email') }}</label>
                 <input type="email" name="email" value="{{ old('email') }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.phone') }}</label>
                 <input type="text" name="phone" value="{{ old('phone') }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('phone')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.whatsapp') }}</label>
@@ -51,6 +54,7 @@
                     <option value="vip" {{ old('status') == 'vip' ? 'selected' : '' }}>{{ __('client.status_vip') }}</option>
                     <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>{{ __('client.status_inactive') }}</option>
                 </select>
+                @error('status')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.city') }}</label>

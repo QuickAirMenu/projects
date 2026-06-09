@@ -46,32 +46,6 @@
                 </div>
             </div>
 
-            <!-- Notifications -->
-            <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" class="relative p-2 text-gray-700 hover:text-gray-900">
-                    <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute top-0 {{ is_rtl() ? 'left-0' : 'right-0' }} inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">3</span>
-                </button>
-
-                <div x-show="open" 
-                     @click.away="open = false"
-                     x-transition
-                     class="absolute {{ is_rtl() ? 'left-0' : 'right-0' }} mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200">
-                    <div class="p-4 border-b border-gray-200">
-                        <h3 class="font-semibold text-gray-900">{{ __('messages.notifications') }}</h3>
-                    </div>
-                    <div class="max-h-96 overflow-y-auto custom-scrollbar">
-                        <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
-                            <p class="text-sm text-gray-900">{{ __('common.sample_notification') }}</p>
-                            <p class="text-xs text-gray-500 mt-1">{{ __('common.time_ago', ['time' => '5 دقائق']) }}</p>
-                        </div>
-                    </div>
-                    <div class="p-3 border-t border-gray-200 text-center">
-                        <a href="#" class="text-sm text-primary-600 hover:text-primary-700">{{ __('common.view_all') }}</a>
-                    </div>
-                </div>
-            </div>
-
             <!-- User Menu -->
             <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open" class="flex items-center text-gray-700 hover:text-gray-900">

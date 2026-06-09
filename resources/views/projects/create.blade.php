@@ -22,6 +22,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.name') }} *</label>
                 <input type="text" name="name" value="{{ old('name') }}" required
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -34,6 +35,7 @@
                         </option>
                     @endforeach
                 </select>
+                @error('client_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -44,6 +46,7 @@
                         <option value="{{ $type->id }}" {{ old('service_type_id') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
                     @endforeach
                 </select>
+                @error('service_type_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -62,6 +65,7 @@
                         <option value="{{ $p }}" {{ old('priority', 'medium') === $p ? 'selected' : '' }}>{{ __('project.priority_'.$p) }}</option>
                     @endforeach
                 </select>
+                @error('priority')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -72,12 +76,14 @@
                         <option value="{{ $m->id }}" {{ old('manager_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
                     @endforeach
                 </select>
+                @error('manager_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('project.budget') }}</label>
                 <input type="number" name="budget" value="{{ old('budget') }}" step="0.01" min="0"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('budget')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
@@ -90,6 +96,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('project.deadline') }}</label>
                 <input type="date" name="deadline" value="{{ old('deadline') }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('deadline')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div class="md:col-span-2">

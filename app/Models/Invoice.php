@@ -78,6 +78,14 @@ class Invoice extends Model
             $invoice->total = $invoice->subtotal + $invoice->tax_amount - $invoice->discount_amount;
             $invoice->remaining_amount = $invoice->total;
         });
+
+        static::updating(function (Invoice $invoice) {
+            $subtotal = $invoice->items->sum('total');
+            $invoice->subtotal = $subtotal;
+            $invoice->tax_amount = $invoice->tax_percentage > 0 ? ($subtotal * $invoice->tax_percentage) / 100 : ($invoice->tax_amount ?? 0);
+            $invoice->total = $subtotal + $invoice->tax_amount - ($invoice->discount_amount ?? 0);
+            $invoice->remaining_amount = $invoice->total;
+        });
     }
 
     /**

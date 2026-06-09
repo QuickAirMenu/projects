@@ -5,18 +5,18 @@
 <div class="mb-6 flex items-center justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-800">{{ __('finance.payments') }}</h1>
-        <p class="text-gray-500 text-sm mt-1">إجمالي المحصّل: <strong>{{ number_format($stats['total_received'], 2) }} ر.س</strong></p>
+        <p class="text-gray-500 text-sm mt-1">{{ __('finance.total_received_label') }}: <strong>{{ number_format($stats['total_received'], 2) }} {{ __('messages.currency') }}</strong></p>
     </div>
 </div>
 
 <div class="flex gap-2 mb-4">
     <a href="{{ route('payments.index') }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-file-alt me-1"></i>الكل
+        <i class="fas fa-file-alt me-1"></i>{{ __('messages.all') }}
     </a>
     <a href="{{ route('payments.index', ['trashed' => 1]) }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-archive me-1"></i>الأرشيف
+        <i class="fas fa-archive me-1"></i>{{ __('messages.archive') }}
     </a>
 </div>
 
@@ -27,7 +27,7 @@
         </div>
         <div>
             <p class="text-xl font-bold text-gray-800">{{ number_format($stats['total_received'], 2) }}</p>
-            <p class="text-xs text-gray-500">إجمالي المحصّل</p>
+            <p class="text-xs text-gray-500">{{ __('finance.total_received_label') }}</p>
         </div>
     </div>
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
@@ -36,7 +36,7 @@
         </div>
         <div>
             <p class="text-xl font-bold text-gray-800">{{ number_format($stats['this_month'], 2) }}</p>
-            <p class="text-xs text-gray-500">هذا الشهر</p>
+            <p class="text-xs text-gray-500">{{ __('finance.this_month') }}</p>
         </div>
     </div>
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
@@ -45,7 +45,7 @@
         </div>
         <div>
             <p class="text-xl font-bold text-gray-800">{{ $stats['count'] }}</p>
-            <p class="text-xs text-gray-500">عدد الدفعات</p>
+            <p class="text-xs text-gray-500">{{ __('finance.payments_count') }}</p>
         </div>
     </div>
 </div>
@@ -54,13 +54,13 @@
     <table class="w-full text-sm">
         <thead>
             <tr class="bg-gray-50 border-b">
-                <th class="text-start px-5 py-3 font-semibold text-gray-600">رقم الدفعة</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">الفاتورة</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">العميل</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600">المبلغ</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">طريقة الدفع</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">التاريخ</th>
-                <th class="text-end px-5 py-3 font-semibold text-gray-600">الإجراءات</th>
+                <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('finance.payment_number') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('finance.invoice') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('client.client') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('finance.amount') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.payment_method') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.date') }}</th>
+                <th class="text-end px-5 py-3 font-semibold text-gray-600">{{ __('messages.actions') }}</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
@@ -71,7 +71,7 @@
                     <a href="{{ route('invoices.show', $payment->invoice_id) }}" class="text-blue-600 hover:underline">{{ $payment->invoice?->invoice_number }}</a>
                 </td>
                 <td class="px-4 py-3 hidden lg:table-cell text-gray-600">{{ $payment->invoice?->client?->name }}</td>
-                <td class="px-4 py-3 font-bold text-green-600">{{ number_format($payment->amount, 2) }} ر.س</td>
+                <td class="px-4 py-3 font-bold text-green-600">{{ number_format($payment->amount, 2) }} {{ __('messages.currency') }}</td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ __('finance.method_'.$payment->payment_method) }}</td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ $payment->payment_date->format('Y-m-d') }}</td>
                 <td class="px-5 py-3">
@@ -79,9 +79,9 @@
                         @if($trashed)
                         <form action="{{ route('payments.restore', $payment) }}" method="POST">
                             @csrf
-                            <button type="submit" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition" title="استعادة">
+                            <button type="submit" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition" title="{{ __('messages.restore') }}">
                                 <i class="fas fa-undo"></i>
-                                استعادة
+                                {{ __('messages.restore') }}
                             </button>
                         </form>
                         @else
@@ -104,7 +104,7 @@
             @empty
             <tr><td colspan="7" class="py-16 text-center text-gray-400">
                 <i class="fas fa-money-bill text-5xl mb-3 block text-gray-200"></i>
-                لا توجد دفعات مسجلة
+                {{ __('finance.no_payments') }}
             </td></tr>
             @endforelse
         </tbody>

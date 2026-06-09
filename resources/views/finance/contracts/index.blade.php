@@ -11,19 +11,19 @@
 <div class="flex gap-2 mb-4">
     <a href="{{ route('contracts.index') }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-file-alt me-1"></i>الكل
+        <i class="fas fa-file-alt me-1"></i>{{ __('messages.all') }}
     </a>
     <a href="{{ route('contracts.index', ['trashed' => 1]) }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-archive me-1"></i>الأرشيف
+        <i class="fas fa-archive me-1"></i>{{ __('messages.archive') }}
     </a>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     @foreach([
-        ['label' => 'إجمالي قيمة العقود النشطة', 'val' => number_format($stats['active_value'], 2) . ' ' . __('messages.currency'), 'meta' => 'العقود الجارية فقط', 'icon' => 'fa-file-contract', 'chip' => 'bg-blue-50 text-blue-600'],
-        ['label' => 'عدد العقود المنتهية', 'val' => $stats['ended_count'], 'meta' => 'مكتملة أو موقوفة', 'icon' => 'fa-flag-checkered', 'chip' => 'bg-amber-50 text-amber-600'],
-        ['label' => 'موقعة من العميل', 'val' => $stats['signed_count'], 'meta' => 'جاهزة للمتابعة', 'icon' => 'fa-pen-fancy', 'chip' => 'bg-emerald-50 text-emerald-600'],
+        ['label' => __('finance.active_contracts_value'), 'val' => number_format($stats['active_value'], 2) . ' ' . __('messages.currency'), 'meta' => __('finance.active_contracts_only'), 'icon' => 'fa-file-contract', 'chip' => 'bg-blue-50 text-blue-600'],
+        ['label' => __('finance.ended_contracts_count'), 'val' => $stats['ended_count'], 'meta' => __('finance.completed_or_terminated'), 'icon' => 'fa-flag-checkered', 'chip' => 'bg-amber-50 text-amber-600'],
+        ['label' => __('finance.signed_by_client_count'), 'val' => $stats['signed_count'], 'meta' => __('finance.ready_for_followup'), 'icon' => 'fa-pen-fancy', 'chip' => 'bg-emerald-50 text-emerald-600'],
     ] as $card)
     <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
         <div class="flex items-start justify-between gap-3">
@@ -46,8 +46,8 @@
             <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('finance.contract_number') }}</th>
             <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('project.project') }}</th>
             <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('finance.contract_value') }}</th>
-            <th class="text-start px-4 py-3 font-semibold text-gray-600">الحالة</th>
-            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">تاريخ البداية</th>
+            <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('messages.status') }}</th>
+            <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.start_date') }}</th>
             <th class="text-end px-5 py-3"></th>
         </tr></thead>
         <tbody class="divide-y divide-gray-50">
@@ -69,7 +69,7 @@
                         @if($trashed)
                         <form action="{{ route('contracts.restore', $contract) }}" method="POST">
                             @csrf
-                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="استعادة">
+                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="{{ __('messages.restore') }}">
                                 <i class="fas fa-undo"></i>
                             </button>
                         </form>
@@ -84,7 +84,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="py-16 text-center text-gray-400"><i class="fas fa-file-contract text-5xl mb-3 block text-gray-200"></i>لا توجد عقود</td></tr>
+            <tr><td colspan="6" class="py-16 text-center text-gray-400"><i class="fas fa-file-contract text-5xl mb-3 block text-gray-200"></i>{{ __('finance.no_contracts') }}</td></tr>
             @endforelse
         </tbody>
     </table>

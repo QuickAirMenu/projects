@@ -19,7 +19,7 @@ class ClientPortalAccount extends Authenticatable
         'last_login_at',
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = ['password', 'setup_token'];
 
     protected $casts = [
         'password' => 'hashed',

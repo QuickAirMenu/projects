@@ -78,12 +78,17 @@
                 <td class="px-5 py-3 text-end">
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('change-requests.show', $cr) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
+                        <a href="{{ route('change-requests.edit', $cr) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
                         @if($cr->status === 'pending')
                         <form action="{{ route('change-requests.approve', $cr) }}" method="POST">
                             @csrf
                             <button type="submit" class="p-1.5 text-green-500 hover:bg-green-50 rounded-lg" title="اعتماد"><i class="fas fa-check"></i></button>
                         </form>
                         @endif
+                        <form action="{{ route('change-requests.destroy', $cr) }}" method="POST" onsubmit="return confirmDelete(this)" class="inline">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
+                        </form>
                     </div>
                 </td>
             </tr>

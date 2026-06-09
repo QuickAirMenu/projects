@@ -12,21 +12,21 @@
 <div class="flex gap-2 mb-4">
     <a href="{{ route('invoices.index') }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-file-alt me-1"></i>الكل
+        <i class="fas fa-file-alt me-1"></i>{{ __('messages.all') }}
     </a>
     <a href="{{ route('invoices.index', ['trashed' => 1]) }}" 
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        <i class="fas fa-archive me-1"></i>الأرشيف
+        <i class="fas fa-archive me-1"></i>{{ __('messages.archive') }}
     </a>
 </div>
 
 {{-- Financial Summary --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     @foreach([
-        ['label' => 'إجمالي الفواتير', 'val' => number_format($stats['total_invoiced'],2), 'color' => 'blue',  'icon' => 'fa-file-invoice-dollar'],
-        ['label' => 'المحصّل',         'val' => number_format($stats['total_paid'],2),     'color' => 'green', 'icon' => 'fa-money-bill-wave'],
-        ['label' => 'غير مدفوع',       'val' => number_format($stats['unpaid'],2),         'color' => 'red',   'icon' => 'fa-exclamation-circle'],
-        ['label' => 'متأخرة (عدد)',    'val' => $stats['overdue'],                         'color' => 'orange','icon' => 'fa-clock'],
+        ['label' => __('finance.total_invoiced'), 'val' => number_format($stats['total_invoiced'],2), 'color' => 'blue',  'icon' => 'fa-file-invoice-dollar'],
+        ['label' => __('finance.total_collected'), 'val' => number_format($stats['total_paid'],2),     'color' => 'green', 'icon' => 'fa-money-bill-wave'],
+        ['label' => __('finance.unpaid'),          'val' => number_format($stats['unpaid'],2),         'color' => 'red',   'icon' => 'fa-exclamation-circle'],
+        ['label' => __('finance.overdue_count'),   'val' => $stats['overdue'],                         'color' => 'orange','icon' => 'fa-clock'],
     ] as $c)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4">
         <div class="w-11 h-11 rounded-xl bg-{{ $c['color'] }}-100 flex items-center justify-center">
@@ -50,7 +50,7 @@
             @endforeach
         </select>
         <select name="invoice_type" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">نوع الفاتورة</option>
+            <option value="">{{ __('finance.invoice_type') }}</option>
             @foreach(['initial','partial','final','additional'] as $t)
                 <option value="{{ $t }}" {{ request('invoice_type') === $t ? 'selected' : '' }}>{{ __('finance.type_'.$t) }}</option>
             @endforeach
@@ -96,7 +96,7 @@
                         @if($trashed)
                         <form action="{{ route('invoices.restore', $invoice) }}" method="POST">
                             @csrf
-                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="استعادة">
+                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="{{ __('messages.restore') }}">
                                 <i class="fas fa-undo"></i>
                             </button>
                         </form>
@@ -113,7 +113,7 @@
             @empty
             <tr><td colspan="7" class="py-16 text-center text-gray-400">
                 <i class="fas fa-file-invoice text-5xl mb-3 block text-gray-200"></i>
-                لا توجد فواتير
+                {{ __('finance.no_invoices') }}
             </td></tr>
             @endforelse
         </tbody>

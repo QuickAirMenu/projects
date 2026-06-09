@@ -67,4 +67,8 @@ return [
     'meeting'                   => 'Meeting',
     'call'                      => 'Call',
     'other'                     => 'Other',
+    'archive'                   => 'Archive',
+    'public_link'               => 'Public Link',
+    'send'                      => 'Send',
+    'restore'                   => 'Restore',
 ];

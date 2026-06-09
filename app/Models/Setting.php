@@ -16,7 +16,5 @@ class Setting extends Model
         'group',
     ];
 
-    protected $casts = [
-        'value' => 'string',
-    ];
+    protected $casts = [];
 }

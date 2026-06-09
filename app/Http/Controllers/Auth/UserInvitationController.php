@@ -21,7 +21,7 @@ class UserInvitationController extends Controller
     public function completeSetup(Request $request, string $token)
     {
         $request->validate([
-            'password' => 'required|min:8|confirmed',
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)],
         ]);
 
         $user = User::where('invitation_token', $token)

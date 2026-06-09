@@ -91,6 +91,13 @@ class Quote extends Model
             $quote->tax_amount = ($quote->subtotal * $quote->tax_percentage) / 100;
             $quote->total = $quote->subtotal + $quote->tax_amount - $quote->discount_amount;
         });
+
+        static::updating(function (Quote $quote) {
+            $subtotal = $quote->items->sum('total');
+            $quote->subtotal = $subtotal;
+            $quote->tax_amount = $quote->tax_percentage > 0 ? ($subtotal * $quote->tax_percentage) / 100 : ($quote->tax_amount ?? 0);
+            $quote->total = $subtotal + $quote->tax_amount - ($quote->discount_amount ?? 0);
+        });
     }
 
     /**
