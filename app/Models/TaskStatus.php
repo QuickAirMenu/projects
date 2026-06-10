@@ -52,6 +52,6 @@ class TaskStatus extends Model
 
     public function scopeDefault($query)
     {
-        return $query->where('is_default', true)->first();
+        return $query->where('is_default', true);
     }
 }

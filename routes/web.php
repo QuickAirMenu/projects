@@ -48,6 +48,9 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
+// Help center
+Route::get('/help', fn() => view('help'))->name('help');
+
 // Public quotes
 Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->middleware('throttle:30,1')->name('quotes.public');
 Route::get('/q/{token}/pdf', [QuoteController::class, 'publicPdf'])->middleware('throttle:30,1')->name('quotes.public-pdf');
@@ -74,7 +77,6 @@ Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSe
 Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::post('logout', [LogoutController::class, 'logout'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/help', fn() => view('help'))->name('help');
     Route::get('/support', fn() => view('support'))->name('support');
     Route::post('/support', function (\Illuminate\Http\Request $request) {
         $request->validate([
