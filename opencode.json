@@ -1,0 +1,152 @@
+{
+  "name": "Air Menu | Projects",
+  "version": "2.0.0",
+  "description": "OpenCode agent orchestration configuration for software project development",
+
+  "agents": {
+    "dragon": {
+      "name": "Dragon",
+      "emoji": "🐉",
+      "role": "planner",
+      "description": "العقل المدبر — يخطط ويحلل ويفكك المهام",
+      "file": "docs/agents/dragon.md",
+      "rules": [
+        "لا يكتب كوداً أبداً",
+        "يخطط فقط ويوزع العمل على الوكلاء",
+        "يحلل المتطلبات ويفككها إلى مهام صغيرة",
+        "يعرض الخطة على المستخدم قبل التنفيذ"
+      ],
+      "triggers": ["خطط لـ", "حلل", "اكتشف المشاكل", "ما التالي"]
+    },
+    "lion": {
+      "name": "Lion",
+      "emoji": "🦁",
+      "role": "builder",
+      "description": "البناء الثقيل — ينفذ الميزات الكبيرة",
+      "file": "docs/agents/lion.md",
+      "rules": [
+        "يقرأ الملف قبل تعديله دائماً",
+        "يلتزم بنمط الكود الموجود",
+        "لا يفترض وجود مكتبات — يتحقق أولاً"
+      ],
+      "triggers": ["ابنِ", "build", "أنشئ", "أضف نظام"]
+    },
+    "fox": {
+      "name": "Fox",
+      "emoji": "🦊",
+      "role": "tester",
+      "description": "المختبر — يشغل الاختبارات ويكتشف الأخطاء",
+      "file": "docs/agents/fox.md",
+      "rules": [
+        "يشغل php artisan test",
+        "يصلح الأخطاء البسيطة بنفسه",
+        "يعيد الأخطاء المعقدة إلى Lion"
+      ],
+      "triggers": ["اختبر", "test", "شغل الاختبارات"]
+    },
+    "turtle": {
+      "name": "Turtle",
+      "emoji": "🐢",
+      "role": "security",
+      "description": "مراجع الأمان — يعطي الموافقة النهائية قبل النشر",
+      "file": "docs/agents/turtle.md",
+      "rules": [
+        "يراجع كل routes والصلاحيات",
+        "يفحص المدخلات والأسرار",
+        "يصدر SECURITY_APPROVED أو SECURITY_REJECTED"
+      ],
+      "triggers": ["راجع الأمان", "security", "افحص الصلاحيات"]
+    },
+    "eagle": {
+      "name": "Eagle",
+      "emoji": "🦅",
+      "role": "deployer",
+      "description": "الناشر — يرفع الكود للإنتاج",
+      "file": "docs/agents/eagle.md",
+      "rules": [
+        "لا ينشر إلا بعد SECURITY_APPROVED",
+        "يبني الأصول محلياً",
+        "يتحقق من routes بعد النشر"
+      ],
+      "triggers": ["انشر", "deploy", "ارفع للإنتاج"]
+    },
+    "cheetah": {
+      "name": "Cheetah",
+      "emoji": "🐆",
+      "role": "quick_tasks",
+      "description": "السريع — KPIs وتحسينات صغيرة",
+      "file": "docs/agents/cheetah.md",
+      "parallel": true
+    },
+    "tiger": {
+      "name": "Tiger",
+      "emoji": "🐯",
+      "role": "pdf_exports",
+      "description": "الدقيق — PDF وتصدير",
+      "file": "docs/agents/tiger.md",
+      "parallel": true
+    },
+    "wolf": {
+      "name": "Wolf",
+      "emoji": "🐺",
+      "role": "long_tasks",
+      "description": "المسافر — أنظمة متكاملة",
+      "file": "docs/agents/wolf.md",
+      "parallel": true
+    }
+  },
+
+  "workflow": {
+    "pipeline": ["dragon", "lion", "fox", "turtle", "eagle"],
+    "parallel_agents": ["cheetah", "tiger", "wolf"],
+    "rules": [
+      "Dragon يخطط ولا يكتب كود",
+      "بعد كل بناء: Fox → Turtle → Eagle",
+      "Turtle بوابة — لا نشر بدون APPROVED",
+      "البناء محلياً — لا npm على السيرفر",
+      "كل موجة تنتهي بنشر"
+    ]
+  },
+
+  "deploy": {
+    "build_command": "npm run build",
+    "rsync_path": "public/build/",
+    "server_commands": [
+      "git pull origin main",
+      "composer install --no-dev --optimize-autoloader",
+      "php artisan migrate --force",
+      "php artisan optimize:clear",
+      "php artisan optimize"
+    ],
+    "verify_urls": [
+      "/",
+      "/quotes",
+      "/welcome",
+      "/login"
+    ]
+  },
+
+  "quality_gates": {
+    "before_deploy": {
+      "tests": "php artisan test",
+      "assertions_minimum": 70,
+      "lint": null,
+      "security_review": "turtle"
+    }
+  },
+
+  "conventions": {
+    "language": "php",
+    "framework": "laravel",
+    "frontend": "vite + tailwind + alpinejs",
+    "pdf": "mpdf",
+    "auth": "spatie/permission",
+    "naming": {
+      "controllers": "PascalCase",
+      "models": "PascalCase",
+      "views": "kebab-case",
+      "routes": "kebab-case",
+      "migrations": "snake_case_timestamp"
+    }
+  }
+}
