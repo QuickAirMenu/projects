@@ -30,12 +30,20 @@
             </button>
             <div x-show="open" x-collapse class="{{ is_rtl() ? 'mr-4' : 'ml-4' }} space-y-1 mt-1">
                 <a href="{{ route('projects.index') }}" class="sidebar-link text-sm {{ request()->routeIs('projects.index') ? 'active' : '' }}">
-                    <i class="fas fa-list w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
-                    <span>{{ __('messages.all') }}</span>
+                    <i class="fas fa-table w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                    <span>{{ __('project.list_view') }}</span>
                 </a>
                 <a href="{{ route('projects.board') }}" class="sidebar-link text-sm {{ request()->routeIs('projects.board') ? 'active' : '' }}">
                     <i class="fas fa-columns w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                     <span>{{ __('project.kanban') }}</span>
+                </a>
+                <a href="{{ route('projects.calendar') }}" class="sidebar-link text-sm {{ request()->routeIs('projects.calendar') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-alt w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                    <span>{{ __('project.calendar') }}</span>
+                </a>
+                <a href="{{ route('projects.timeline') }}" class="sidebar-link text-sm {{ request()->routeIs('projects.timeline') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                    <span>{{ __('project.timeline') }}</span>
                 </a>
             </div>
         </div>
@@ -51,8 +59,8 @@
             </button>
             <div x-show="open" x-collapse class="{{ is_rtl() ? 'mr-4' : 'ml-4' }} space-y-1 mt-1">
                 <a href="{{ route('tasks.index') }}" class="sidebar-link text-sm {{ request()->routeIs('tasks.index') ? 'active' : '' }}">
-                    <i class="fas fa-list w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
-                    <span>{{ __('messages.all') }}</span>
+                    <i class="fas fa-table w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                    <span>{{ __('task.list_view') }}</span>
                 </a>
                 <a href="{{ route('tasks.kanban') }}" class="sidebar-link text-sm {{ request()->routeIs('tasks.kanban') ? 'active' : '' }}">
                     <i class="fas fa-columns w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
@@ -62,6 +70,10 @@
                     <i class="fas fa-calendar-alt w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                     <span>{{ __('task.calendar') }}</span>
                 </a>
+                <a href="{{ route('tasks.timeline') }}" class="sidebar-link text-sm {{ request()->routeIs('tasks.timeline') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                    <span>{{ __('task.timeline') }}</span>
+                </a>
             </div>
         </div>
         @endcan
@@ -69,7 +81,8 @@
         <!-- Finance Section -->
         @canany(['view-quotes', 'view-invoices', 'view-payments', 'view-contracts'])
         <div x-data="{ open: {{ request()->routeIs('quotes.*') || request()->routeIs('invoices.*') || request()->routeIs('payments.*') || request()->routeIs('contracts.*') ? 'true' : 'false' }} }" class="pt-2">
-            <button @click="open = !open" class="px-4 mb-1 w-full flex items-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <button @click="open = !open" class="sidebar-link w-full {{ request()->routeIs('quotes.*') || request()->routeIs('invoices.*') || request()->routeIs('payments.*') || request()->routeIs('contracts.*') ? 'active' : '' }}">
+                <i class="fas fa-coins w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
                 <span>{{ __('common.finance') }}</span>
                 <i class="fas fa-chevron-down text-xs transition-transform duration-200 {{ is_rtl() ? 'mr-auto' : 'ml-auto' }}" :class="open ? 'rotate-180' : ''"></i>
             </button>
@@ -126,6 +139,15 @@
             @endcan
         </div>
         @endcanany
+
+        <!-- Export / Import -->
+        <div class="pt-2">
+            <p class="px-4 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">@lang('common.import_export')</p>
+            <a href="{{ route('imports.index') }}" class="sidebar-link {{ request()->routeIs('imports.*') ? 'active' : '' }}">
+                <i class="fas fa-upload w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                <span>@lang('common.import_data')</span>
+            </a>
+        </div>
 
         <!-- Help + Support -->
         <div class="pt-2">

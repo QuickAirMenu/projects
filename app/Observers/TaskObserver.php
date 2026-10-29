@@ -8,6 +8,21 @@ use App\Services\ProjectService;
 
 class TaskObserver
 {
+    public function creating(Task $task): void
+    {
+        if (empty($task->created_by)) {
+            $task->created_by = auth()->id();
+        }
+    }
+
+    public function created(Task $task): void
+    {
+        // Recalculate parent project progress when a task is created
+        if ($task->project_id) {
+            app(ProjectService::class)->recalculateProgress($task->project);
+        }
+    }
+
     public function updated(Task $task): void
     {
         // Notify when task is assigned to someone new
@@ -15,16 +30,25 @@ class TaskObserver
             app(NotificationService::class)->notifyTaskAssigned($task);
         }
 
-        // Recalculate parent project progress when task status changes
-        if ($task->isDirty('status_id') && $task->project_id) {
+        // Recalculate parent project progress when task changes
+        if ($task->project_id) {
             app(ProjectService::class)->recalculateProgress($task->project);
         }
     }
 
-    public function creating(Task $task): void
+    public function deleted(Task $task): void
     {
-        if (empty($task->created_by)) {
-            $task->created_by = auth()->id();
+        // Recalculate parent project progress when a task is deleted
+        if ($task->project_id) {
+            app(ProjectService::class)->recalculateProgress($task->project);
+        }
+    }
+
+    public function restored(Task $task): void
+    {
+        // Recalculate parent project progress when a task is restored
+        if ($task->project_id) {
+            app(ProjectService::class)->recalculateProgress($task->project);
         }
     }
 }

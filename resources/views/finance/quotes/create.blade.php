@@ -89,11 +89,18 @@
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
-            {{ __('finance.discount') }} %
+            {{ __('finance.discount') }}
             <i class="fas fa-circle-question text-gray-400 cursor-help" title="{{ __('finance.discount_help') }}"></i>
         </label>
-        <input type="number" name="discount_percentage" value="{{ old('discount_percentage', $isEdit ? $quoteModel?->discount_percentage : 0) }}" step="0.01" min="0" max="100"
-               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="flex gap-2">
+            <select name="discount_type" id="discountType" class="border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="percentage" {{ old('discount_type', $isEdit ? $quoteModel?->discount_type : 'percentage') === 'percentage' ? 'selected' : '' }}>{{ __('finance.percentage') }}</option>
+                <option value="fixed" {{ old('discount_type', $isEdit ? $quoteModel?->discount_type : 'percentage') === 'fixed' ? 'selected' : '' }}>{{ __('finance.fixed_amount') }}</option>
+            </select>
+            <input type="number" name="discount_percentage" id="discountInput" value="{{ old('discount_percentage', $isEdit ? (($quoteModel?->discount_value ?: $quoteModel?->discount_percentage) ?? 0) : 0) }}" step="0.01" min="0"
+                   class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span id="discountSuffix" class="flex items-center text-sm text-gray-500 min-w-[40px]">%</span>
+        </div>
         @error('discount_percentage')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
     </div>
 </div>
@@ -103,8 +110,8 @@
 <div id="items-container">
     <div class="grid grid-cols-12 gap-2 mb-2 text-xs text-gray-500 px-1">
         <div class="col-span-4">{{ __('messages.description') }}</div>
-        <div class="col-span-2">{{ __('task.hours') }}</div>
-        <div class="col-span-2">{{ __('finance.method_other') }}</div>
+        <div class="col-span-2">{{ __('finance.quantity') }}</div>
+        <div class="col-span-2">{{ __('finance.unit_price') }}</div>
         <div class="col-span-3">{{ __('project.service_type') }}</div>
         <div class="col-span-1"></div>
     </div>
@@ -137,6 +144,7 @@
     <div class="w-64 space-y-2 text-sm">
         <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.subtotal') }}</span><span id="subtotal" class="font-medium">0.00</span></div>
         <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.tax') }}</span><span id="taxAmount" class="font-medium">0.00</span></div>
+        <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.discount') }}</span><span id="discountDisplay" class="text-red-500">0.00</span></div>
         <div class="flex justify-between border-t pt-2"><span class="font-semibold">{{ __('finance.total') }}</span><span id="total" class="font-bold text-blue-600">0.00</span></div>
     </div>
 </div>
@@ -147,10 +155,21 @@
         @error('notes')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
 </div>
 
+<div class="mt-4">
+    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.terms_and_conditions') }}</label>
+    <textarea name="terms_and_conditions" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('terms_and_conditions', $quoteModel?->terms_and_conditions ?? '') }}</textarea>
+    @error('terms_and_conditions')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+</div>
+
 <div class="flex gap-3 mt-6">
-    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-xl transition">
+    <button type="submit" name="action" value="save" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-xl transition">
         <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
     </button>
+    @if($isEdit && in_array($quoteModel?->status, ['draft', 'sent']))
+    <button type="submit" name="action" value="send" class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2.5 rounded-xl transition">
+        <i class="fas fa-paper-plane me-2"></i>{{ __('messages.save_and_send') }}
+    </button>
+    @endif
     <a href="{{ route('quotes.index') }}" class="bg-gray-100 text-gray-700 font-medium px-6 py-2.5 rounded-xl transition">{{ __('messages.cancel') }}</a>
 </div>
 </form>
@@ -224,8 +243,14 @@ document.addEventListener('click', e => {
 });
 
 document.addEventListener('input', e => {
-    if (e.target.classList.contains('qty-input') || e.target.classList.contains('price-input') || e.target.id === 'taxInput') {
+    if (e.target.classList.contains('qty-input') || e.target.classList.contains('price-input') || e.target.id === 'taxInput' || e.target.id === 'discountInput') {
         calcTotals();
+    }
+});
+document.addEventListener('change', e => {
+    if (e.target.id === 'discountType') {
+        calcTotals();
+        document.getElementById('discountSuffix').textContent = e.target.value === 'percentage' ? '%' : '{{ __("finance.currency") }}';
     }
 });
 
@@ -262,9 +287,13 @@ function calcTotals() {
         sub += q * p;
     });
     const tax = sub * (parseFloat(document.getElementById('taxInput')?.value) || 0) / 100;
+    const discountRaw = parseFloat(document.getElementById('discountInput')?.value) || 0;
+    const discountType = document.getElementById('discountType')?.value || 'percentage';
+    const discount = discountType === 'fixed' ? discountRaw : sub * discountRaw / 100;
     document.getElementById('subtotal').textContent = sub.toFixed(2);
     document.getElementById('taxAmount').textContent = tax.toFixed(2);
-    document.getElementById('total').textContent = (sub + tax).toFixed(2);
+    document.getElementById('discountDisplay').textContent = '-' + discount.toFixed(2);
+    document.getElementById('total').textContent = Math.max(0, sub + tax - discount).toFixed(2);
 }
 </script>
 @endpush

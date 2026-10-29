@@ -45,7 +45,7 @@
                 <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('users.user') }}</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('users.email') }}</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('users.role') }}</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('users.job_title') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('users.job_level') }}</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('messages.status') }}</th>
                 <th class="text-end px-5 py-3 font-semibold text-gray-600">{{ __('messages.actions') }}</th>
             </tr>
@@ -60,17 +60,23 @@
                         </div>
                         <div>
                             <p class="font-medium text-gray-800">{{ $user->name }}</p>
-                            <p class="text-xs text-gray-400">{{ $user->phone }}</p>
+                            <p class="text-xs text-gray-400 privacy-mask">{{ $user->phone }}</p>
                         </div>
                     </div>
                 </td>
-                <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $user->email }}</td>
+                <td class="px-4 py-3 hidden md:table-cell text-gray-600 privacy-mask">{{ $user->email }}</td>
                 <td class="px-4 py-3 hidden lg:table-cell">
                     @foreach($user->roles as $role)
                     <span class="px-2 py-0.5 rounded-full text-xs bg-purple-100 text-purple-700 me-1">{{ $role->name }}</span>
                     @endforeach
                 </td>
-                <td class="px-4 py-3 hidden lg:table-cell text-gray-500">{{ $user->job_title ?? '-' }}</td>
+                <td class="px-4 py-3 hidden lg:table-cell">
+                    @if($user->job_level)
+                        <span class="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700">{{ __('users.level_' . $user->job_level) }}</span>
+                    @else
+                        <span class="text-gray-400">-</span>
+                    @endif
+                </td>
                 <td class="px-4 py-3">
                     <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600' }}">
                         {{ $user->is_active ? __('users.active') : __('users.inactive') }}

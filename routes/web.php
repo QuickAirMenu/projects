@@ -3,6 +3,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\BulkActionController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\ClientCommunicationController;
@@ -23,6 +26,10 @@ use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Report\ProjectReportController;
 use App\Http\Controllers\Report\TaskReportController;
 use App\Http\Controllers\Report\FinanceReportController;
+use App\Mail\SupportMail;
+use App\Models\Setting;
+use App\Services\MailConfigService;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Report\PerformanceReportController;
 use App\Http\Controllers\Portal\ClientPortalController;
 use App\Http\Controllers\Setting\SettingController;
@@ -33,6 +40,8 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Auth\UserInvitationController;
 use App\Http\Controllers\User\RoleController;
 use App\Http\Controllers\User\PermissionController;
+use App\Http\Controllers\ExportController;
+use App\Http\Controllers\ImportController;
 
 // Guest
 Route::middleware('guest')->group(function () {
@@ -54,6 +63,9 @@ Route::get('/help', fn() => view('help'))->name('help');
 // Public quotes
 Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->middleware('throttle:30,1')->name('quotes.public');
 Route::get('/q/{token}/pdf', [QuoteController::class, 'publicPdf'])->middleware('throttle:30,1')->name('quotes.public-pdf');
+Route::get('/q/{token}/approve', [QuoteController::class, 'publicApproveForm'])->middleware('throttle:30,1')->name('quotes.public-approve-form');
+Route::post('/q/{token}/approve', [QuoteController::class, 'publicApprove'])->middleware('throttle:10,1')->name('quotes.public-approve');
+Route::post('/q/{token}/reject', [QuoteController::class, 'publicReject'])->middleware('throttle:10,1')->name('quotes.public-reject');
 
 // Client Portal Routes
 Route::prefix('portal')->name('portal.')->group(function () {
@@ -62,10 +74,27 @@ Route::prefix('portal')->name('portal.')->group(function () {
     Route::get('/setup/{token}', [ClientPortalController::class, 'showSetup'])->name('setup');
     Route::post('/setup/{token}', [ClientPortalController::class, 'completeSetup'])->name('setup.post');
 
+    Route::get('/forgot-password', [ClientPortalController::class, 'showForgotPassword'])->name('forgot-password');
+    Route::post('/forgot-password', [ClientPortalController::class, 'sendResetLink'])->middleware('throttle:3,1')->name('forgot-password.post');
+    Route::get('/reset-password/{token}', [ClientPortalController::class, 'showResetPassword'])->name('reset-password');
+    Route::post('/reset-password/{token}', [ClientPortalController::class, 'completeResetPassword'])->name('reset-password.post');
+
     Route::middleware(['auth:client'])->group(function () {
-        Route::get('/dashboard', [ClientPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/dashboard',          [ClientPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/invoices',           [ClientPortalController::class, 'invoices'])->name('invoices');
+        Route::get('/invoices/{invoice}/pdf', [ClientPortalController::class, 'downloadInvoicePdf'])->name('invoices.pdf');
+        Route::get('/quotes',             [ClientPortalController::class, 'quotes'])->name('quotes');
+        Route::get('/quotes/{quote}/pdf', [ClientPortalController::class, 'downloadQuotePdf'])->name('quotes.pdf');
+        Route::get('/attachments/{attachment}/download', [ClientPortalController::class, 'downloadAttachment'])->name('attachments.download');
         Route::get('/projects/{project}', [ClientPortalController::class, 'projectShow'])->name('projects.show');
-        Route::post('/logout', [ClientPortalController::class, 'logout'])->name('logout');
+        Route::get('/payments',           [ClientPortalController::class, 'payments'])->name('payments');
+        Route::get('/payments/{payment}/proof', [ClientPortalController::class, 'downloadPaymentProof'])->name('payments.proof');
+        Route::get('/contracts',          [ClientPortalController::class, 'contracts'])->name('contracts');
+        Route::get('/contracts/{contract}/pdf', [ClientPortalController::class, 'downloadContractPdf'])->name('contracts.pdf');
+        Route::get('/profile',            [ClientPortalController::class, 'profile'])->name('profile');
+        Route::put('/profile',            [ClientPortalController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profile/password',   [ClientPortalController::class, 'updatePassword'])->name('profile.password');
+        Route::post('/logout',            [ClientPortalController::class, 'logout'])->name('logout');
     });
 });
 
@@ -80,14 +109,40 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::get('/support', fn() => view('support'))->name('support');
     Route::post('/support', function (\Illuminate\Http\Request $request) {
         $request->validate([
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:5000',
+            'subject'    => 'required|string|max:255',
+            'message'    => 'required|string|max:5000',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240',
         ]);
-        \Illuminate\Support\Facades\Log::info('Support message', [
-            'user' => auth()->user()->email,
-            'subject' => $request->subject,
-            'message' => $request->message,
-        ]);
+
+        $settings = Setting::whereIn('key', ['company_name', 'company_name_ar', 'company_logo'])
+            ->pluck('value', 'key')
+            ->toArray();
+
+        $toEmail = $settings['company_email'] ?? 'support@airmenu.net';
+
+        try {
+            app(MailConfigService::class)->applyDynamicMailConfig();
+            if (config('mail.mailers.smtp.host')) {
+                $mail = new SupportMail(
+                    auth()->user()->name,
+                    auth()->user()->email,
+                    $request->subject,
+                    $request->message,
+                );
+
+                if ($request->hasFile('attachment')) {
+                    $mail->attach($request->file('attachment')->getRealPath(), [
+                        'as'   => $request->file('attachment')->getClientOriginalName(),
+                        'mime' => $request->file('attachment')->getMimeType(),
+                    ]);
+                }
+
+                Mail::to($toEmail)->send($mail);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return back()->with('success', __('support.message_sent'));
     })->name('support.send');
 
@@ -99,10 +154,20 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Notifications
-    Route::prefix('notifications')->name('notifications.')->group(function () {
-        Route::get('/', fn() => redirect()->route('dashboard'))->name('index');
-        Route::post('{id}/read', function ($id) { auth()->user()->notifications()->findOrFail($id)->markAsRead(); return redirect()->back(); })->name('read');
-        Route::post('read-all', function () { auth()->user()->unreadNotifications->markAsRead(); return redirect()->back(); })->name('read-all');
+    Route::prefix('notifications')->name('notifications.')->group(function() {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+        Route::post('read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
+        Route::get('count', [NotificationController::class, 'unreadCount'])->name('count');
+    });
+
+    // Global search (Cmd-K)
+    Route::get('search', SearchController::class)->name('search');
+
+    // Bulk actions
+    Route::prefix('bulk')->name('bulk.')->group(function () {
+        Route::post('projects/delete', [BulkActionController::class, 'bulkDestroyProjects'])->name('projects.delete');
+        Route::post('invoices/delete', [BulkActionController::class, 'bulkDestroyInvoices'])->name('invoices.delete');
     });
 
     // Clients
@@ -123,6 +188,9 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::prefix('projects')->name('projects.')->group(function () {
         Route::get('/', [ProjectController::class, 'index'])->name('index');
         Route::get('board', [ProjectController::class, 'kanban'])->name('board');
+        Route::get('calendar', [ProjectController::class, 'calendar'])->name('calendar');
+        Route::get('calendar/data', [ProjectController::class, 'calendarData'])->name('calendar.data');
+        Route::get('timeline', [ProjectController::class, 'timeline'])->name('timeline');
         Route::get('create', [ProjectController::class, 'create'])->name('create');
         Route::get('{project}/handoff', [ProjectController::class, 'handoff'])->name('handoff');
         Route::post('{project}/handoff', [ProjectController::class, 'completeHandoff'])->name('handoff.complete');
@@ -132,10 +200,13 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::put('{project}', [ProjectController::class, 'update'])->name('update');
         Route::delete('{project}', [ProjectController::class, 'destroy'])->name('destroy');
         Route::post('{project}/attachments', [ProjectAttachmentController::class, 'store'])->name('attachments.store');
+        Route::get('attachments/{attachment}/download', [ProjectAttachmentController::class, 'download'])->name('attachments.download');
         Route::delete('attachments/{attachment}', [ProjectAttachmentController::class, 'destroy'])->name('attachments.destroy');
         Route::get('{project}/workflow', [ProjectWorkflowController::class, 'show'])->name('workflow.show');
         Route::post('{project}/workflow/{step}/complete', [ProjectWorkflowController::class, 'completeStep'])->name('workflow.complete');
         Route::post('{project}/workflow/{step}/undo', [ProjectWorkflowController::class, 'undoStep'])->name('workflow.undo');
+        Route::post('{project}/archive', [ProjectController::class, 'archive'])->name('archive');
+        Route::post('{project}/unarchive', [ProjectController::class, 'unarchive'])->name('unarchive');
     });
 
     // Tasks
@@ -143,6 +214,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [TaskController::class, 'index'])->name('index');
         Route::get('kanban', [KanbanController::class, 'index'])->name('kanban');
         Route::get('calendar', [TaskController::class, 'calendar'])->name('calendar');
+        Route::get('calendar/data', [TaskController::class, 'calendarData'])->name('calendar.data');
+        Route::get('timeline', [TaskController::class, 'timeline'])->name('timeline');
         Route::get('create', [TaskController::class, 'create'])->name('create');
         Route::post('/', [TaskController::class, 'store'])->name('store');
         Route::get('{task}', [TaskController::class, 'show'])->name('show');
@@ -171,6 +244,9 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('{quote}/restore', [QuoteController::class, 'restore'])->withTrashed()->name('restore');
         Route::delete('{quote}', [QuoteController::class, 'destroy'])->name('destroy');
         Route::post('{quote}/send', [QuoteController::class, 'send'])->name('send');
+        Route::post('{quote}/send-whatsapp', [QuoteController::class, 'sendWhatsApp'])->name('send-whatsapp');
+        Route::post('{quote}/approve', [QuoteController::class, 'approve'])->name('approve');
+        Route::post('{quote}/redraft', [QuoteController::class, 'redraft'])->name('redraft');
         Route::post('{quote}/convert', [QuoteController::class, 'convertToProject'])->name('convert');
         Route::post('{quote}/convert-to-invoice', [QuoteController::class, 'convertToInvoice'])->name('convert-to-invoice');
     });
@@ -181,6 +257,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('create', [ContractController::class, 'create'])->name('create');
         Route::post('/', [ContractController::class, 'store'])->name('store');
         Route::get('{contract}/pdf', [ContractController::class, 'pdf'])->name('pdf');
+        Route::get('{contract}/download', [ContractController::class, 'downloadFile'])->name('download');
         Route::get('{contract}', [ContractController::class, 'show'])->name('show');
         Route::get('{contract}/edit', [ContractController::class, 'edit'])->name('edit');
         Route::put('{contract}', [ContractController::class, 'update'])->name('update');
@@ -208,6 +285,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('/', [PaymentController::class, 'store'])->name('store');
         Route::get('{payment}', [PaymentController::class, 'show'])->name('show');
         Route::get('{payment}/edit', [PaymentController::class, 'edit'])->name('edit');
+        Route::get('{payment}/download-proof', [PaymentController::class, 'downloadProof'])->name('download-proof');
+        Route::get('{payment}/view-proof', [PaymentController::class, 'viewProof'])->name('view-proof');
         Route::put('{payment}', [PaymentController::class, 'update'])->name('update');
         Route::post('{payment}/restore', [PaymentController::class, 'restore'])->withTrashed()->name('restore');
         Route::delete('{payment}', [PaymentController::class, 'destroy'])->name('destroy');
@@ -283,5 +362,25 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [PermissionController::class, 'index'])->name('index');
         Route::post('/', [PermissionController::class, 'store'])->name('store');
         Route::delete('{permission}', [PermissionController::class, 'destroy'])->name('destroy');
+    });
+
+    // Imports
+    Route::prefix('imports')->name('imports.')->group(function () {
+        Route::get('/', [ImportController::class, 'showForm'])->name('index');
+        Route::get('clients/template', [ImportController::class, 'downloadClientTemplate'])->name('clients.template');
+        Route::get('projects/template', [ImportController::class, 'downloadProjectTemplate'])->name('projects.template');
+        Route::post('clients', [ImportController::class, 'importClients'])->name('clients');
+        Route::post('projects', [ImportController::class, 'importProjects'])->name('projects');
+    });
+
+    // Exports
+    Route::prefix('exports')->name('exports.')->middleware('permission:view-reports')->group(function () {
+        Route::get('projects', [ExportController::class, 'projects'])->name('projects');
+        Route::get('tasks', [ExportController::class, 'tasks'])->name('tasks');
+        Route::get('clients', [ExportController::class, 'clients'])->name('clients');
+        Route::get('invoices', [ExportController::class, 'invoices'])->name('invoices');
+        Route::get('quotes', [ExportController::class, 'quotes'])->name('quotes');
+        Route::get('payments', [ExportController::class, 'payments'])->name('payments');
+        Route::get('contracts', [ExportController::class, 'contracts'])->name('contracts');
     });
 });

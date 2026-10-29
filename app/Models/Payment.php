@@ -58,42 +58,6 @@ class Payment extends Model
                 );
             }
         });
-
-        // Update invoice after payment is created
-        static::created(function ($payment) {
-            $invoice = $payment->invoice;
-            $invoice->paid_amount += $payment->amount;
-            $invoice->remaining_amount = $invoice->total - $invoice->paid_amount;
-            
-            // Update payment status
-            if ($invoice->remaining_amount <= 0) {
-                $invoice->payment_status = 'paid';
-            } elseif ($invoice->paid_amount > 0) {
-                $invoice->payment_status = 'partially_paid';
-            }
-            
-            $invoice->save();
-        });
-
-        static::deleted(function (Payment $payment) {
-            if ($payment->invoice) {
-                $paid = $payment->invoice->payments()->sum('amount');
-                $payment->invoice->update([
-                    'paid_amount' => $paid,
-                    'remaining_amount' => $payment->invoice->total - $paid,
-                ]);
-            }
-        });
-
-        static::restored(function (Payment $payment) {
-            if ($payment->invoice) {
-                $paid = $payment->invoice->payments()->sum('amount');
-                $payment->invoice->update([
-                    'paid_amount' => $paid,
-                    'remaining_amount' => $payment->invoice->total - $paid,
-                ]);
-            }
-        });
     }
 
     /**

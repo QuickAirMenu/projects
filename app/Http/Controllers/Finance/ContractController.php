@@ -17,6 +17,8 @@ class ContractController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Contract::class);
+
         $query = Contract::with(['project','client','creator'])->latest();
         if ($request->trashed) $query->onlyTrashed();
         $contracts = $query->paginate(15);
@@ -32,6 +34,8 @@ class ContractController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Contract::class);
+
         $projects = Project::orderBy('name')->get();
         $clients  = Client::orderBy('name')->get();
         $prefillData = null;
@@ -52,6 +56,8 @@ class ContractController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Contract::class);
+
         $request->validate([
             'project_id'     => 'required|exists:projects,id',
             'client_id'      => 'required|exists:clients,id',
@@ -78,10 +84,10 @@ class ContractController extends Controller
         $data['signed_by_client'] = $request->boolean('signed_by_client');
         $data['signed_at'] = $data['signed_by_client'] ? ($data['signed_at'] ?? now()) : null;
         $data['created_by']      = Auth::id();
-        $data['contract_number'] = 'CNT-'.date('Ym').'-'.str_pad(Contract::count()+1,4,'0',STR_PAD_LEFT);
+        $data['contract_number'] = generate_number(workspace_config('contract.number_prefix', 'CNT'));
 
         if ($request->hasFile('contract_file')) {
-            $data['contract_file_path'] = $request->file('contract_file')->store('contracts','public');
+            $data['contract_file_path'] = $request->file('contract_file')->store('contracts','private');
         }
 
         Contract::create($data);
@@ -91,6 +97,8 @@ class ContractController extends Controller
 
     public function show(Contract $contract)
     {
+        $this->authorize('view', $contract);
+
         $contract->load(['project.invoices', 'client', 'creator', 'createdBy', 'invoice']);
         $projectInvoices = $contract->project ? $contract->project->invoices()->with('payments')->get() : collect();
 
@@ -99,6 +107,8 @@ class ContractController extends Controller
 
     public function edit(Contract $contract)
     {
+        $this->authorize('update', $contract);
+
         $projects = Project::orderBy('name')->get();
         $clients  = Client::orderBy('name')->get();
         return view('finance.contracts.create', compact('contract','projects','clients'));
@@ -106,6 +116,8 @@ class ContractController extends Controller
 
     public function update(Request $request, Contract $contract)
     {
+        $this->authorize('update', $contract);
+
         $request->validate([
             'project_id'     => 'required|exists:projects,id',
             'client_id'      => 'required|exists:clients,id',
@@ -131,8 +143,8 @@ class ContractController extends Controller
         $data['signed_by_client'] = $request->boolean('signed_by_client');
         $data['signed_at'] = $data['signed_by_client'] ? ($data['signed_at'] ?? $contract->signed_at ?? now()) : null;
         if ($request->hasFile('contract_file')) {
-            if ($contract->contract_file_path) Storage::disk('public')->delete($contract->contract_file_path);
-            $data['contract_file_path'] = $request->file('contract_file')->store('contracts','public');
+            if ($contract->contract_file_path) Storage::disk('private')->delete($contract->contract_file_path);
+            $data['contract_file_path'] = $request->file('contract_file')->store('contracts','private');
         }
         $contract->update($data);
         return redirect()->route('contracts.show', $contract)
@@ -141,7 +153,9 @@ class ContractController extends Controller
 
     public function destroy(Contract $contract)
     {
-        if ($contract->contract_file_path) Storage::disk('public')->delete($contract->contract_file_path);
+        $this->authorize('delete', $contract);
+
+        if ($contract->contract_file_path) Storage::disk('private')->delete($contract->contract_file_path);
         $contract->delete();
         return redirect()->route('contracts.index')
             ->with('success', __('messages.deleted_successfully'));
@@ -149,12 +163,16 @@ class ContractController extends Controller
 
     public function restore(Contract $contract)
     {
+        $this->authorize('update', $contract);
+
         $contract->restore();
-        return redirect()->route('contracts.index')->with('success', 'تمت استعادة عنصر من الأرشيف');
+        return redirect()->route('contracts.index')->with('success', __('messages.restored_successfully'));
     }
 
     public function pdf(Contract $contract)
     {
+        $this->authorize('view', $contract);
+
         $contract->load(['project', 'client', 'createdBy']);
         $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
             ->pluck('value', 'key')
@@ -171,5 +189,19 @@ class ContractController extends Controller
         $mpdf->WriteHTML($html);
         return response($mpdf->Output("contract-{$contract->contract_number}.pdf", 'S'), 200)
             ->header('Content-Type', 'application/pdf');
+    }
+
+    public function downloadFile(Contract $contract)
+    {
+        $this->authorize('view', $contract);
+
+        if (!$contract->contract_file_path) {
+            abort(404);
+        }
+
+        return Storage::disk('private')->download(
+            $contract->contract_file_path,
+            basename($contract->contract_file_path)
+        );
     }
 }

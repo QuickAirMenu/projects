@@ -1,8 +1,13 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse';
+import { Calendar } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 window.Alpine = Alpine;
+window.FullCalendar = { Calendar, dayGridPlugin, timeGridPlugin, interactionPlugin };
 Alpine.plugin(collapse);
 Alpine.start();
 
@@ -65,6 +70,25 @@ window.toggleDarkMode = function() {
     document.documentElement.classList.toggle('dark');
     localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
 };
+
+// Privacy Mode Toggle
+window.togglePrivacy = function() {
+    const isOn = document.body.classList.toggle('privacy-on');
+    localStorage.setItem('privacyMode', isOn ? 'on' : 'off');
+    const icon = document.getElementById('privacyIcon');
+    if (icon) {
+        icon.className = isOn ? 'fas fa-eye-slash text-lg text-amber-500' : 'fas fa-eye text-lg';
+    }
+};
+
+// Restore privacy mode on load
+document.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('privacyMode') === 'on') {
+        document.body.classList.add('privacy-on');
+        const icon = document.getElementById('privacyIcon');
+        if (icon) icon.className = 'fas fa-eye-slash text-lg text-amber-500';
+    }
+});
 
 // Auto-hide alerts
 document.addEventListener('DOMContentLoaded', function() {

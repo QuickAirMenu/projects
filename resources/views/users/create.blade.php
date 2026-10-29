@@ -40,8 +40,18 @@
                 @error('role')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.job_level') }}</label>
+                <select name="job_level" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">-- {{ __('messages.select') }} --</option>
+                    @foreach(\App\Models\User::JOB_LEVELS as $key => $label)
+                        <option value="{{ $key }}" {{ old('job_level') == $key ? 'selected' : '' }}>{{ __('users.level_' . $key) }}</option>
+                    @endforeach
+                </select>
+                @error('job_level')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.job_title') }}</label>
-                <input type="text" name="job_title" value="{{ old('job_title') }}" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" name="job_title" value="{{ old('job_title') }}" placeholder="{{ __('users.job_title_placeholder') }}" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.phone') }}</label>
@@ -54,6 +64,14 @@
                     <option value="en" {{ old('language') === 'en' ? 'selected' : '' }}>English</option>
                 </select>
                 @error('language')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div class="md:col-span-2">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="send_invite" value="1" {{ old('send_invite') ? 'checked' : '' }}
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-sm text-gray-700">{{ __('users.send_invite') }}</span>
+                </label>
+                <p class="text-xs text-gray-400 mt-1">{{ __('users.send_invite_hint') }}</p>
             </div>
         </div>
         <div class="flex gap-3 mt-6">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -31,11 +32,12 @@ class ProfileController extends Controller
             'email'     => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone'     => 'nullable|string|max:20',
             'job_title' => 'nullable|string|max:100',
+            'job_level' => 'nullable|in:' . implode(',', array_keys(User::JOB_LEVELS)),
             'language'  => 'nullable|in:ar,en',
             'avatar'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $data = $request->only(['name', 'email', 'phone', 'job_title', 'language']);
+        $data = $request->only(['name', 'email', 'phone', 'job_title', 'job_level', 'language']);
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {

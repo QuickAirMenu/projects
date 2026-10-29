@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('title', $client->name)
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[
+        ['label' => 'client.clients', 'url' => route('clients.index')],
+        ['label' => $client->name, 'url' => null],
+    ]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex items-center justify-between">
     <div>
@@ -49,13 +56,13 @@
             </div>
             <div class="space-y-3 text-sm">
                 @if($client->phone)
-                <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-phone w-4 text-blue-400"></i> {{ $client->phone }}</div>
+                <div class="flex items-center gap-3 text-gray-600 privacy-mask"><i class="fas fa-phone w-4 text-blue-400"></i> {{ $client->phone }}</div>
                 @endif
                 @if($client->whatsapp)
-                <div class="flex items-center gap-3 text-gray-600"><i class="fab fa-whatsapp w-4 text-green-400"></i> {{ $client->whatsapp }}</div>
+                <div class="flex items-center gap-3 text-gray-600 privacy-mask"><i class="fab fa-whatsapp w-4 text-green-400"></i> {{ $client->whatsapp }}</div>
                 @endif
                 @if($client->email)
-                <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-envelope w-4 text-blue-400"></i> {{ $client->email }}</div>
+                <div class="flex items-center gap-3 text-gray-600 privacy-mask"><i class="fas fa-envelope w-4 text-blue-400"></i> {{ $client->email }}</div>
                 @endif
                 @if($client->city)
                 <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-map-marker-alt w-4 text-red-400"></i> {{ $client->city }}</div>
@@ -84,7 +91,7 @@
                     <p class="text-xs text-gray-500">{{ __('client.projects_count') }}</p>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-green-600">{{ number_format($client->lifetime_value, 0) }}</p>
+                    <p class="text-2xl font-bold text-green-600 privacy-mask">{{ number_format($client->lifetime_value, 0) }}</p>
                     <p class="text-xs text-gray-500">{{ __('client.lifetime_value') }}</p>
                 </div>
             </div>

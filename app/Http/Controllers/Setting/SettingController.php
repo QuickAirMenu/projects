@@ -41,11 +41,14 @@ class SettingController extends Controller
             'mail_password' => 'mail',
             'mail_from_address' => 'mail',
             'mail_from_name' => 'mail',
+            'portal_show_invoices' => 'portal',
+            'portal_show_quotes' => 'portal',
+            'vat_number' => 'general',
+            'commercial_registration' => 'general',
         ];
 
         if ($request->hasFile('company_logo')) {
             $path = $request->file('company_logo')->store('settings', 'public');
-
             Setting::updateOrCreate(
                 ['key' => 'company_logo'],
                 ['value' => $path, 'group' => 'general']
@@ -56,16 +59,28 @@ class SettingController extends Controller
             if ($key === 'mail_password' && blank($value)) {
                 continue;
             }
-
             if ($key === 'mail_password') {
                 $value = Crypt::encryptString($value);
             }
-
+            if ($key === 'company_website' && $value && !str_starts_with($value, 'http')) {
+                $value = 'https://' . $value;
+            }
             Setting::updateOrCreate(
                 ['key' => $key],
                 ['value' => $value, 'group' => $groupMap[$key] ?? 'general']
             );
         }
+
+        $checkboxKeys = ['portal_show_invoices', 'portal_show_quotes'];
+        if ($request->hasAny($checkboxKeys)) {
+            foreach ($checkboxKeys as $key) {
+                Setting::updateOrCreate(
+                    ['key' => $key],
+                    ['value' => $request->boolean($key) ? '1' : '0', 'group' => $groupMap[$key]]
+                );
+            }
+        }
+
         return redirect()->route('settings.index')
             ->with('success', __('messages.updated_successfully'));
     }

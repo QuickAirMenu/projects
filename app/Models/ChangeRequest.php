@@ -78,10 +78,10 @@ class ChangeRequest extends Model
     public function getStatusBadgeAttribute()
     {
         $badges = [
-            'pending' => ['color' => 'warning', 'text' => __('common.status.pending')],
-            'approved' => ['color' => 'success', 'text' => __('common.status.approved')],
-            'rejected' => ['color' => 'danger', 'text' => __('common.status.rejected')],
-            'implemented' => ['color' => 'info', 'text' => __('common.status.implemented')],
+            'pending' => ['color' => 'warning', 'text' => __('change_request.status_pending')],
+            'approved' => ['color' => 'success', 'text' => __('change_request.status_approved')],
+            'rejected' => ['color' => 'danger', 'text' => __('change_request.status_rejected')],
+            'implemented' => ['color' => 'info', 'text' => __('change_request.status_implemented')],
         ];
 
         $badge = $badges[$this->status] ?? $badges['pending'];

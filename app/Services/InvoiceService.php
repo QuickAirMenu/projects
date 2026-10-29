@@ -15,15 +15,19 @@ class InvoiceService
     public function createInvoice(array $data): Invoice
     {
         return DB::transaction(function () use ($data) {
-            $data['created_by']     = Auth::id();
-            $data['invoice_number'] = $this->generateInvoiceNumber();
+            $data['created_by']      = Auth::id();
+            $data['invoice_number']  = $this->generateInvoiceNumber();
+            $data['tax_percentage']  = $data['tax_percentage'] ?? 0;
+            $data['discount_type']   = $data['discount_type'] ?? 'fixed';
+            $data['discount_value']  = $data['discount_amount'] ?? 0; // input from form field named discount_amount
+            $data['discount_amount'] = $data['discount_type'] === 'percentage'
+                ? round(collect($data['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']) * $data['discount_value'] / 100, 2)
+                : $data['discount_value'];
 
             // Calculate totals
-            $subtotal        = collect($data['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']);
-            $taxPercentage    = $data['tax_percentage'] ?? 0;
-            $taxAmount       = round($subtotal * $taxPercentage / 100, 2);
-            $discountAmount  = $data['discount_amount'] ?? 0;
-            $total           = $subtotal + $taxAmount - $discountAmount;
+            $subtotal       = collect($data['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']);
+            $taxAmount      = round($subtotal * $data['tax_percentage'] / 100, 2);
+            $total          = max(0, $subtotal + $taxAmount - $data['discount_amount']);
 
             $invoice = Invoice::create(array_merge($data, [
                 'subtotal'         => $subtotal,
@@ -54,23 +58,22 @@ class InvoiceService
     public function updateInvoice(Invoice $invoice, array $data): Invoice
     {
         return DB::transaction(function () use ($invoice, $data) {
-            $invoice->items()->delete();
+            // Lock the row to prevent concurrent payment updates
+            $invoice = Invoice::whereKey($invoice->id)->lockForUpdate()->first();
+
+            $data['tax_percentage']  = $data['tax_percentage'] ?? $invoice->tax_percentage;
+            $data['discount_type']   = $data['discount_type'] ?? $invoice->discount_type ?? 'fixed';
+            $data['discount_value']  = $data['discount_amount'] ?? $invoice->discount_value ?? $invoice->discount_amount;
 
             $subtotal       = collect($data['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']);
-            $taxPercentage  = $data['tax_percentage'] ?? $invoice->tax_percentage;
-            $taxAmount      = round($subtotal * $taxPercentage / 100, 2);
-            $discountAmount = $data['discount_amount'] ?? $invoice->discount_amount;
-            $total          = $subtotal + $taxAmount - $discountAmount;
+            $taxAmount      = round($subtotal * $data['tax_percentage'] / 100, 2);
+            $data['discount_amount'] = $data['discount_type'] === 'percentage'
+                ? round($subtotal * $data['discount_value'] / 100, 2)
+                : $data['discount_value'];
+            $total          = max(0, $subtotal + $taxAmount - $data['discount_amount']);
             $paidAmount     = $invoice->paid_amount ?? 0;
 
-            $paymentStatus = 'unpaid';
-            if ($paidAmount >= $total) {
-                $paymentStatus = 'paid';
-            } elseif ($paidAmount > 0) {
-                $paymentStatus = 'partially_paid';
-            } elseif (!empty($data['due_date']) && $data['due_date'] < now()->toDateString()) {
-                $paymentStatus = 'overdue';
-            }
+            $paymentStatus = $this->determinePaymentStatus($invoice, $total, $paidAmount, $data['due_date'] ?? null);
 
             $invoice->update(array_merge(array_diff_key($data, ['items' => '']), [
                 'subtotal' => $subtotal,
@@ -81,6 +84,8 @@ class InvoiceService
                 'payment_status' => $paymentStatus,
             ]));
 
+            // Replace items after update to avoid model event interference
+            $invoice->items()->delete();
             foreach ($data['items'] as $order => $item) {
                 $invoice->items()->create([
                     'description' => $item['description'],
@@ -97,25 +102,21 @@ class InvoiceService
 
     /**
      * Record a payment and update invoice payment status.
+     * Source of truth for paid_amount / remaining_amount / payment_status.
      */
     public function recordPayment(Invoice $invoice, array $data): Payment
     {
         return DB::transaction(function () use ($invoice, $data) {
+            // Lock the invoice row to prevent concurrent payment updates
+            $invoice = Invoice::whereKey($invoice->id)->lockForUpdate()->first();
+
             $data['payment_number'] = $this->generatePaymentNumber();
             $data['received_by']    = Auth::id();
 
             $payment    = $invoice->payments()->create($data);
             $totalPaid  = $invoice->payments()->sum('amount');
             $remaining  = max(0, $invoice->total - $totalPaid);
-
-            $status = 'unpaid';
-            if ($totalPaid >= $invoice->total) {
-                $status = 'paid';
-            } elseif ($totalPaid > 0) {
-                $status = 'partially_paid';
-            } elseif ($invoice->due_date && $invoice->due_date < now()) {
-                $status = 'overdue';
-            }
+            $status     = $this->determinePaymentStatus($invoice, $invoice->total, $totalPaid, $invoice->due_date?->toDateString());
 
             $invoice->update([
                 'paid_amount'    => $totalPaid,
@@ -127,10 +128,52 @@ class InvoiceService
         });
     }
 
+    /**
+     * Recalculate invoice payment totals and status.
+     * Used after a payment update/delete/restore.
+     */
+    public function recalculateInvoiceTotals(Invoice $invoice): void
+    {
+        DB::transaction(function () use ($invoice) {
+            $invoice = Invoice::whereKey($invoice->id)->lockForUpdate()->first();
+
+            $totalPaid  = $invoice->payments()->sum('amount');
+            $remaining  = max(0, $invoice->total - $totalPaid);
+            $status     = $this->determinePaymentStatus($invoice, $invoice->total, $totalPaid, $invoice->due_date?->toDateString());
+
+            $invoice->update([
+                'paid_amount'    => $totalPaid,
+                'remaining_amount' => $remaining,
+                'payment_status' => $status,
+            ]);
+        });
+    }
+
+    /**
+     * Determine the payment status based on paid vs total, with overdue fallback.
+     */
+    protected function determinePaymentStatus(Invoice $invoice, float $total, float $paidAmount, ?string $dueDate = null): string
+    {
+        if ($paidAmount >= $total && $total > 0) {
+            return 'paid';
+        }
+
+        if ($paidAmount > 0) {
+            return 'partially_paid';
+        }
+
+        $effectiveDue = $dueDate ?? $invoice->due_date?->toDateString();
+        if (!empty($effectiveDue) && $effectiveDue < now()->toDateString()) {
+            return 'overdue';
+        }
+
+        return 'unpaid';
+    }
+
     protected function generateInvoiceNumber(): string
     {
         $prefix = 'INV-' . date('Ym') . '-';
-        $last   = Invoice::where('invoice_number', 'like', $prefix . '%')
+        $last   = Invoice::withTrashed()->where('invoice_number', 'like', $prefix . '%')
             ->orderByDesc('invoice_number')->first();
         $seq = $last ? (int) substr($last->invoice_number, -4) + 1 : 1;
         return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
@@ -139,14 +182,14 @@ class InvoiceService
     protected function generatePaymentNumber(): string
     {
         $prefix = 'PAY-' . date('Ym') . '-';
-        $last   = Payment::where('payment_number', 'like', $prefix . '%')
+        $last   = Payment::withTrashed()->where('payment_number', 'like', $prefix . '%')
             ->orderByDesc('payment_number')->first();
         $seq = $last ? (int) substr($last->payment_number, -4) + 1 : 1;
 
         do {
             $number = $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
             $seq++;
-        } while (Payment::where('payment_number', $number)->exists());
+        } while (Payment::withTrashed()->where('payment_number', $number)->exists());
 
         return $number;
     }

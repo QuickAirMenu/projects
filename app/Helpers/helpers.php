@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
 if (!function_exists('workspace_config')) {
     /**
      * Get workspace configuration value
@@ -21,6 +24,13 @@ if (!function_exists('workspace_config')) {
         }
 
         return config("workspace.{$key}", $default);
+    }
+}
+
+if (!function_exists('portal_setting')) {
+    function portal_setting(string $key, $default = '0'): string
+    {
+        return \App\Models\Setting::where('key', $key)->value('value') ?? $default;
     }
 }
 
@@ -133,9 +143,41 @@ if (!function_exists('generate_number')) {
     {
         $year = date('Y');
         $month = date('m');
-        $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-        
-        return "{$prefix}-{$year}{$month}-{$nextNumber}";
+
+        // Use database lock to prevent race conditions
+        $lock = Cache::lock("number_generation_{$prefix}_{$year}{$month}", 10);
+
+        try {
+            $lock->block(5); // Wait up to 5 seconds for the lock
+
+            // Get current max number from the database atomically
+            $maxNumber = DB::table('number_sequences')
+                ->where('prefix', $prefix)
+                ->where('year_month', $year.$month)
+                ->value('last_number');
+
+            if ($maxNumber === null) {
+                $maxNumber = $lastNumber;
+                DB::table('number_sequences')->insert([
+                    'prefix' => $prefix,
+                    'year_month' => $year.$month,
+                    'last_number' => $maxNumber,
+                ]);
+            }
+
+            $nextNumber = $maxNumber + 1;
+
+            DB::table('number_sequences')
+                ->where('prefix', $prefix)
+                ->where('year_month', $year.$month)
+                ->update(['last_number' => $nextNumber]);
+
+            $nextNumberPadded = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+            return "{$prefix}-{$year}{$month}-{$nextNumberPadded}";
+        } finally {
+            $lock->release();
+        }
     }
 }
 
@@ -266,7 +308,7 @@ if (!function_exists('user_avatar')) {
     function user_avatar($user, $size = 40)
     {
         if ($user->avatar) {
-            return asset($user->avatar);
+            return \Illuminate\Support\Facades\Storage::url($user->avatar);
         }
         
         // Generate initials avatar

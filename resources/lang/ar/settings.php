@@ -31,6 +31,7 @@ return [
     'color'                     => 'اللون',
     'sort_order'                => 'الترتيب',
     'icon'                      => 'الأيقونة (Font Awesome)',
+    'icon_hint'                 => 'اختر أيقونة من أعلاه أو تصفح المزيد في',
     'service_name'              => 'اسم الخدمة',
     'status_label'              => 'الحالة',
     'active'                    => 'نشط',
@@ -41,4 +42,9 @@ return [
     'add_item'                  => 'إضافة',
     'unit_price'                => 'السعر',
     'no_data'                   => 'لا توجد بيانات',
+    'portal_settings'           => 'إعدادات بورتال العملاء',
+    'portal_show_invoices'      => 'إظهار الفواتير في البورتال',
+    'portal_show_invoices_hint' => 'سيتمكن العملاء من رؤية الفواتير وتحميلها',
+    'portal_show_quotes'        => 'إظهار عروض الأسعار في البورتال',
+    'portal_show_quotes_hint'   => 'سيتمكن العملاء من رؤية عروض الأسعار وتحميلها',
 ];

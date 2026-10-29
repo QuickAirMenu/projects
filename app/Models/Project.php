@@ -203,6 +203,15 @@ class Project extends Model
         return $query->where('manager_id', $managerId);
     }
 
+    public function scopeVisibleTo($query, \App\Models\User $user)
+    {
+        if ($user->hasAnyRole(['super-admin', 'admin', 'finance'])) return $query;
+        return $query->where(fn($q) => $q
+            ->where('manager_id', $user->id)
+            ->orWhereHas('teamMembers', fn($t) => $t->where('users.id', $user->id))
+        );
+    }
+
     /**
      * Accessors
      */

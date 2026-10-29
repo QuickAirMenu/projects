@@ -69,7 +69,7 @@
                     <a href="{{ route('projects.show', $project) }}" class="font-medium text-gray-800 hover:text-blue-600">{{ $project->name }}</a>
                     <p class="text-xs text-gray-400">{{ $project->manager?->name }}</p>
                 </td>
-                <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $project->client?->name }}</td>
+                <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $project->client?->full_name }}</td>
                 <td class="px-4 py-3">
                     <span class="px-2 py-1 rounded-full text-xs font-medium" style="background:{{ $project->status?->color }}20;color:{{ $project->status?->color }}">
                         {{ $project->status?->name }}

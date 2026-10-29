@@ -55,18 +55,21 @@
                     @endforeach
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('settings.company_logo') }}</label>
-                        <input type="file" name="company_logo" accept=".jpg,.jpeg,.png,.webp,.svg"
-                               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p class="mt-1 text-xs text-gray-400">{{ __('settings.logo_requirements') }}</p>
-                        @if(workspace_config('company_logo'))
-                            <div class="mt-3 flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3">
-                                <img src="{{ workspace_config('company_logo') }}" alt="Company logo" class="h-14 w-auto rounded-lg bg-white object-contain p-2">
-                                <div class="text-xs text-gray-500">
-                                    <p class="font-medium text-gray-700">{{ __('settings.current_logo') }}</p>
-                                    <p>{{ __('settings.logo_replacement_note') }}</p>
-                                </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-20 h-14 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden flex-shrink-0">
+                                <img id="logoPreview" src="{{ workspace_config('company_logo') ?: '' }}" alt="Company logo" class="h-full w-auto object-contain">
                             </div>
-                        @endif
+                            <div class="flex-1">
+                                <input type="file" name="company_logo" accept=".jpg,.jpeg,.png,.webp,.svg" onchange="previewImage(this, 'logoPreview')"
+                                       class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="mt-1 text-xs text-gray-400">{{ __('settings.logo_requirements') }}</p>
+                                @if(workspace_config('company_logo'))
+                                <div class="mt-2 text-xs text-gray-500">
+                                    <span class="font-medium text-gray-700">{{ __('settings.current_logo') }}</span> — {{ __('settings.logo_replacement_note') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <button type="submit" class="mt-5 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-xl transition text-sm">
@@ -139,6 +142,38 @@
                     @endforeach
                 </div>
                 <button type="submit" class="mt-5 bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2.5 rounded-xl transition text-sm">
+                    <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-5 flex items-center gap-2">
+                <i class="fas fa-user-shield text-emerald-500"></i> {{ __('settings.portal_settings') }}
+            </h2>
+            <form action="{{ route('settings.update') }}" method="POST">
+                @csrf @method('PUT')
+                <div class="space-y-4">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" name="portal_show_invoices" value="1"
+                               {{ ($settings['portal']['portal_show_invoices'] ?? '0') === '1' ? 'checked' : '' }}
+                               class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                        <div>
+                            <span class="text-sm font-medium text-gray-700">{{ __('settings.portal_show_invoices') }}</span>
+                            <p class="text-xs text-gray-400">{{ __('settings.portal_show_invoices_hint') }}</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" name="portal_show_quotes" value="1"
+                               {{ ($settings['portal']['portal_show_quotes'] ?? '0') === '1' ? 'checked' : '' }}
+                               class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                        <div>
+                            <span class="text-sm font-medium text-gray-700">{{ __('settings.portal_show_quotes') }}</span>
+                            <p class="text-xs text-gray-400">{{ __('settings.portal_show_quotes_hint') }}</p>
+                        </div>
+                    </label>
+                </div>
+                <button type="submit" class="mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-xl transition text-sm">
                     <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
                 </button>
             </form>

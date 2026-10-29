@@ -24,7 +24,7 @@ class ProjectAttachmentController extends Controller
         ]);
 
         $file = $request->file('file');
-        $path = $file->store('projects/' . $project->id, 'public');
+        $path = $file->store('projects/' . $project->id, 'private');
 
         $project->attachments()->create([
             'uploaded_by' => Auth::id(),
@@ -46,11 +46,28 @@ class ProjectAttachmentController extends Controller
     {
         $this->authorize('update', $attachment->project);
 
-        Storage::disk('public')->delete($attachment->file_path);
+        Storage::disk('private')->delete($attachment->file_path);
         $projectId = $attachment->project_id;
         $attachment->delete();
 
         return redirect()->route('projects.show', $projectId)
             ->with('success', __('project.attachment_deleted'));
+    }
+
+    /**
+     * Download a project attachment (requires view permission on the project).
+     */
+    public function download(ProjectAttachment $attachment)
+    {
+        $this->authorize('view', $attachment->project);
+
+        if (!$attachment->file_path) {
+            abort(404);
+        }
+
+        return Storage::disk('private')->download(
+            $attachment->file_path,
+            $attachment->file_name ?? basename($attachment->file_path)
+        );
     }
 }

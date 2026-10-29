@@ -22,6 +22,8 @@ class Quote extends Model
         'subtotal',
         'tax_percentage',
         'tax_amount',
+        'discount_type',
+        'discount_value',
         'discount_percentage',
         'discount_amount',
         'total',
@@ -35,6 +37,8 @@ class Quote extends Model
         'notes',
         'terms_and_conditions',
         'created_by',
+        'approved_by',
+        'approved_by_ip',
     ];
 
     protected $casts = [
@@ -45,6 +49,8 @@ class Quote extends Model
         'subtotal' => 'decimal:2',
         'tax_percentage' => 'decimal:2',
         'tax_amount' => 'decimal:2',
+        'discount_type' => 'string',
+        'discount_value' => 'decimal:2',
         'discount_percentage' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'total' => 'decimal:2',
@@ -87,17 +93,13 @@ class Quote extends Model
                 $quote->valid_until = now()->addDays(workspace_config('quote.valid_days', 30));
             }
 
-            // Calculate totals
-            $quote->tax_amount = ($quote->subtotal * $quote->tax_percentage) / 100;
-            $quote->total = $quote->subtotal + $quote->tax_amount - $quote->discount_amount;
+            // Calculate totals (only if not already set by service)
+            if (!$quote->subtotal || !$quote->total) {
+                $quote->tax_amount = ($quote->subtotal * $quote->tax_percentage) / 100;
+                $quote->total = $quote->subtotal + $quote->tax_amount - $quote->discount_amount;
+            }
         });
 
-        static::updating(function (Quote $quote) {
-            $subtotal = $quote->items->sum('total');
-            $quote->subtotal = $subtotal;
-            $quote->tax_amount = $quote->tax_percentage > 0 ? ($subtotal * $quote->tax_percentage) / 100 : ($quote->tax_amount ?? 0);
-            $quote->total = $subtotal + $quote->tax_amount - ($quote->discount_amount ?? 0);
-        });
     }
 
     /**
@@ -118,6 +120,11 @@ class Quote extends Model
         return $this->createdBy();
     }
 
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
     public function items()
     {
         return $this->hasMany(QuoteItem::class);
@@ -131,6 +138,11 @@ class Quote extends Model
     public function convertedProject()
     {
         return $this->belongsTo(Project::class, 'converted_to_project_id');
+    }
+
+    public function views()
+    {
+        return $this->hasMany(QuoteView::class);
     }
 
     /**

@@ -6,6 +6,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProjectRequest extends FormRequest
 {
+    protected array $allowList = [
+        'client_id',
+        'name',
+        'description',
+        'service_type_id',
+        'status_id',
+        'manager_id',
+        'start_date',
+        'deadline',
+        'priority',
+        'budget',
+        'internal_notes',
+        'client_notes',
+        'team_members',
+    ];
+
     public function authorize(): bool { return true; }
 
     public function rules(): array
@@ -26,5 +42,11 @@ class StoreProjectRequest extends FormRequest
             'team_members'    => 'nullable|array',
             'team_members.*'  => 'exists:users,id',
         ];
+    }
+
+    protected function passedValidation(): void
+    {
+        $extras = array_diff_key($this->validated(), array_flip($this->allowList));
+        $this->merge(array_diff_key($this->all(), $extras));
     }
 }

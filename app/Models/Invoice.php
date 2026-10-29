@@ -23,6 +23,8 @@ class Invoice extends Model
         'subtotal',
         'tax_percentage',
         'tax_amount',
+        'discount_type',
+        'discount_value',
         'discount_amount',
         'total',
         'paid_amount',
@@ -73,18 +75,31 @@ class Invoice extends Model
                 );
             }
 
-            // Calculate totals
-            $invoice->tax_amount = ($invoice->subtotal * $invoice->tax_percentage) / 100;
-            $invoice->total = $invoice->subtotal + $invoice->tax_amount - $invoice->discount_amount;
-            $invoice->remaining_amount = $invoice->total;
+            $discountType     = $invoice->discount_type ?? 'fixed';
+            $discountValue    = ($invoice->discount_value ?: $invoice->discount_amount) ?? 0;
+            $discountAmount   = $discountType === 'percentage'
+                ? round(($invoice->subtotal ?? 0) * $discountValue / 100, 2)
+                : $discountValue;
+
+            $invoice->discount_value    = $discountValue;
+            $invoice->discount_amount   = $discountAmount;
+            $invoice->tax_amount        = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
+            $invoice->total             = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
+            $invoice->remaining_amount  = $invoice->total;
         });
 
         static::updating(function (Invoice $invoice) {
-            $subtotal = $invoice->items->sum('total');
-            $invoice->subtotal = $subtotal;
-            $invoice->tax_amount = $invoice->tax_percentage > 0 ? ($subtotal * $invoice->tax_percentage) / 100 : ($invoice->tax_amount ?? 0);
-            $invoice->total = $subtotal + $invoice->tax_amount - ($invoice->discount_amount ?? 0);
-            $invoice->remaining_amount = $invoice->total;
+            $discountType     = $invoice->discount_type ?? 'fixed';
+            $discountValue    = ($invoice->discount_value ?: $invoice->discount_amount) ?? 0;
+            $discountAmount   = $discountType === 'percentage'
+                ? round(($invoice->subtotal ?? 0) * $discountValue / 100, 2)
+                : $discountValue;
+
+            $invoice->discount_value    = $discountValue;
+            $invoice->discount_amount   = $discountAmount;
+            $invoice->tax_amount        = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
+            $invoice->total             = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
+            $invoice->remaining_amount  = max(0, $invoice->total - ($invoice->paid_amount ?? 0));
         });
     }
 

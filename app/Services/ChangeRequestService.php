@@ -21,7 +21,7 @@ class ChangeRequestService
     protected function generateRequestNumber(): string
     {
         $prefix = 'CR-' . date('Ym') . '-';
-        $last = ChangeRequest::where('request_number', 'like', $prefix . '%')
+        $last = ChangeRequest::withTrashed()->where('request_number', 'like', $prefix . '%')
             ->orderByDesc('request_number')
             ->first();
 

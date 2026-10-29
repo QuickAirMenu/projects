@@ -20,7 +20,7 @@ return [
         'name' => 'Digital Business Solutions',
         'name_ar' => 'حلول الأعمال الرقمية',
         'email' => 'info@airmenu.net',
-        'phone' => '+966 XX XXX XXXX',
+        'phone' => '+966500518950',
         'address' => 'Jeddah, Saudi Arabia',
         'address_ar' => 'جدة، المملكة العربية السعودية',
         'tax_number' => '300000000000003',

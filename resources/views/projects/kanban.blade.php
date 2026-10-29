@@ -28,7 +28,7 @@
             @foreach($projects[$status->id] ?? [] as $project)
             <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
                 <a href="{{ route('projects.show', $project) }}" class="font-medium text-gray-800 text-sm hover:text-blue-600 block mb-1">{{ $project->name }}</a>
-                <p class="text-xs text-gray-400 mb-2">{{ $project->client?->name }}</p>
+                <p class="text-xs text-gray-400 mb-2">{{ $project->client?->full_name }}</p>
                 <div class="flex items-center justify-between">
                     @php $pc = ['low'=>'blue','medium'=>'yellow','high'=>'orange','urgent'=>'red'][$project->priority] ?? 'gray' @endphp
                     <span class="text-xs px-1.5 py-0.5 rounded-full bg-{{ $pc }}-100 text-{{ $pc }}-700">{{ __('project.priority_'.$project->priority) }}</span>

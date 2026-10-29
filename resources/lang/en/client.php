@@ -43,4 +43,6 @@ return [
     'portal_setup_message'  => 'You can send the account setup link directly to the client email.',
     'portal_setup_no_email' => 'Add an email address to send a portal invitation.',
     'no_portal_account'     => 'No portal account',
+    'send_invite'           => 'Send portal invitation email',
+    'send_invite_hint'      => 'Uncheck to add the client without sending a portal invitation.',
 ];

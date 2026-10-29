@@ -1,41 +1,53 @@
 @extends('portal.layouts.app')
 
-@section('title', 'Setup')
+@section('title', __('portal.setup_title'))
 
 @section('content')
     <div class="mx-auto max-w-md py-12">
-        <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
             <div class="mb-8 text-center">
-                <h1 class="text-3xl font-bold text-white">استكمال الحساب</h1>
-                <p class="mt-2 text-sm text-slate-400">{{ $account->client_name }} / {{ $account->email }}</p>
+                @php $setupLogo = workspace_config('company_logo'); @endphp
+                @if($setupLogo)
+                    <img src="{{ $setupLogo }}" alt="" class="h-10 mx-auto mb-4">
+                @endif
+                <h1 class="text-2xl font-bold text-gray-900">{{ __('portal.setup_title') }}</h1>
+                <p class="mt-1 text-sm text-gray-500">{{ $account->client_name }} / {{ $account->email }}</p>
             </div>
 
             <form method="POST" action="{{ route('portal.setup.post', $token) }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="mb-2 block text-sm text-slate-300" for="name">Name</label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700" for="name">{{ __('common.client') }}</label>
                     <input id="name" type="text" value="{{ $account->client_name }}" disabled
-                        class="w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-slate-300">
+                        class="form-input w-full bg-gray-50 text-gray-500">
                 </div>
 
                 <div>
-                    <label class="mb-2 block text-sm text-slate-300" for="password">Password</label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700" for="password">{{ __('auth.password') }}</label>
                     <input id="password" name="password" type="password" required minlength="8"
-                        class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white placeholder-slate-500 outline-none ring-0 focus:border-emerald-400"
+                        class="form-input w-full"
                         placeholder="********">
                 </div>
 
                 <div>
-                    <label class="mb-2 block text-sm text-slate-300" for="password_confirmation">Confirm Password</label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700" for="password_confirmation">{{ __('portal.confirm_password') }}</label>
                     <input id="password_confirmation" name="password_confirmation" type="password" required minlength="8"
-                        class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white placeholder-slate-500 outline-none ring-0 focus:border-emerald-400"
+                        class="form-input w-full"
                         placeholder="********">
                 </div>
 
-                <button type="submit" class="w-full rounded-xl bg-emerald-500 px-4 py-3 font-semibold text-slate-950 hover:bg-emerald-400">
-                    حفظ كلمة المرور
+                <button type="submit" class="btn btn-primary w-full">
+                    <i class="fas fa-check-circle {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                    {{ __('portal.setup_btn') }}
                 </button>
             </form>
+
+            <div class="mt-6 text-center">
+                <a href="{{ route('portal.login') }}" class="text-sm text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-arrow-{{ is_rtl() ? 'right' : 'left' }} me-1"></i>
+                    {{ __('portal.back_to_login') }}
+                </a>
+            </div>
         </div>
     </div>
 @endsection

@@ -1,11 +1,32 @@
 @extends('layouts.app')
 @section('title', __('finance.contracts'))
+
+@section('breadcrumb')
+    <x-breadcrumb :items="[['label' => 'finance.contracts', 'url' => route('contracts.index')]]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-2xl font-bold text-gray-800">{{ __('finance.contracts') }}</h1>
-    <a href="{{ route('contracts.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
-        <i class="fas fa-plus me-2"></i>{{ __('finance.add_contract') }}
-    </a>
+    <div class="flex gap-2">
+        @if(app()->isLocale('ar'))
+        <a href="{{ route('exports.contracts') }}" class="btn-success flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition font-medium" title="{{ __('common.export_contracts') }}">
+            <i class="fas fa-file-excel"></i>
+            <span class="hidden sm:inline">{{ __('common.export') }}</span>
+        </a>
+        <a href="{{ route('contracts.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
+            <i class="fas fa-plus me-2"></i>{{ __('finance.add_contract') }}
+        </a>
+        @else
+        <a href="{{ route('contracts.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
+            <i class="fas fa-plus me-2"></i>{{ __('finance.add_contract') }}
+        </a>
+        <a href="{{ route('exports.contracts') }}" class="btn-success flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition font-medium" title="{{ __('common.export_contracts') }}">
+            <i class="fas fa-file-excel"></i>
+            <span class="hidden sm:inline">{{ __('common.export') }}</span>
+        </a>
+        @endif
+    </div>
 </div>
 
 <div class="flex gap-2 mb-4">
@@ -29,7 +50,7 @@
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
                 <p class="text-xs font-medium uppercase tracking-wide text-gray-400">{{ $card['label'] }}</p>
-                <p class="mt-2 text-xl font-bold text-gray-900 break-words">{{ $card['val'] }}</p>
+                <p class="mt-2 text-xl font-bold text-gray-900 break-words privacy-mask">{{ $card['val'] }}</p>
                 <p class="mt-1 text-xs text-gray-500">{{ $card['meta'] }}</p>
             </div>
             <div class="flex h-11 w-11 items-center justify-center rounded-xl {{ $card['chip'] }}">
@@ -55,12 +76,12 @@
             @php $statusClasses = ['draft' => 'bg-gray-100 text-gray-700', 'active' => 'bg-green-100 text-green-700', 'completed' => 'bg-blue-100 text-blue-700', 'terminated' => 'bg-red-100 text-red-700'][$contract->status] ?? 'bg-gray-100 text-gray-700'; @endphp
             <tr class="hover:bg-gray-50 transition">
                 <td class="px-5 py-3 font-medium text-gray-800">
-                    <a href="{{ route('contracts.show', $contract) }}" class="hover:text-blue-600">{{ $contract->contract_number }}</a>
+                    <a href="{{ route('contracts.show', $contract) }}" class="hover:text-blue-600 privacy-mask">{{ $contract->contract_number }}</a>
                 </td>
                 <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $contract->project?->name }}</td>
-                <td class="px-4 py-3 hidden lg:table-cell font-medium">{{ number_format($contract->contract_value,2) }}</td>
+                <td class="px-4 py-3 hidden lg:table-cell font-medium privacy-mask">{{ number_format($contract->contract_value,2) }}</td>
                 <td class="px-4 py-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ $statusClasses }}">{{ ucfirst($contract->status) }}</span>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ $statusClasses }}">{{ __('finance.contract_status.'.$contract->status) }}</span>
                 </td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ \Carbon\Carbon::parse($contract->start_date)->format('Y-m-d') }}</td>
                 <td class="px-5 py-3 text-end">

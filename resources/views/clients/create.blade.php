@@ -92,6 +92,14 @@
                 <textarea name="notes" rows="3"
                           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('notes') }}</textarea>
             </div>
+            <div class="md:col-span-2">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="send_invite" value="1" {{ old('send_invite') ? 'checked' : '' }}
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-sm text-gray-700">{{ __('client.send_invite') }}</span>
+                </label>
+                <p class="text-xs text-gray-400 mt-1">{{ __('client.send_invite_hint') }}</p>
+            </div>
         </div>
 
         <div class="flex gap-3 mt-6">

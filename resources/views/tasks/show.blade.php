@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('title', $task->title)
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[
+        ['label' => 'task.tasks', 'url' => route('tasks.index')],
+        ['label' => $task->title, 'url' => null],
+    ]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-5 flex flex-wrap items-start justify-between gap-3">
     <div>

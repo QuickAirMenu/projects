@@ -1,11 +1,18 @@
 @extends('layouts.app')
 @section('title', $invoice->invoice_number)
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[
+        ['label' => 'finance.invoices', 'url' => route('invoices.index')],
+        ['label' => $invoice->invoice_number, 'url' => null],
+    ]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-5 flex items-center justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">{{ $invoice->invoice_number }}</h1>
-        <p class="text-gray-500 text-sm">{{ $invoice->client?->name }} · {{ $invoice->project?->name }}</p>
+        <h1 class="text-2xl font-bold text-gray-800 privacy-mask">{{ $invoice->invoice_number }}</h1>
+        <p class="text-gray-500 text-sm">{{ $invoice->client?->full_name }} · {{ $invoice->project?->name }}</p>
     </div>
     <div class="flex gap-2">
         <a href="{{ route('invoices.pdf', $invoice) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
@@ -19,7 +26,7 @@
             <div class="flex justify-between mb-6 text-sm text-gray-500">
                 <div><p class="font-bold text-gray-800 text-lg">{{ config('app.name') }}</p></div>
                 <div class="text-end">
-                    <p><strong>{{ __('finance.invoice_number') }}:</strong> {{ $invoice->invoice_number }}</p>
+                    <p><strong>{{ __('finance.invoice_number') }}:</strong> <span class="privacy-mask">{{ $invoice->invoice_number }}</span></p>
                     <p><strong>{{ __('finance.invoice_date') }}:</strong> {{ $invoice->invoice_date->format('Y-m-d') }}</p>
                     @if($invoice->due_date)<p><strong>{{ __('finance.due_date') }}:</strong> {{ $invoice->due_date->format('Y-m-d') }}</p>@endif
                 </div>
@@ -28,13 +35,16 @@
                 <thead><tr class="bg-gray-50"><th class="text-start p-3 rounded-s-lg">{{ __('messages.description') }}</th><th class="text-center p-3">{{ __('finance.quantity') }}</th><th class="text-end p-3 rounded-e-lg">{{ __('finance.total') }}</th></tr></thead>
                 <tbody>
                 @foreach($invoice->items as $item)
-                <tr class="border-b"><td class="p-3">{{ $item->description }}</td><td class="p-3 text-center">{{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</td><td class="p-3 text-end font-medium">{{ number_format($item->total, 2) }}</td></tr>
+                <tr class="border-b"><td class="p-3">{{ $item->description }}</td><td class="p-3 text-center privacy-mask">{{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</td><td class="p-3 text-end font-medium privacy-mask">{{ number_format($item->total, 2) }}</td></tr>
                 @endforeach
                 </tbody>
                 <tfoot>
-                    <tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.subtotal') }}</td><td class="p-3 text-end">{{ number_format($invoice->subtotal, 2) }}</td></tr>
-                    <tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.tax') }} ({{ $invoice->tax_percentage }}%)</td><td class="p-3 text-end">{{ number_format($invoice->tax_amount, 2) }}</td></tr>
-                    <tr class="border-t"><td colspan="2" class="p-3 text-end font-bold">{{ __('finance.total') }}</td><td class="p-3 text-end font-bold text-blue-600 text-lg">{{ number_format($invoice->total, 2) }}</td></tr>
+                    <tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.subtotal') }}</td><td class="p-3 text-end privacy-mask">{{ number_format($invoice->subtotal, 2) }}</td></tr>
+                    <tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.tax') }} ({{ $invoice->tax_percentage }}%)</td><td class="p-3 text-end privacy-mask">{{ number_format($invoice->tax_amount, 2) }}</td></tr>
+                    @if($invoice->discount_amount > 0)
+                    <tr><td colspan="2" class="p-3 text-end text-gray-500">{{ __('finance.discount') }}@if($invoice->discount_type === 'percentage') ({{ $invoice->discount_value }}%)@endif</td><td class="p-3 text-end text-red-500 privacy-mask">-{{ number_format($invoice->discount_amount, 2) }}</td></tr>
+                    @endif
+                    <tr class="border-t"><td colspan="2" class="p-3 text-end font-bold">{{ __('finance.total') }}</td><td class="p-3 text-end font-bold text-blue-600 text-lg privacy-mask">{{ number_format($invoice->total, 2) }}</td></tr>
                 </tfoot>
             </table>
         </div>
@@ -66,15 +76,20 @@
             @forelse($invoice->payments as $payment)
             <div class="flex items-center justify-between py-3 border-b last:border-0 text-sm">
                 <div>
-                    <p class="font-medium text-gray-800">{{ number_format($payment->amount, 2) }} {{ __('messages.currency') }}</p>
+                    <p class="font-medium text-gray-800 privacy-mask">{{ number_format($payment->amount, 2) }} {{ __('messages.currency') }}</p>
                     <p class="text-xs text-gray-400">{{ __('finance.method_'.$payment->payment_method) }} · {{ $payment->payment_date->format('Y-m-d') }}</p>
                     @if($payment->proof_file_path)
-                    <a href="{{ Storage::url($payment->proof_file_path) }}" target="_blank" class="text-xs text-blue-600 hover:underline">
-                        {{ __('finance.payment_proof') }}: {{ $payment->proof_file_name }}
-                    </a>
+                    <div class="flex items-center gap-1.5 mt-1.5">
+                        <a href="{{ route('payments.view-proof', $payment) }}" target="_blank" class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-1 rounded-lg text-xs hover:bg-blue-100 transition">
+                            <i class="fas fa-eye"></i> {{ __('messages.view') }}
+                        </a>
+                        <a href="{{ route('payments.download-proof', $payment) }}" class="inline-flex items-center gap-1 bg-gray-50 text-gray-600 px-2 py-1 rounded-lg text-xs hover:bg-gray-100 transition">
+                            <i class="fas fa-download"></i> {{ __('messages.download') }}
+                        </a>
+                    </div>
                     @endif
                 </div>
-                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">{{ $payment->payment_number }}</span>
+                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full privacy-mask">{{ $payment->payment_number }}</span>
             </div>
             @empty
             <p class="text-gray-400 text-sm text-center py-3">{{ __('finance.no_payments_recorded') }}</p>
@@ -89,9 +104,9 @@
                     {{ __('finance.status_'.$invoice->payment_status) }}
                 </span>
             </div>
-            <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.total') }}</span><span class="font-bold">{{ number_format($invoice->total, 2) }}</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.paid_amount') }}</span><span class="text-green-600 font-medium">{{ number_format($invoice->paid_amount, 2) }}</span></div>
-            <div class="flex justify-between border-t pt-2"><span class="font-semibold">{{ __('finance.remaining') }}</span><span class="font-bold text-red-500">{{ number_format($invoice->remaining_amount, 2) }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.total') }}</span><span class="font-bold privacy-mask">{{ number_format($invoice->total, 2) }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.paid_amount') }}</span><span class="text-green-600 font-medium privacy-mask">{{ number_format($invoice->paid_amount, 2) }}</span></div>
+            <div class="flex justify-between border-t pt-2"><span class="font-semibold">{{ __('finance.remaining') }}</span><span class="font-bold text-red-500 privacy-mask">{{ number_format($invoice->remaining_amount, 2) }}</span></div>
             @if($invoice->contract)
             <div class="border-t pt-2">
                 <a href="{{ route('contracts.show', $invoice->contract) }}" class="text-blue-600 hover:underline text-sm">{{ __('finance.view_linked_contract') }}</a>

@@ -23,9 +23,30 @@
                 <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('settings.name_en') }} *</label>
                 <input type="text" name="name_en" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
-            <div>
+            <div x-data="iconPicker()">
                 <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('settings.icon') }}</label>
-                <input type="text" name="icon" placeholder="fa-laptop" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="flex items-center gap-2">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-gray-100 rounded-xl border border-gray-200" :class="selectedPreviewClass">
+                        <i class="fas text-lg" :class="selectedIcon || 'fa-icons'"></i>
+                    </div>
+                    <input type="text" name="icon" x-model="selectedIcon" placeholder="fa-laptop"
+                           class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <p class="text-xs text-gray-400 mt-1.5">
+                    {{ __('settings.icon_hint') }}
+                    <a href="https://fontawesome.com/search?ic=free-collection" target="_blank" class="text-blue-600 hover:underline">
+                        fontawesome.com/search
+                    </a>
+                </p>
+                <div class="mt-2 flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                    <template x-for="icon in icons" :key="icon">
+                        <button type="button" @click="selectedIcon = icon"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg border transition"
+                                :class="selectedIcon === icon ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'">
+                            <i class="fas text-sm" :class="icon"></i>
+                        </button>
+                    </template>
+                </div>
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('settings.color') }}</label>
@@ -121,3 +142,42 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function iconPicker() {
+    return {
+        selectedIcon: '{{ old('icon') }}',
+        selectedPreviewClass: '',
+        icons: [
+            'fa-laptop','fa-code','fa-palette','fa-globe','fa-share-nodes',
+            'fa-bullhorn','fa-image','fa-wrench','fa-camera','fa-pen',
+            'fa-chart-line','fa-chart-bar','fa-chart-pie','fa-chart-simple',
+            'fa-file','fa-file-lines','fa-file-pdf','fa-file-word',
+            'fa-folder','fa-folder-open','fa-box','fa-truck',
+            'fa-gear','fa-sliders','fa-filter','fa-magnifying-glass',
+            'fa-users','fa-user','fa-user-group','fa-user-plus',
+            'fa-building','fa-shop','fa-store','fa-cart-shopping',
+            'fa-tag','fa-tags','fa-credit-card','fa-money-bill',
+            'fa-phone','fa-envelope','fa-message','fa-comments',
+            'fa-star','fa-heart','fa-thumbs-up','fa-flag',
+            'fa-calendar','fa-clock','fa-bell','fa-check',
+            'fa-plus','fa-minus','fa-pen-to-square','fa-trash',
+            'fa-download','fa-upload','fa-print','fa-share',
+            'fa-link','fa-paperclip','fa-lock','fa-key',
+            'fa-lightbulb','fa-rocket','fa-gem','fa-bolt',
+            'fa-cloud','fa-database','fa-server','fa-shield',
+            'fa-paintbrush','fa-wand-magic','fa-scissors','fa-ruler',
+            'fa-cube','fa-cubes','fa-layer-group','fa-circle-nodes',
+            'fa-video','fa-music','fa-headphones','fa-microphone',
+            'fa-trophy','fa-medal','fa-graduation-cap','fa-book',
+            'fa-mobile','fa-tablet','fa-desktop','fa-print',
+            'fa-plane','fa-car','fa-bus','fa-bicycle',
+            'fa-crown','fa-diamond','fa-gift','fa-fire',
+            'fa-sun','fa-moon','fa-cloud-sun','fa-water',
+            'fa-tree','fa-leaf','fa-seedling','fa-paw',
+        ],
+    };
+}
+</script>
+@endpush

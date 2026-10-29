@@ -83,7 +83,7 @@ class ProjectService
     protected function generateProjectNumber(): string
     {
         $prefix = 'PRJ-' . date('Ym') . '-';
-        $last   = Project::where('project_number', 'like', $prefix . '%')
+        $last   = Project::withTrashed()->where('project_number', 'like', $prefix . '%')
             ->orderByDesc('project_number')
             ->first();
 

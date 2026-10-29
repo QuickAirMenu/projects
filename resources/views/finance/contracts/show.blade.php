@@ -1,10 +1,18 @@
 @extends('layouts.app')
 @section('title', $contract->contract_number)
+
+@section('breadcrumb')
+    <x-breadcrumb :items="[
+        ['label' => 'finance.contracts', 'url' => route('contracts.index')],
+        ['label' => $contract->contract_number, 'url' => null],
+    ]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex items-center justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-800">{{ $contract->title }}</h1>
-        <p class="text-gray-500 text-sm mt-1">{{ $contract->contract_number }}</p>
+        <p class="text-gray-500 text-sm mt-1 privacy-mask">{{ $contract->contract_number }}</p>
     </div>
     <div class="flex gap-2">
         <a href="{{ route('contracts.pdf', $contract) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
@@ -17,14 +25,14 @@
     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div class="grid grid-cols-2 gap-5 text-sm mb-5">
             <div><p class="text-gray-500 mb-1">{{ __('finance.project') }}</p><a href="{{ route('projects.show', $contract->project) }}" class="font-medium text-blue-600 hover:underline">{{ $contract->project?->name }}</a></div>
-            <div><p class="text-gray-500 mb-1">{{ __('client.client') }}</p><p class="font-medium">{{ $contract->client?->name }}</p></div>
+            <div><p class="text-gray-500 mb-1">{{ __('client.client') }}</p><p class="font-medium">{{ $contract->client?->full_name }}</p></div>
             @if($contract->invoice)
             <div><p class="text-gray-500 mb-1">{{ __('finance.linked_invoice') }}</p><a href="{{ route('invoices.show', $contract->invoice) }}" class="font-medium text-blue-600 hover:underline">{{ $contract->invoice->invoice_number }}</a></div>
             @endif
-            <div><p class="text-gray-500 mb-1">{{ __('finance.contract_value_label') }}</p><p class="font-bold text-xl text-gray-800">{{ number_format($contract->contract_value,2) }} {{ __('messages.currency') }}</p></div>
+            <div><p class="text-gray-500 mb-1">{{ __('finance.contract_value_label') }}</p><p class="font-bold text-xl text-gray-800 privacy-mask">{{ number_format($contract->contract_value,2) }} {{ __('messages.currency') }}</p></div>
             <div><p class="text-gray-500 mb-1">{{ __('messages.status') }}</p>
                 @php $sc = ['draft'=>'gray','active'=>'green','completed'=>'blue','terminated'=>'red'][$contract->status]??'gray' @endphp
-                <span class="px-2 py-1 rounded-full text-xs font-medium bg-{{ $sc }}-100 text-{{ $sc }}-700">{{ ucfirst($contract->status) }}</span>
+                <span class="px-2 py-1 rounded-full text-xs font-medium bg-{{ $sc }}-100 text-{{ $sc }}-700">{{ __('finance.contract_status.'.$contract->status) }}</span>
             </div>
             <div><p class="text-gray-500 mb-1">{{ __('finance.start_date') }}</p><p class="font-medium">{{ \Carbon\Carbon::parse($contract->start_date)->format('Y-m-d') }}</p></div>
             <div><p class="text-gray-500 mb-1">{{ __('finance.end_date') }}</p><p class="font-medium">{{ $contract->end_date ? \Carbon\Carbon::parse($contract->end_date)->format('Y-m-d') : '-' }}</p></div>
@@ -55,7 +63,7 @@
         @endif
         @if($contract->contract_file_path)
         <div class="border-t pt-4 mt-4">
-            <a href="{{ Storage::url($contract->contract_file_path) }}" target="_blank" class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-sm hover:bg-blue-100 transition">
+            <a href="{{ route('contracts.download', $contract) }}" class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-sm hover:bg-blue-100 transition">
                 <i class="fas fa-file-pdf"></i> {{ __('finance.download_contract') }}
             </a>
         </div>
@@ -77,9 +85,9 @@
     <div class="flex items-center justify-between gap-4 mb-4">
         <h3 class="font-semibold text-gray-800">{{ __('finance.project_invoices') }}</h3>
         <div class="text-sm text-gray-500">
-            {{ __('finance.total_invoices_label') }}: <span class="font-semibold text-gray-800">{{ number_format($projectInvoices->sum('total'), 2) }}</span>
+            {{ __('finance.total_invoices_label') }}: <span class="font-semibold text-gray-800 privacy-mask">{{ number_format($projectInvoices->sum('total'), 2) }}</span>
             <span class="mx-2">|</span>
-            {{ __('finance.against_contract_value') }}: <span class="font-semibold text-gray-800">{{ number_format($contract->contract_value, 2) }}</span>
+            {{ __('finance.against_contract_value') }}: <span class="font-semibold text-gray-800 privacy-mask">{{ number_format($contract->contract_value, 2) }}</span>
         </div>
     </div>
 
@@ -99,9 +107,9 @@
                 @forelse($projectInvoices as $invoice)
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 font-medium text-gray-800">{{ $invoice->invoice_number }}</td>
-                    <td class="px-4 py-3">{{ number_format($invoice->total, 2) }}</td>
-                    <td class="px-4 py-3 text-green-600">{{ number_format($invoice->paid_amount, 2) }}</td>
-                    <td class="px-4 py-3 text-red-600">{{ number_format($invoice->remaining_amount, 2) }}</td>
+                    <td class="px-4 py-3 privacy-mask">{{ number_format($invoice->total, 2) }}</td>
+                    <td class="px-4 py-3 text-green-600 privacy-mask">{{ number_format($invoice->paid_amount, 2) }}</td>
+                    <td class="px-4 py-3 text-red-600 privacy-mask">{{ number_format($invoice->remaining_amount, 2) }}</td>
                     <td class="px-4 py-3">
                         <span class="px-2 py-1 rounded-full text-xs font-medium {{ $invoice->payment_status === 'paid' ? 'bg-green-100 text-green-700' : ($invoice->payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
                             {{ __('finance.status_'.$invoice->payment_status) }}

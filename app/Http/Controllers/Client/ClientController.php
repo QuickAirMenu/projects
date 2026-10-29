@@ -20,6 +20,8 @@ class ClientController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Client::class);
+
         $query = Client::with(['assignedUser', 'projects'])->latest();
 
         if ($request->search) {
@@ -48,17 +50,21 @@ class ClientController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Client::class);
+
         $users = User::where('is_active', true)->orderBy('name')->get();
         return view('clients.create', compact('users'));
     }
 
     public function store(StoreClientRequest $request)
     {
+        $this->authorize('create', Client::class);
+
         $data = $request->validated();
         $data['created_by'] = Auth::id();
         $client = Client::create($data);
 
-        if ($client->email) {
+        if ($client->email && $request->boolean('send_invite')) {
             $this->sendPortalInvite($client);
         }
 
@@ -68,33 +74,41 @@ class ClientController extends Controller
 
     public function show(Client $client)
     {
+        $this->authorize('view', $client);
+
         $client->load(['projects.status', 'communications.user', 'assignedUser', 'portalAccount']);
         return view('clients.show', compact('client'));
     }
 
     public function resendPortalInvite(Client $client)
     {
+        $this->authorize('update', $client);
+
         if (!$client->email) {
-            return back()->with('error', 'لا يوجد بريد إلكتروني للعميل');
+            return back()->with('error', __('messages.client_no_email'));
         }
 
         if ($client->portalAccount?->email_verified_at) {
-            return back()->with('success', 'حساب البوابة مفعّل بالفعل');
+            return back()->with('success', __('messages.portal_already_active'));
         }
 
         $this->sendPortalInvite($client);
 
-        return back()->with('success', 'تم إرسال دعوة بوابة العميل');
+        return back()->with('success', __('messages.client_invite_sent'));
     }
 
     public function edit(Client $client)
     {
+        $this->authorize('update', $client);
+
         $users = User::where('is_active', true)->orderBy('name')->get();
         return view('clients.edit', compact('client', 'users'));
     }
 
     public function update(UpdateClientRequest $request, Client $client)
     {
+        $this->authorize('update', $client);
+
         $client->update($request->validated());
         return redirect()->route('clients.show', $client)
             ->with('success', __('messages.updated_successfully'));
@@ -102,6 +116,8 @@ class ClientController extends Controller
 
     public function destroy(Client $client)
     {
+        $this->authorize('delete', $client);
+
         $client->delete();
         return redirect()->route('clients.index')
             ->with('success', __('messages.deleted_successfully'));

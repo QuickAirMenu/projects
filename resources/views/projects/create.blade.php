@@ -16,6 +16,15 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
     <form action="{{ route('projects.store') }}" method="POST">
         @csrf
+        @if(request('quote_id') || ($sourceQuote ?? null))
+            <input type="hidden" name="source_quote_id" value="{{ request('quote_id') ?? ($sourceQuote->id ?? '') }}">
+        @endif
+        @if($sourceQuote ?? null)
+            <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                <i class="fas fa-link me-1"></i>
+                {{ __('finance.converting_from_quote', ['number' => $sourceQuote->quote_number]) }}
+            </div>
+        @endif
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
             <div class="md:col-span-2">

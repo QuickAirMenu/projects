@@ -6,6 +6,16 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StorePaymentRequest extends FormRequest
 {
+    protected array $allowList = [
+        'invoice_id',
+        'amount',
+        'payment_date',
+        'payment_method',
+        'transaction_reference',
+        'notes',
+        'proof_of_payment',
+    ];
+
     public function authorize(): bool { return true; }
 
     public function rules(): array
@@ -19,5 +29,11 @@ class StorePaymentRequest extends FormRequest
             'notes'                 => 'nullable|string',
             'proof_of_payment'      => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,webp',
         ];
+    }
+
+    protected function passedValidation(): void
+    {
+        $extras = array_diff_key($this->validated(), array_flip($this->allowList));
+        $this->merge(array_diff_key($this->all(), $extras));
     }
 }

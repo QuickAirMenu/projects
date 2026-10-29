@@ -129,6 +129,15 @@ class Client extends Model
     }
 
     /**
+     * Recalculate lifetime_value from the sum of all paid amounts on non-deleted invoices.
+     */
+    public function recalculateLifetimeValue(): void
+    {
+        $this->lifetime_value = $this->invoices()->sum('paid_amount');
+        $this->save();
+    }
+
+    /**
      * Accessors
      */
     
@@ -140,10 +149,10 @@ class Client extends Model
     public function getStatusBadgeAttribute()
     {
         $badges = [
-            'active' => ['color' => 'success', 'text' => __('common.status.active')],
-            'potential' => ['color' => 'info', 'text' => __('common.status.potential')],
-            'inactive' => ['color' => 'secondary', 'text' => __('common.status.inactive')],
-            'vip' => ['color' => 'warning', 'text' => __('common.status.vip')],
+            'active' => ['color' => 'success', 'text' => __('client.status_active')],
+            'potential' => ['color' => 'info', 'text' => __('client.status_potential')],
+            'inactive' => ['color' => 'secondary', 'text' => __('client.status_inactive')],
+            'vip' => ['color' => 'warning', 'text' => __('client.status_vip')],
         ];
 
         $badge = $badges[$this->status] ?? $badges['potential'];

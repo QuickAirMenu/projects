@@ -32,8 +32,18 @@
                 @error('role')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.job_level') }}</label>
+                <select name="job_level" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">-- {{ __('messages.select') }} --</option>
+                    @foreach(\App\Models\User::JOB_LEVELS as $key => $label)
+                        <option value="{{ $key }}" {{ old('job_level', $user->job_level) == $key ? 'selected' : '' }}>{{ __('users.level_' . $key) }}</option>
+                    @endforeach
+                </select>
+                @error('job_level')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.job_title') }}</label>
-                <input type="text" name="job_title" value="{{ old('job_title',$user->job_title) }}" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" name="job_title" value="{{ old('job_title', $user->job_title) }}" placeholder="{{ __('users.job_title_placeholder') }}" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('job_title')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>

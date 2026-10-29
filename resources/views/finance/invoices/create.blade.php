@@ -31,14 +31,33 @@
 <form action="{{ $formAction }}" method="POST">
 @csrf
 @if($isEdit) @method('PUT') @endif
-@if(!empty($prefillData['quote']))
+@if(isset($prefillData['quote']))
     <input type="hidden" name="quote_id" value="{{ $prefillData['quote']->id }}">
 @endif
-@if(!empty($prefillData))
+@if(!empty($prefillData) && isset($prefillData['quote']))
     <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
         {{ __('finance.imported_quote_data', ['number' => $prefillData['quote']->quote_number]) }}
     </div>
+@elseif(!empty($prefillData) && isset($prefillData['project_id']) && !isset($prefillData['quote']))
+    <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+        {{ __('finance.imported_project_data', ['name' => $prefillData['description'] ?? '']) }}
+    </div>
 @endif
+
+@if(!empty($prefillData) && isset($prefillData['project_id']) && $availableQuotes->count() > 0)
+<div class="mb-5 p-4 rounded-xl border border-blue-100 bg-blue-50">
+    <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('finance.select_quote_for_items') }}</label>
+    <select id="quoteSelect" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="">-- {{ __('messages.select') }} --</option>
+        @foreach($availableQuotes as $q)
+        <option value="{{ $q->id }}" {{ request('quote_id') == $q->id ? 'selected' : '' }} data-items="{{ $q->items->count() }}">
+            {{ $q->quote_number }} — {{ number_format($q->total, 2) }} ({{ $q->items->count() }} {{ __('finance.quote_items') }})
+        </option>
+        @endforeach
+    </select>
+</div>
+@endif
+
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('project.project') }} *</label>
@@ -87,8 +106,15 @@
     </div>
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('finance.discount') }}</label>
-        <input type="number" name="discount_amount" value="{{ old('discount_amount', $isEdit ? $invoiceModel?->discount_amount : 0) }}" step="0.01" min="0"
-               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="flex gap-2">
+            <select name="discount_type" id="discountType" class="border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="fixed" {{ old('discount_type', $isEdit ? $invoiceModel?->discount_type : 'fixed') === 'fixed' ? 'selected' : '' }}>{{ __('finance.fixed_amount') }}</option>
+                <option value="percentage" {{ old('discount_type', $isEdit ? $invoiceModel?->discount_type : 'fixed') === 'percentage' ? 'selected' : '' }}>{{ __('finance.percentage') }}</option>
+            </select>
+            <input type="number" name="discount_amount" id="discountInput" value="{{ old('discount_amount', $isEdit ? (($invoiceModel?->discount_value ?: $invoiceModel?->discount_amount) ?? 0) : 0) }}" step="0.01" min="0"
+                   class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span id="discountSuffix" class="flex items-center text-sm text-gray-500 min-w-[40px]">{{ __('finance.currency') }}</span>
+        </div>
     </div>
 </div>
 
@@ -114,6 +140,7 @@
     <div class="w-64 space-y-2 text-sm">
         <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.subtotal') }}</span><span id="subtotal">0.00</span></div>
         <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.tax') }}</span><span id="taxAmt">0.00</span></div>
+        <div class="flex justify-between"><span class="text-gray-500">{{ __('finance.discount') }}</span><span id="discountDisplay" class="text-red-500">0.00</span></div>
         <div class="flex justify-between border-t pt-2"><span class="font-semibold">{{ __('finance.total') }}</span><span id="total" class="font-bold text-blue-600">0.00</span></div>
     </div>
 </div>
@@ -129,6 +156,14 @@
 
 @push('scripts')
 <script>
+document.getElementById('quoteSelect')?.addEventListener('change', function() {
+    if (this.value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('quote_id', this.value);
+        window.location.href = url.toString();
+    }
+});
+
 let idx = {{ count($rows) }};
 const prefillItems = @json(!empty($prefillData['items']) ? $prefillData['items'] : []);
 
@@ -157,15 +192,25 @@ document.getElementById('add-item').addEventListener('click', () => {
     calc();
 });
 document.addEventListener('click', e => { if(e.target.closest('.remove-row')) { e.target.closest('.item-row').remove(); calc(); } });
-document.addEventListener('input', e => { if(['qty-input','price-input'].some(c => e.target.classList.contains(c)) || e.target.id === 'taxInput') calc(); });
+document.addEventListener('input', e => { if(['qty-input','price-input'].some(c => e.target.classList.contains(c)) || e.target.id === 'taxInput' || e.target.id === 'discountInput' || e.target.id === 'discountType') calc(); });
+document.addEventListener('change', e => { if (e.target.id === 'discountType') { calc(); updateDiscountSuffix(); } });
+function updateDiscountSuffix() {
+    const type = document.getElementById('discountType').value;
+    document.getElementById('discountSuffix').textContent = type === 'percentage' ? '%' : '{{ __("finance.currency") }}';
+}
 function calc() {
     let sub = 0;
     document.querySelectorAll('.item-row').forEach(r => { sub += (parseFloat(r.querySelector('.qty-input')?.value)||0) * (parseFloat(r.querySelector('.price-input')?.value)||0); });
     const tax = sub * (parseFloat(document.getElementById('taxInput').value)||0)/100;
+    const discountRaw = parseFloat(document.getElementById('discountInput').value)||0;
+    const discountType = document.getElementById('discountType').value;
+    const discount = discountType === 'percentage' ? sub * discountRaw / 100 : discountRaw;
     document.getElementById('subtotal').textContent = sub.toFixed(2);
     document.getElementById('taxAmt').textContent = tax.toFixed(2);
-    document.getElementById('total').textContent = (sub+tax).toFixed(2);
+    document.getElementById('discountDisplay').textContent = '-' + discount.toFixed(2);
+    document.getElementById('total').textContent = Math.max(0, sub + tax - discount).toFixed(2);
 }
+updateDiscountSuffix();
 </script>
 @endpush
 @endsection

@@ -13,21 +13,24 @@ class QuoteService
     public function createQuote(array $data): Quote
     {
         return DB::transaction(function () use ($data) {
-            $data['created_by']   = Auth::id();
-            $data['quote_number'] = $this->generateQuoteNumber();
+            $data['created_by']          = Auth::id();
+            $data['quote_number']        = $this->generateQuoteNumber();
+            $data['tax_percentage']      = $data['tax_percentage'] ?? 0;
+            $data['discount_type']       = $data['discount_type'] ?? 'percentage';
+            $data['discount_value']      = $data['discount_percentage'] ?? 0;
+            $data['discount_percentage'] = $data['discount_type'] === 'fixed' ? 0 : $data['discount_value'];
 
             $subtotal       = collect($data['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']);
-            $taxPercentage  = $data['tax_percentage'] ?? 0;
-            $discountPercentage = $data['discount_percentage'] ?? 0;
-            $taxAmount      = round($subtotal * $taxPercentage / 100, 2);
-            $discountAmount = round($subtotal * $discountPercentage / 100, 2);
-            $total          = $subtotal + $taxAmount - $discountAmount;
+            $taxAmount      = round($subtotal * $data['tax_percentage'] / 100, 2);
+            $data['discount_amount'] = $data['discount_type'] === 'fixed'
+                ? $data['discount_value']
+                : round($subtotal * $data['discount_value'] / 100, 2);
+            $total          = max(0, $subtotal + $taxAmount - $data['discount_amount']);
 
             $quote = Quote::create(array_merge($data, [
-                'subtotal'         => $subtotal,
-                'tax_amount'       => $taxAmount,
-                'discount_amount'  => $discountAmount,
-                'total'            => $total,
+                'subtotal'        => $subtotal,
+                'tax_amount'      => $taxAmount,
+                'total'           => $total,
             ]));
 
             foreach ($data['items'] as $order => $item) {
@@ -51,22 +54,25 @@ class QuoteService
     public function updateQuote(Quote $quote, array $data): Quote
     {
         return DB::transaction(function () use ($quote, $data) {
-            $quote->items()->delete();
+            $data['tax_percentage']      = $data['tax_percentage'] ?? $quote->tax_percentage;
+            $data['discount_type']       = $data['discount_type'] ?? $quote->discount_type ?? 'percentage';
+            $data['discount_value']      = $data['discount_percentage'] ?? $quote->discount_value ?? $quote->discount_percentage;
+            $data['discount_percentage'] = $data['discount_type'] === 'fixed' ? 0 : $data['discount_value'];
 
             $subtotal       = collect($data['items'])->sum(fn($i) => $i['quantity'] * $i['unit_price']);
-            $taxPercentage  = $data['tax_percentage'] ?? $quote->tax_percentage;
-            $discountPercentage = $data['discount_percentage'] ?? $quote->discount_percentage;
-            $taxAmount      = round($subtotal * $taxPercentage / 100, 2);
-            $discountAmount = round($subtotal * $discountPercentage / 100, 2);
-            $total          = $subtotal + $taxAmount - $discountAmount;
+            $taxAmount      = round($subtotal * $data['tax_percentage'] / 100, 2);
+            $data['discount_amount'] = $data['discount_type'] === 'fixed'
+                ? $data['discount_value']
+                : round($subtotal * $data['discount_value'] / 100, 2);
+            $total          = max(0, $subtotal + $taxAmount - $data['discount_amount']);
 
             $quote->update(array_merge(array_diff_key($data, ['items' => '']), [
-                'subtotal' => $subtotal,
-                'tax_amount' => $taxAmount,
-                'discount_amount' => $discountAmount,
-                'total' => $total,
+                'subtotal'        => $subtotal,
+                'tax_amount'      => $taxAmount,
+                'total'           => $total,
             ]));
 
+            $quote->items()->delete();
             foreach ($data['items'] as $order => $item) {
                 $quote->items()->create([
                     'description' => $item['description'],
@@ -108,7 +114,7 @@ class QuoteService
     protected function generateQuoteNumber(): string
     {
         $prefix = 'QT-' . date('Ym') . '-';
-        $last   = Quote::where('quote_number', 'like', $prefix . '%')
+        $last   = Quote::withTrashed()->where('quote_number', 'like', $prefix . '%')
             ->orderByDesc('quote_number')->first();
         $seq = $last ? (int) substr($last->quote_number, -4) + 1 : 1;
         return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);

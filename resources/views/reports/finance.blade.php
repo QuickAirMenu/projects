@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('title', __('messages.finance_report'))
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[
+        ['label' => 'common.reports', 'url' => route('reports.index')],
+        ['label' => 'messages.finance_report', 'url' => null],
+    ]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex items-center justify-between">
     <div>
@@ -24,7 +31,7 @@
         <div class="w-10 h-10 rounded-xl bg-{{ $c['color'] }}-100 flex items-center justify-center mb-3">
             <i class="fas {{ $c['icon'] }} text-{{ $c['color'] }}-600"></i>
         </div>
-        <p class="text-lg font-bold text-gray-800">{{ $c['val'] }}</p>
+        <p class="text-lg font-bold text-gray-800 privacy-mask">{{ $c['val'] }}</p>
         <p class="text-xs text-gray-500 mt-1">{{ $c['label'] }}</p>
     </div>
     @endforeach
@@ -47,8 +54,8 @@
                 @php $months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']; @endphp
                 <tr class="border-b last:border-0 hover:bg-gray-50">
                     <td class="py-2 text-gray-700">{{ $months[$row->month-1] ?? $row->month }}</td>
-                    <td class="py-2 text-end text-gray-800">{{ number_format($row->total,2) }}</td>
-                    <td class="py-2 text-end text-green-600">{{ number_format($row->paid,2) }}</td>
+                    <td class="py-2 text-end text-gray-800 privacy-mask">{{ number_format($row->total,2) }}</td>
+                    <td class="py-2 text-end text-green-600 privacy-mask">{{ number_format($row->paid,2) }}</td>
                     <td class="py-2 text-end">
                         @php $pct = $row->total > 0 ? round($row->paid/$row->total*100) : 0 @endphp
                         <div class="flex items-center justify-end gap-2">
@@ -68,7 +75,7 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
     <form method="GET" class="flex flex-wrap gap-3">
         <select name="payment_status" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">{{ __('finance.payment_status') }}</option>
+            <option value="">{{ __('finance.all_payment_statuses') }}</option>
             @foreach(['unpaid'=>'unpaid','partially_paid'=>'partially_paid','paid'=>'paid','overdue'=>'overdue'] as $v=>$l)
                 <option value="{{ $v }}" {{ request('payment_status') === $v ? 'selected' : '' }}>{{ __('finance.status_'.$v) }}</option>
             @endforeach
@@ -98,10 +105,10 @@
                     <a href="{{ route('invoices.show', $inv) }}" class="font-medium text-gray-800 hover:text-blue-600">{{ $inv->invoice_number }}</a>
                     <p class="text-xs text-gray-400">{{ $inv->invoice_date->format('Y-m-d') }}</p>
                 </td>
-                <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $inv->client?->name }}</td>
-                <td class="px-4 py-3 hidden lg:table-cell font-medium">{{ number_format($inv->total,2) }}</td>
-                <td class="px-4 py-3 hidden lg:table-cell text-green-600">{{ number_format($inv->paid_amount,2) }}</td>
-                <td class="px-4 py-3 hidden xl:table-cell text-red-500">{{ number_format($inv->remaining_amount,2) }}</td>
+                <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $inv->client?->full_name }}</td>
+                <td class="px-4 py-3 hidden lg:table-cell font-medium privacy-mask">{{ number_format($inv->total,2) }}</td>
+                <td class="px-4 py-3 hidden lg:table-cell text-green-600 privacy-mask">{{ number_format($inv->paid_amount,2) }}</td>
+                <td class="px-4 py-3 hidden xl:table-cell text-red-500 privacy-mask">{{ number_format($inv->remaining_amount,2) }}</td>
                 <td class="px-4 py-3">
                     <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $sc }}-100 text-{{ $sc }}-700">{{ __('finance.status_'.$inv->payment_status) }}</span>
                 </td>

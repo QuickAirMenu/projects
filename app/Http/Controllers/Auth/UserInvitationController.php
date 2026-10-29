@@ -37,6 +37,6 @@ class UserInvitationController extends Controller
         ]);
 
         return redirect()->route('login')
-            ->with('success', 'تم إعداد الحساب بنجاح. يمكنك تسجيل الدخول الآن.');
+            ->with('success', __('messages.account_setup_success'));
     }
 }

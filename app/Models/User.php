@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -20,6 +21,18 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    const JOB_LEVELS = [
+        'intern'  => 'Intern / Trainee',
+        'junior'  => 'Junior',
+        'mid'     => 'Mid-Level / Specialist',
+        'senior'  => 'Senior',
+        'lead'    => 'Lead',
+        'manager' => 'Manager',
+        'head'    => 'Head / Director',
+        'vp'      => 'VP / Vice President',
+        'clevel'  => 'C-Level',
+    ];
+
     protected $fillable = [
         'name',
         'email',
@@ -27,6 +40,7 @@ class User extends Authenticatable
         'phone',
         'avatar',
         'job_title',
+        'job_level',
         'department',
         'is_active',
         'language',
@@ -62,7 +76,7 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'phone', 'job_title', 'is_active'])
+            ->logOnly(['name', 'email', 'phone', 'job_title', 'job_level', 'is_active'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
@@ -141,7 +155,7 @@ class User extends Authenticatable
     
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar ? asset($this->avatar) : user_avatar($this);
+        return $this->avatar ? Storage::url($this->avatar) : user_avatar($this);
     }
 
     public function getIsAdminAttribute()

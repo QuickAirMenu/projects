@@ -14,4 +14,6 @@
     'send' => 'Send',
     'contact_us' => 'Contact Us',
     'message_sent' => 'Your message has been sent. We will contact you soon.',
+    'attachment' => 'Attachment (optional)',
+    'attachment_hint' => 'Accepted: images, PDF, Word — up to 10MB',
 ];

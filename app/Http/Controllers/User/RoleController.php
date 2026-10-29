@@ -65,7 +65,7 @@ class RoleController extends Controller
     {
         if (in_array($role->name, ['super-admin', 'admin'])) {
             return redirect()->route('roles.index')
-                ->with('error', __('common.cannot_delete_system_role'));
+                ->with('error', __('messages.cannot_delete_system_role'));
         }
 
         $role->delete();

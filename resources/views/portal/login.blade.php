@@ -1,35 +1,52 @@
 @extends('portal.layouts.app')
 
-@section('title', 'دخول')
+@section('title', __('portal.login_title'))
 
 @section('content')
     <div class="mx-auto max-w-md py-12">
-        <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
             <div class="mb-8 text-center">
-                <h1 class="text-3xl font-bold text-white">بوابة العميل</h1>
-                <p class="mt-2 text-sm text-slate-400">ادخل بإيميلك وكلمة المرور لمتابعة مشروعك فقط</p>
+                @php $loginLogo = workspace_config('company_logo'); @endphp
+                @if($loginLogo)
+                    <img src="{{ $loginLogo }}" alt="" class="h-10 mx-auto mb-4">
+                @endif
+                <h1 class="text-2xl font-bold text-gray-900">{{ __('portal.portal_login') }}</h1>
+                <p class="mt-1 text-sm text-gray-500">{{ __('portal.login_title') }}</p>
             </div>
 
             <form method="POST" action="{{ route('portal.login.post') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="mb-2 block text-sm text-slate-300" for="email">البريد الإلكتروني</label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700" for="email">{{ __('auth.email') }}</label>
                     <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
-                        class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white placeholder-slate-500 outline-none ring-0 focus:border-emerald-400"
+                        class="form-input w-full"
                         placeholder="name@example.com">
                 </div>
 
                 <div>
-                    <label class="mb-2 block text-sm text-slate-300" for="password">كلمة المرور</label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700" for="password">{{ __('auth.password') }}</label>
                     <input id="password" name="password" type="password" required
-                        class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white placeholder-slate-500 outline-none ring-0 focus:border-emerald-400"
+                        class="form-input w-full"
                         placeholder="********">
                 </div>
 
-                <button type="submit" class="w-full rounded-xl bg-emerald-500 px-4 py-3 font-semibold text-slate-950 hover:bg-emerald-400">
-                    دخول
-                </button>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                        {{ __('auth.login') }}
+                    </button>
+                    <a href="{{ route('portal.forgot-password') }}" class="text-sm text-primary-600 hover:underline">
+                        {{ __('portal.forgot_password') }}
+                    </a>
+                </div>
             </form>
+
+            <div class="mt-6 text-center">
+                <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="text-sm text-primary-600 hover:underline">
+                    <i class="fas fa-language me-1"></i>
+                    {{ app()->getLocale() === 'ar' ? 'English' : 'عربي' }}
+                </a>
+            </div>
         </div>
     </div>
 @endsection

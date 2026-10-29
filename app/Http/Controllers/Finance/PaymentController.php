@@ -18,6 +18,8 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Payment::class);
+
         $query = Payment::with(['invoice.client','invoice.project','receiver'])->latest();
         if ($request->trashed) $query->onlyTrashed();
         $payments = $query->paginate(20);
@@ -32,6 +34,8 @@ class PaymentController extends Controller
 
     public function store(StorePaymentRequest $request)
     {
+        $this->authorize('create', Payment::class);
+
         $invoice = Invoice::findOrFail($request->invoice_id);
         $data = $request->validated();
         unset($data['proof_of_payment']);
@@ -54,6 +58,8 @@ class PaymentController extends Controller
 
     public function edit(Payment $payment)
     {
+        $this->authorize('update', $payment);
+
         $payment->load(['invoice.client', 'invoice.project']);
 
         return view('finance.payments.edit', compact('payment'));
@@ -61,6 +67,8 @@ class PaymentController extends Controller
 
     public function update(StorePaymentRequest $request, Payment $payment)
     {
+        $this->authorize('update', $payment);
+
         $data = $request->validated();
 
         if ((int) $data['invoice_id'] !== (int) $payment->invoice_id) {
@@ -86,11 +94,11 @@ class PaymentController extends Controller
             ]);
 
             if ($oldPath) {
-                Storage::disk('public')->delete($oldPath);
+                Storage::disk('private')->delete($oldPath);
             }
         }
 
-        $this->recalculateInvoiceTotals($payment->invoice);
+        $this->invoiceService->recalculateInvoiceTotals($payment->invoice);
 
         return redirect()->route('payments.index')
             ->with('success', __('messages.updated_successfully'));
@@ -98,20 +106,24 @@ class PaymentController extends Controller
 
     public function show(Payment $payment)
     {
+        $this->authorize('view', $payment);
+
         return redirect()->route('payments.edit', $payment);
     }
 
     public function destroy(Payment $payment)
     {
+        $this->authorize('delete', $payment);
+
         $invoice = $payment->invoice;
 
         if ($payment->proof_file_path) {
-            Storage::disk('public')->delete($payment->proof_file_path);
+            Storage::disk('private')->delete($payment->proof_file_path);
         }
 
         $payment->delete();
 
-        $this->recalculateInvoiceTotals($invoice);
+        $this->invoiceService->recalculateInvoiceTotals($invoice);
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', __('messages.deleted_successfully'));
@@ -119,20 +131,42 @@ class PaymentController extends Controller
 
     public function restore(Payment $payment)
     {
+        $this->authorize('update', $payment);
+
         $invoice = $payment->invoice;
         $payment->restore();
-        $this->recalculateInvoiceTotals($invoice);
-        return redirect()->route('payments.index')->with('success', 'تمت استعادة عنصر من الأرشيف');
+        $this->invoiceService->recalculateInvoiceTotals($invoice);
+        return redirect()->route('payments.index')->with('success', __('messages.restored_successfully'));
     }
 
-    protected function recalculateInvoiceTotals(Invoice $invoice): void
+    public function downloadProof(Payment $payment)
     {
-        $totalPaid = $invoice->payments()->sum('amount');
-        $invoice->update([
-            'paid_amount'     => $totalPaid,
-            'remaining_amount'=> max(0, $invoice->total - $totalPaid),
-            'payment_status'  => $totalPaid >= $invoice->total ? 'paid' : ($totalPaid > 0 ? 'partially_paid' : 'unpaid'),
-        ]);
+        $this->authorize('view', $payment);
+
+        if (!$payment->proof_file_path) {
+            abort(404);
+        }
+
+        return Storage::disk('private')->download(
+            $payment->proof_file_path,
+            $payment->proof_file_name ?? basename($payment->proof_file_path)
+        );
+    }
+
+    public function viewProof(Payment $payment)
+    {
+        $this->authorize('view', $payment);
+
+        if (!$payment->proof_file_path) {
+            abort(404);
+        }
+
+        $mime = Storage::disk('private')->mimeType($payment->proof_file_path);
+        $content = Storage::disk('private')->get($payment->proof_file_path);
+
+        return response($content)
+            ->header('Content-Type', $mime)
+            ->header('Content-Disposition', 'inline; filename="' . ($payment->proof_file_name ?? basename($payment->proof_file_path)) . '"');
     }
 
     protected function storeProofOfPayment(UploadedFile $file, string $paymentNumber): string
@@ -140,16 +174,16 @@ class PaymentController extends Controller
         $directory = 'payments/' . $paymentNumber;
 
         if (!str_starts_with((string) $file->getMimeType(), 'image/') || blank(config('workspace.tinify.api_key'))) {
-            return $file->store($directory, 'public');
+            return $file->store($directory, 'private');
         }
 
         $compressed = $this->compressImageWithTinify($file);
         if ($compressed === null) {
-            return $file->store($directory, 'public');
+            return $file->store($directory, 'private');
         }
 
         $path = $directory . '/' . $file->hashName();
-        Storage::disk('public')->put($path, $compressed);
+        Storage::disk('private')->put($path, $compressed);
 
         return $path;
     }

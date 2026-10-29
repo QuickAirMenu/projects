@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('title', $project->name)
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[
+        ['label' => 'project.projects', 'url' => route('projects.index')],
+        ['label' => $project->name, 'url' => null],
+    ]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
@@ -15,7 +22,7 @@
             </span>
         </div>
         <h1 class="text-2xl font-bold text-gray-800 mt-1">{{ $project->name }}</h1>
-        <p class="text-gray-500 text-sm">{{ $project->client?->name }}</p>
+        <p class="text-gray-500 text-sm">{{ $project->client?->full_name }}</p>
     </div>
     <div class="flex gap-2">
         @can('update', $project)
@@ -29,14 +36,34 @@
         <a href="{{ route('projects.index') }}" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl transition text-sm">
             <i class="fas fa-arrow-right"></i> {{ __('messages.back') }}
         </a>
+        <a href="{{ route('invoices.create', ['project_id' => $project->id]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm transition font-medium">
+            <i class="fas fa-file-invoice me-2"></i>{{ __('finance.create_invoice') }}
+        </a>
         <a href="{{ route('projects.handoff', $project) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm transition font-medium">
-            <i class="fas fa-check-circle me-2"></i>تسليم المشروع
+            <i class="fas fa-check-circle me-2"></i>{{ __('project.handoff_project') }}
         </a>
         @if(auth()->id() === $project->manager_id && $project->progress_percentage >= 100 && !$project->is_handed_off)
         <a href="{{ route('projects.handoff', $project) }}" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl transition text-sm">
             <i class="fas fa-truck"></i> {{ __('project.handoff_project') }}
         </a>
         @endif
+        @can('update', $project)
+            @if($project->is_archived)
+                <form action="{{ route('projects.unarchive', $project) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl transition text-sm">
+                        <i class="fas fa-box-open"></i> {{ __('project.unarchive') }}
+                    </button>
+                </form>
+            @else
+                <form action="{{ route('projects.archive', $project) }}" method="POST" onsubmit="return confirm('{{ __('project.archive_confirm') }}')">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-2 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-xl transition text-sm">
+                        <i class="fas fa-archive"></i> {{ __('project.archive') }}
+                    </button>
+                </form>
+            @endif
+        @endcan
     </div>
 </div>
 
@@ -103,7 +130,7 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ Storage::url($att->file_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-download"></i></a>
+                    <a href="{{ route('projects.attachments.download', $att) }}" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-download"></i></a>
                     <form action="{{ route('projects.attachments.destroy', $att) }}" method="POST" onsubmit="return confirmDelete(this)">
                         @csrf @method('DELETE')
                         <button type="submit" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-trash"></i></button>
@@ -119,7 +146,7 @@
     {{-- Sidebar --}}
     <div class="space-y-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 text-sm">
-            <div class="flex justify-between"><span class="text-gray-500">{{ __('client.client') }}</span><span class="font-medium">{{ $project->client?->name }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('client.client') }}</span><span class="font-medium">{{ $project->client?->full_name }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.service_type') }}</span><span class="font-medium">{{ $project->serviceType?->name }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.manager') }}</span><span class="font-medium">{{ $project->manager?->name }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.start_date') }}</span><span class="font-medium">{{ $project->start_date?->format('Y-m-d') ?? '-' }}</span></div>
@@ -138,6 +165,21 @@
                 </span>
             </div>
         </div>
+
+        {{-- Invoices --}}
+        @if($project->invoices->count())
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <h3 class="font-semibold text-gray-700 mb-3 text-sm">{{ __('finance.invoices') }}</h3>
+            @foreach($project->invoices as $inv)
+            <div class="flex items-center justify-between py-2 border-b last:border-0">
+                <a href="{{ route('invoices.show', $inv) }}" class="text-sm text-blue-600 hover:underline">{{ $inv->invoice_number }}</a>
+                <span class="text-xs px-2 py-0.5 rounded-full {{ $inv->payment_status === 'paid' ? 'bg-green-100 text-green-700' : ($inv->payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                    {{ __('finance.status_'.$inv->payment_status) }}
+                </span>
+            </div>
+            @endforeach
+        </div>
+        @endif
 
         {{-- Team Members --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">

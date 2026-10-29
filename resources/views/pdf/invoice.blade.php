@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body{font-family:DejaVu Sans,sans-serif;font-size:12px;color:#1f2937;margin:0}
+        body{font-family:dejavusans,sans-serif;font-size:12px;color:#1f2937;margin:0}
         .page{padding:28px}
         .header{display:table;width:100%;margin-bottom:18px}
         .header > div{display:table-cell;vertical-align:top;width:50%}
@@ -35,15 +35,15 @@
             <p class="sub">{{ $settings['company_address'] ?? '-' }}</p>
         </div>
         <div style="text-align:{{ $isRtl ? 'left' : 'right' }}">
-            <p class="title" style="margin-bottom:4px">فاتورة</p>
-            <p class="sub"><strong>الرقم:</strong> {{ $invoice->invoice_number }}</p>
-            <p class="sub"><strong>التاريخ:</strong> {{ $invoice->invoice_date?->format('Y-m-d') }}</p>
-            @if($invoice->due_date)<p class="sub"><strong>الاستحقاق:</strong> {{ $invoice->due_date?->format('Y-m-d') }}</p>@endif
+            <p class="title" style="margin-bottom:4px">{{ __('finance.invoice') }}</p>
+            <p class="sub"><strong>{{ __('finance.invoice_number') }}:</strong> {{ $invoice->invoice_number }}</p>
+            <p class="sub"><strong>{{ __('finance.invoice_date') }}:</strong> {{ $invoice->invoice_date?->format('Y-m-d') }}</p>
+            @if($invoice->due_date)<p class="sub"><strong>{{ __('finance.due_date') }}:</strong> {{ $invoice->due_date?->format('Y-m-d') }}</p>@endif
         </div>
     </div>
 
     <div class="box">
-        <p class="section-title">معلومات العميل</p>
+        <p class="section-title">{{ __('finance.client_info') }}</p>
         <p style="margin:0 0 4px"><strong>{{ $invoice->client?->name }}</strong></p>
         @if($invoice->client?->company_name)<p class="muted" style="margin:0 0 4px">{{ $invoice->client->company_name }}</p>@endif
         @if($invoice->project?->name)<p class="muted" style="margin:0">{{ $invoice->project->name }}</p>@endif
@@ -51,7 +51,7 @@
 
     <div class="box">
         <table>
-            <thead><tr><th>الوصف</th><th style="width:80px">الكمية</th><th style="width:120px">سعر الوحدة</th><th style="width:120px">الإجمالي</th></tr></thead>
+            <thead><tr><th>{{ __('finance.description') }}</th><th style="width:80px">{{ __('finance.quantity') }}</th><th style="width:120px">{{ __('finance.unit_price') }}</th><th style="width:120px">{{ __('finance.total') }}</th></tr></thead>
             <tbody>
                 @foreach($invoice->items as $item)
                     <tr>
@@ -66,22 +66,22 @@
     </div>
 
     <table class="totals">
-        <tr><td>الإجمالي الفرعي</td><td style="text-align:end">{{ number_format($invoice->subtotal, 2) }} {{ $currency }}</td></tr>
-        <tr><td>الضريبة</td><td style="text-align:end">{{ number_format($invoice->tax_amount, 2) }} {{ $currency }}</td></tr>
-        <tr><td>الخصم</td><td style="text-align:end">-{{ number_format($invoice->discount_amount, 2) }} {{ $currency }}</td></tr>
-        <tr><td><strong>الإجمالي</strong></td><td style="text-align:end"><strong>{{ number_format($invoice->total, 2) }} {{ $currency }}</strong></td></tr>
-        <tr><td>المدفوع</td><td style="text-align:end">{{ number_format($invoice->paid_amount, 2) }} {{ $currency }}</td></tr>
-        <tr><td>المتبقي</td><td style="text-align:end">{{ number_format($invoice->remaining_amount, 2) }} {{ $currency }}</td></tr>
+        <tr><td>{{ __('finance.subtotal') }}</td><td style="text-align:end">{{ number_format($invoice->subtotal, 2) }} {{ $currency }}</td></tr>
+        <tr><td>{{ __('finance.tax') }}</td><td style="text-align:end">{{ number_format($invoice->tax_amount, 2) }} {{ $currency }}</td></tr>
+        <tr><td>{{ __('finance.discount') }}{{ $invoice->discount_type === 'percentage' ? ' ('.($invoice->discount_value ?? $invoice->discount_amount).'%)' : '' }}</td><td style="text-align:end">-{{ number_format($invoice->discount_amount, 2) }} {{ $currency }}</td></tr>
+        <tr><td><strong>{{ __('finance.total') }}</strong></td><td style="text-align:end"><strong>{{ number_format($invoice->total, 2) }} {{ $currency }}</strong></td></tr>
+        <tr><td>{{ __('finance.paid_amount') }}</td><td style="text-align:end">{{ number_format($invoice->paid_amount, 2) }} {{ $currency }}</td></tr>
+        <tr><td>{{ __('finance.remaining_amount') }}</td><td style="text-align:end">{{ number_format($invoice->remaining_amount, 2) }} {{ $currency }}</td></tr>
     </table>
 
     @if($invoice->notes || $invoice->terms)
     <div class="box">
         @if($invoice->notes)
-            <p class="section-title">ملاحظات</p>
+            <p class="section-title">{{ __('finance.notes') }}</p>
             <p style="margin-top:0;white-space:pre-line">{{ $invoice->notes }}</p>
         @endif
         @if($invoice->terms)
-            <p class="section-title">الشروط والأحكام</p>
+            <p class="section-title">{{ __('finance.terms_and_conditions') }}</p>
             <p style="margin-top:0;white-space:pre-line">{{ $invoice->terms }}</p>
         @endif
     </div>

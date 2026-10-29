@@ -31,6 +31,7 @@ return [
     'color'                     => 'Color',
     'sort_order'                => 'Order',
     'icon'                      => 'Icon (Font Awesome)',
+    'icon_hint'                 => 'Click an icon above or browse more at',
     'service_name'              => 'Service Name',
     'status_label'              => 'Status',
     'active'                    => 'Active',
@@ -41,4 +42,9 @@ return [
     'add_item'                  => 'Add',
     'unit_price'                => 'Price',
     'no_data'                   => 'No data available',
+    'portal_settings'           => 'Client Portal Settings',
+    'portal_show_invoices'      => 'Show Invoices in Portal',
+    'portal_show_invoices_hint' => 'Clients will be able to see and download invoices',
+    'portal_show_quotes'        => 'Show Quotes in Portal',
+    'portal_show_quotes_hint'   => 'Clients will be able to see and download quotes',
 ];

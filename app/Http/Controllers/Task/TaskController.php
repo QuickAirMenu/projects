@@ -16,6 +16,8 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Task::class);
+
         $query = Task::with(['project','status','assignedUser'])
             ->whereNull('parent_task_id')
             ->latest();
@@ -28,9 +30,7 @@ class TaskController extends Controller
         if ($request->overdue)    $query->where('due_date', '<', now());
 
         $user = Auth::user();
-        if ($user->hasRole('team-member')) {
-            $query->where('assigned_to', $user->id);
-        }
+        $query->visibleTo($user);
 
         $tasks    = $query->paginate(20)->withQueryString();
         $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
@@ -49,6 +49,8 @@ class TaskController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Task::class);
+
         $projects = Project::orderBy('name')->get();
         $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
         $users    = User::where('is_active', true)->orderBy('name')->get();
@@ -57,6 +59,8 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request)
     {
+        $this->authorize('create', Task::class);
+
         $data = $request->validated();
         $data['created_by'] = Auth::id();
         $task = Task::create($data);
@@ -66,6 +70,8 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
+        $this->authorize('view', $task);
+
         $task->load(['project', 'status', 'assignedUser', 'subtasks.status']);
         $task->setRelation('checklists', $task->checklists()->orderBy('sort_order')->get());
         $task->setRelation('timeLogs', $task->timeLogs()->with('user')->latest()->take(5)->get());
@@ -97,16 +103,63 @@ class TaskController extends Controller
             ->with('success', __('messages.deleted_successfully'));
     }
 
-    public function calendar(Request $request)
+    public function calendar()
     {
-        $user  = Auth::user();
-        $month = $request->month ?? now()->month;
-        $year  = $request->year ?? now()->year;
-        $query = Task::with(['status','project'])->whereNotNull('due_date')
-            ->whereMonth('due_date', $month)
-            ->whereYear('due_date', $year);
-        if ($user->hasRole('team-member')) $query->where('assigned_to', $user->id);
+        $projects = Project::orderBy('name')->get(['id', 'name']);
+        return view('tasks.calendar', compact('projects'));
+    }
+
+    public function calendarData(Request $request)
+    {
+        $query = Task::with(['project:id,name', 'status:id,name_en,name_ar'])
+            ->whereNotNull('due_date');
+
+        $user = Auth::user();
+        if ($user->hasRole('team-member')) {
+            $query->where('assigned_to', $user->id);
+        }
+
         $tasks = $query->get();
-        return view('tasks.calendar', compact('tasks', 'month', 'year'));
+
+        $events = $tasks->map(function ($task) {
+            $colors = [
+                'urgent' => '#ef4444',
+                'high'   => '#f97316',
+                'medium' => '#3b82f6',
+                'low'    => '#6b7280',
+            ];
+            $color = $colors[$task->priority] ?? '#6b7280';
+
+            return [
+                'id'      => (string) $task->id,
+                'title'   => $task->title,
+                'start'   => $task->due_date->format('Y-m-d'),
+                'url'     => route('tasks.show', $task),
+                'color'   => $color,
+                'textColor' => '#ffffff',
+                'extendedProps' => [
+                    'project'  => $task->project->name ?? '',
+                    'priority' => $task->priority,
+                ],
+            ];
+        });
+
+        return response()->json($events);
+    }
+
+    public function timeline(Request $request)
+    {
+        $query = Task::with(['project', 'status', 'assignedUser'])
+            ->whereNotNull('start_date')
+            ->orWhereNotNull('due_date')
+            ->orderBy('start_date');
+
+        $user = Auth::user();
+        if ($user->hasRole('team-member')) {
+            $query->where('assigned_to', $user->id);
+        }
+
+        $tasks = $query->get();
+        return view('tasks.timeline', compact('tasks'));
     }
 }

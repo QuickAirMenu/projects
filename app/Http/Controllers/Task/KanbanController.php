@@ -18,11 +18,8 @@ class KanbanController extends Controller
 
         $query = Task::with(['project', 'assignedUser', 'status'])
             ->whereNull('parent_task_id')
-            ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id));
-
-        if (auth()->user()->hasRole('team-member')) {
-            $query->where('assigned_to', auth()->id());
-        }
+            ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
+            ->visibleTo(auth()->user());
 
         $tasks = $query->get()->groupBy('status_id');
 

@@ -1,17 +1,27 @@
 @extends('layouts.app')
 @section('title', __('client.clients'))
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[['label' => 'client.clients', 'url' => route('clients.index')]]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
         <h1 class="text-2xl font-bold text-gray-800">{{ __('client.clients') }}</h1>
         <p class="text-gray-500 text-sm mt-1">{{ $stats['total'] }} {{ __('client.client') }}</p>
     </div>
-    @can('create', App\Models\Client::class)
-    <a href="{{ route('clients.create') }}" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition font-medium">
-        <i class="fas fa-plus"></i> {{ __('client.add_client') }}
-    </a>
-    @endcan
+    <div class="flex gap-2">
+        @can('create', App\Models\Client::class)
+        <a href="{{ route('clients.create') }}" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition font-medium">
+            <i class="fas fa-plus"></i> {{ __('client.add_client') }}
+        </a>
+        @endcan
+        <a href="{{ route('exports.clients') }}" class="btn-success flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition font-medium" title="@lang('common.export_clients')">
+            <i class="fas fa-file-excel"></i>
+            <span class="hidden sm:inline">@lang('common.export')</span>
+        </a>
+    </div>
 </div>
 
 
@@ -80,7 +90,7 @@
                         </div>
                     </div>
                 </td>
-                <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $client->phone ?? '-' }}</td>
+                <td class="px-4 py-3 hidden md:table-cell text-gray-600 privacy-mask">{{ $client->phone ?? '-' }}</td>
                 <td class="px-4 py-3 hidden lg:table-cell text-gray-600">{{ $client->city ?? '-' }}</td>
                 <td class="px-4 py-3">
                     <span class="px-2 py-1 rounded-full text-xs font-medium
@@ -91,7 +101,7 @@
                     </span>
                 </td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-600">{{ $client->projects->count() }}</td>
-                <td class="px-4 py-3 hidden xl:table-cell font-medium text-gray-800">{{ number_format($client->lifetime_value) }}</td>
+                <td class="px-4 py-3 hidden xl:table-cell font-medium text-gray-800 privacy-mask">{{ number_format($client->lifetime_value) }}</td>
                 <td class="px-5 py-3 text-end">
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('clients.show', $client) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i class="fas fa-eye"></i></a>

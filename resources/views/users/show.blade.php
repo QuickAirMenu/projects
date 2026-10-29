@@ -14,7 +14,12 @@
             {{ mb_substr($user->name,0,1) }}
         </div>
         <h2 class="font-bold text-gray-800 text-lg">{{ $user->name }}</h2>
-        <p class="text-gray-500 text-sm">{{ $user->job_title ?? '' }}</p>
+        <p class="text-gray-500 text-sm">
+            @if($user->job_level)
+                <span class="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700 me-1">{{ __('users.level_' . $user->job_level) }}</span>
+            @endif
+            {{ $user->job_title ?? '' }}
+        </p>
         <div class="flex flex-wrap justify-center gap-1 mt-2">
             @foreach($user->roles as $role)
             <span class="px-2 py-0.5 rounded-full text-xs bg-purple-100 text-purple-700">{{ $role->name }}</span>

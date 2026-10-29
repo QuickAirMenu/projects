@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('title', __('task.tasks'))
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[['label' => 'task.tasks', 'url' => route('tasks.index')]]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
@@ -19,6 +23,10 @@
             <i class="fas fa-plus me-2"></i>{{ __('task.add_task') }}
         </a>
         @endcan
+        <a href="{{ route('exports.tasks') }}" class="btn-success flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition font-medium" title="@lang('common.export_tasks')">
+            <i class="fas fa-file-excel"></i>
+            <span class="hidden sm:inline">@lang('common.export')</span>
+        </a>
     </div>
 </div>
 

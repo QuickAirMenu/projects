@@ -1,20 +1,40 @@
 @extends('layouts.app')
 @section('title', __('finance.invoices'))
 
+@section('breadcrumb')
+    <x-breadcrumb :items="[['label' => 'finance.invoices', 'url' => route('invoices.index')]]" :show-home="false" />
+@endsection
+
 @section('content')
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-2xl font-bold text-gray-800">{{ __('finance.invoices') }}</h1>
-    <a href="{{ route('invoices.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
-        <i class="fas fa-plus me-2"></i>{{ __('finance.add_invoice') }}
-    </a>
+    <div class="flex gap-2">
+        @if(app()->isLocale('ar'))
+        <a href="{{ route('exports.invoices') }}" class="btn-success flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition font-medium" title="{{ __('common.export_invoices') }}">
+            <i class="fas fa-file-excel"></i>
+            <span class="hidden sm:inline">{{ __('common.export') }}</span>
+        </a>
+        <a href="{{ route('invoices.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
+            <i class="fas fa-plus me-2"></i>{{ __('finance.add_invoice') }}
+        </a>
+        @else
+        <a href="{{ route('invoices.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
+            <i class="fas fa-plus me-2"></i>{{ __('finance.add_invoice') }}
+        </a>
+        <a href="{{ route('exports.invoices') }}" class="btn-success flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition font-medium" title="{{ __('common.export_invoices') }}">
+            <i class="fas fa-file-excel"></i>
+            <span class="hidden sm:inline">{{ __('common.export') }}</span>
+        </a>
+        @endif
+    </div>
 </div>
 
 <div class="flex gap-2 mb-4">
-    <a href="{{ route('invoices.index') }}" 
+    <a href="{{ route('invoices.index') }}"
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ !$trashed ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
         <i class="fas fa-file-alt me-1"></i>{{ __('messages.all') }}
     </a>
-    <a href="{{ route('invoices.index', ['trashed' => 1]) }}" 
+    <a href="{{ route('invoices.index', ['trashed' => 1]) }}"
        class="px-4 py-2 rounded-xl text-sm font-medium transition {{ $trashed ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
         <i class="fas fa-archive me-1"></i>{{ __('messages.archive') }}
     </a>
@@ -33,7 +53,7 @@
             <i class="fas {{ $c['icon'] }} text-{{ $c['color'] }}-600 text-lg"></i>
         </div>
         <div class="min-w-0">
-            <p class="text-lg font-bold text-gray-800 truncate">{{ $c['val'] }}</p>
+            <p class="text-lg font-bold text-gray-800 truncate privacy-mask">{{ $c['val'] }}</p>
             <p class="text-xs text-gray-500">{{ $c['label'] }}</p>
         </div>
     </div>
@@ -62,64 +82,140 @@
     </form>
 </div>
 
-<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <table class="w-full text-sm">
-        <thead>
-            <tr class="bg-gray-50 border-b border-gray-100">
-                <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('finance.invoice_number') }}</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('client.client') }}</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('project.project') }}</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('finance.total') }}</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.remaining') }}</th>
-                <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('messages.status') }}</th>
-                <th class="text-end px-5 py-3 font-semibold text-gray-600">{{ __('messages.actions') }}</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-50">
-            @forelse($invoices as $invoice)
-            @php $sc = ['paid'=>'green','partially_paid'=>'yellow','overdue'=>'red','unpaid'=>'gray'][$invoice->payment_status] ?? 'gray' @endphp
-            <tr class="hover:bg-gray-50 transition">
-                <td class="px-5 py-3">
-                    <a href="{{ route('invoices.show', $invoice) }}" class="font-medium text-gray-800 hover:text-blue-600">{{ $invoice->invoice_number }}</a>
-                    <p class="text-xs text-gray-400">{{ $invoice->invoice_date->format('Y-m-d') }}</p>
-                </td>
-                <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $invoice->client?->name }}</td>
-                <td class="px-4 py-3 hidden lg:table-cell text-gray-600">{{ $invoice->project?->name ?? '-' }}</td>
-                <td class="px-4 py-3 hidden lg:table-cell font-medium">{{ number_format($invoice->total, 2) }}</td>
-                <td class="px-4 py-3 hidden xl:table-cell font-medium text-red-600">{{ number_format($invoice->remaining_amount, 2) }}</td>
-                <td class="px-4 py-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-{{ $sc }}-100 text-{{ $sc }}-700">{{ __('finance.status_'.$invoice->payment_status) }}</span>
-                </td>
-                <td class="px-5 py-3 text-end">
-                    <div class="flex items-center justify-end gap-1">
-                        <a href="{{ route('invoices.show', $invoice) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
-                        @if($trashed)
-                        <form action="{{ route('invoices.restore', $invoice) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="{{ __('messages.restore') }}">
-                                <i class="fas fa-undo"></i>
-                            </button>
-                        </form>
-                        @else
-                        <a href="{{ route('invoices.edit', $invoice) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
-                        <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" onsubmit="return confirmDelete(this)">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
-                        </form>
-                        @endif
-                    </div>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="7" class="py-16 text-center text-gray-400">
-                <i class="fas fa-file-invoice text-5xl mb-3 block text-gray-200"></i>
-                {{ __('finance.no_invoices') }}
-            </td></tr>
-            @endforelse
-        </tbody>
-    </table>
-    @if($invoices->hasPages())
-    <div class="px-5 py-4 border-t">{{ $invoices->links() }}</div>
-    @endif
+{{-- Bulk Action Toolbar + Table --}}
+<div x-data="bulkActions('{{ route('bulk.invoices.delete') }}', '{{ __('messages.confirm_bulk_delete') }}')" class="mb-3">
+    <div x-show="selected.length > 0" x-cloak
+         class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-3 flex items-center justify-between">
+        <div class="flex items-center gap-3 text-sm text-blue-800">
+            <i class="fas fa-check-square text-blue-500"></i>
+            <span><span x-text="selected.length"></span> {{ __('messages.items_selected') }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button @click="clearSelection()" type="button" class="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800">
+                {{ __('messages.cancel') }}
+            </button>
+            <button @click="submitDelete()" type="button" class="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center gap-1.5">
+                <i class="fas fa-trash"></i> {{ __('messages.delete_selected') }}
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="text-start px-4 py-3 w-10">
+                        <input type="checkbox" @change="toggleAll($event, {{ $invoices->pluck('id')->toJson() }})"
+                               :checked="allSelected({{ $invoices->pluck('id')->toJson() }})"
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    </th>
+                    <th class="text-start px-5 py-3 font-semibold text-gray-600">{{ __('finance.invoice_number') }}</th>
+                    <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('client.client') }}</th>
+                    <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('project.project') }}</th>
+                    <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('finance.total') }}</th>
+                    <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.remaining') }}</th>
+                    <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('messages.status') }}</th>
+                    <th class="text-end px-5 py-3 font-semibold text-gray-600">{{ __('messages.actions') }}</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                @forelse($invoices as $invoice)
+                @php $sc = ['paid'=>'green','partially_paid'=>'yellow','overdue'=>'red','unpaid'=>'gray'][$invoice->payment_status] ?? 'gray' @endphp
+                <tr class="hover:bg-gray-50 transition" :class="selected.includes({{ $invoice->id }}) ? 'bg-blue-50/40' : ''">
+                    <td class="px-4 py-3">
+                        <input type="checkbox" value="{{ $invoice->id }}" x-model="selected"
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    </td>
+                    <td class="px-5 py-3">
+                        <a href="{{ route('invoices.show', $invoice) }}" class="font-medium text-gray-800 hover:text-blue-600 privacy-mask">{{ $invoice->invoice_number }}</a>
+                        <p class="text-xs text-gray-400">{{ $invoice->invoice_date->format('Y-m-d') }}</p>
+                    </td>
+                    <td class="px-4 py-3 hidden md:table-cell text-gray-600">{{ $invoice->client?->full_name }}</td>
+                    <td class="px-4 py-3 hidden lg:table-cell text-gray-600">{{ $invoice->project?->name ?? '-' }}</td>
+                    <td class="px-4 py-3 hidden lg:table-cell font-medium privacy-mask">{{ number_format($invoice->total, 2) }}</td>
+                    <td class="px-4 py-3 hidden xl:table-cell font-medium text-red-600 privacy-mask">{{ number_format($invoice->remaining_amount, 2) }}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-{{ $sc }}-100 text-{{ $sc }}-700">{{ __('finance.status_'.$invoice->payment_status) }}</span>
+                    </td>
+                    <td class="px-5 py-3 text-end">
+                        <div class="flex items-center justify-end gap-1">
+                            <a href="{{ route('invoices.show', $invoice) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></a>
+                            @if($trashed)
+                            <form action="{{ route('invoices.restore', $invoice) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="{{ __('messages.restore') }}">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                            </form>
+                            @else
+                            <a href="{{ route('invoices.edit', $invoice) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
+                            <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" onsubmit="return confirmDelete(this)">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
+                            </form>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="8" class="py-16 text-center text-gray-400">
+                    <i class="fas fa-file-invoice text-5xl mb-3 block text-gray-200"></i>
+                    {{ __('finance.no_invoices') }}
+                </td></tr>
+                @endforelse
+            </tbody>
+        </table>
+        @if($invoices->hasPages())
+        <div class="px-5 py-4 border-t">{{ $invoices->links() }}</div>
+        @endif
+    </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function bulkActions(url, confirmMsg) {
+    return {
+        selected: [],
+        toggleAll(event, ids) {
+            if (event.target.checked) {
+                this.selected = [...new Set([...this.selected, ...ids])];
+            } else {
+                this.selected = this.selected.filter(id => !ids.includes(id));
+            }
+        },
+        allSelected(ids) {
+            if (!ids.length) return false;
+            return ids.every(id => this.selected.includes(id));
+        },
+        clearSelection() {
+            this.selected = [];
+        },
+        async submitDelete() {
+            if (!this.selected.length) return;
+            if (!confirm(confirmMsg)) return;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ ids: this.selected })
+                });
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    alert('{{ __('messages.operation_failed') }}');
+                }
+            } catch (e) {
+                alert('{{ __('messages.operation_failed') }}');
+            }
+        }
+    }
+}
+</script>
+@endpush

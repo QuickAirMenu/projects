@@ -1,0 +1,59 @@
+name: Deploy to Production
+
+on:
+  workflow_run:
+    workflows: ["Run Tests"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: mbstring, dom, fileinfo, mysql, pdo, gd
+          coverage: none
+
+      - name: Install composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Deploy via rsync over SSH
+        uses: easingthemes/ssh-deploy@v4
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_PORT: ${{ secrets.SSH_PORT }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: ${{ secrets.SSH_PATH }}
+          SOURCE: .
+          ARGS: -avz --delete --include='public/build/***' --include='resources/views/***' --include='resources/lang/***' --include='resources/css/***' --include='resources/js/***' --include='app/***' --include='routes/***' --include='config/***' --include='composer.json' --include='composer.lock' --exclude='*'
+
+      - name: SSH and run deploy commands
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.SSH_PATH }}
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan optimize:clear
+            php artisan optimize

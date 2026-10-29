@@ -169,6 +169,12 @@ class Task extends Model
         return $query->where('is_blocked', true);
     }
 
+    public function scopeVisibleTo($query, \App\Models\User $user)
+    {
+        if ($user->hasAnyRole(['super-admin', 'admin', 'finance'])) return $query;
+        return $query->where('assigned_to', $user->id);
+    }
+
     /**
      * Accessors
      */

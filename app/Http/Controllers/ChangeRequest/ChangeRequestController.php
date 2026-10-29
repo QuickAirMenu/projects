@@ -16,6 +16,8 @@ class ChangeRequestController extends Controller
 
     public function index(Request $request)
     {
+        abort_unless(Auth::user()->can('view-change-requests'), 403);
+
         $query = ChangeRequest::with(['project', 'project.client', 'creator', 'approver'])
             ->latest();
 
@@ -37,12 +39,16 @@ class ChangeRequestController extends Controller
 
     public function create()
     {
+        abort_unless(Auth::user()->can('create-change-requests'), 403);
+
         $projects = Project::orderBy('name')->get();
         return view('change-requests.create', compact('projects'));
     }
 
     public function store(StoreChangeRequestRequest $request)
     {
+        abort_unless(Auth::user()->can('create-change-requests'), 403);
+
         $this->changeRequestService->create($request->validated());
 
         return redirect()->route('change-requests.index')
@@ -51,6 +57,8 @@ class ChangeRequestController extends Controller
 
     public function show(ChangeRequest $changeRequest)
     {
+        abort_unless(Auth::user()->can('view-change-requests'), 403);
+
         $changeRequest->load(['project', 'project.client', 'creator', 'approver']);
         return view('change-requests.show', compact('changeRequest'));
     }

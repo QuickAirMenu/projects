@@ -34,8 +34,18 @@
                            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.job_level') }}</label>
+                    <select name="job_level" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- {{ __('messages.select') }} --</option>
+                        @foreach(\App\Models\User::JOB_LEVELS as $key => $label)
+                            <option value="{{ $key }}" {{ old('job_level', $user->job_level) == $key ? 'selected' : '' }}>{{ __('users.level_' . $key) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.job_title') }}</label>
                     <input type="text" name="job_title" value="{{ old('job_title', $user->job_title) }}"
+                           placeholder="{{ __('users.job_title_placeholder') }}"
                            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
@@ -47,8 +57,13 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.avatar') }}</label>
-                    <input type="file" name="avatar" accept="image/*"
-                           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden flex-shrink-0">
+                            <img id="avatarPreview" src="{{ $user->avatar_url }}" alt="Avatar" class="w-full h-full object-cover">
+                        </div>
+                        <input type="file" name="avatar" accept="image/*" onchange="previewImage(this, 'avatarPreview')"
+                               class="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                 </div>
             </div>
             <div class="mt-5">
