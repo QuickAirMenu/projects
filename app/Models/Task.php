@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Task extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -64,7 +64,6 @@ class Task extends Model
     /**
      * Relationships
      */
-    
     public function project()
     {
         return $this->belongsTo(Project::class);
@@ -120,7 +119,6 @@ class Task extends Model
     /**
      * Scopes
      */
-    
     public function scopeMainTasks($query)
     {
         return $query->whereNull('parent_task_id');
@@ -149,7 +147,7 @@ class Task extends Model
     public function scopeOverdue($query)
     {
         return $query->where('due_date', '<', now())
-            ->whereHas('status', function($q) {
+            ->whereHas('status', function ($q) {
                 $q->where('slug', '!=', 'done');
             });
     }
@@ -169,19 +167,21 @@ class Task extends Model
         return $query->where('is_blocked', true);
     }
 
-    public function scopeVisibleTo($query, \App\Models\User $user)
+    public function scopeVisibleTo($query, User $user)
     {
-        if ($user->hasAnyRole(['super-admin', 'admin', 'finance'])) return $query;
+        if ($user->hasAnyRole(['super-admin', 'admin', 'finance'])) {
+            return $query;
+        }
+
         return $query->where('assigned_to', $user->id);
     }
 
     /**
      * Accessors
      */
-    
     public function getIsOverdueAttribute()
     {
-        if (!$this->due_date || $this->status->slug === 'done') {
+        if (! $this->due_date || $this->status->slug === 'done') {
             return false;
         }
 
@@ -198,6 +198,7 @@ class Task extends Model
         if ($this->relationLoaded('checklists')) {
             return $this->checklists->where('is_completed', true)->count();
         }
+
         return $this->checklists()->where('is_completed', true)->count();
     }
 
@@ -206,6 +207,7 @@ class Task extends Model
         if ($this->relationLoaded('checklists')) {
             return $this->checklists->count();
         }
+
         return $this->checklists()->count();
     }
 
@@ -224,6 +226,7 @@ class Task extends Model
         if ($this->relationLoaded('timeLogs')) {
             return $this->timeLogs->sum('hours');
         }
+
         return $this->timeLogs()->sum('hours');
     }
 }

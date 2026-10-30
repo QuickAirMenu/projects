@@ -13,7 +13,6 @@ use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\ServiceType;
 use App\Models\ServiceTypeItem;
-use App\Models\Task;
 use App\Models\TaskChecklist;
 use App\Models\TaskComment;
 use App\Models\TimeLog;
@@ -26,10 +25,10 @@ class DemoBusinessSeeder extends Seeder
     {
         $this->dedupeSeedData();
 
-        $admin = User::whereHas('roles', fn($q) => $q->where('name', 'super-admin'))->first()
-            ?? User::whereHas('roles', fn($q) => $q->where('name', 'admin'))->first();
-        $finance = User::whereHas('roles', fn($q) => $q->where('name', 'finance'))->first() ?? $admin;
-        $member = User::whereHas('roles', fn($q) => $q->where('name', 'team-member'))->first() ?? $admin;
+        $admin = User::whereHas('roles', fn ($q) => $q->where('name', 'super-admin'))->first()
+            ?? User::whereHas('roles', fn ($q) => $q->where('name', 'admin'))->first();
+        $finance = User::whereHas('roles', fn ($q) => $q->where('name', 'finance'))->first() ?? $admin;
+        $member = User::whereHas('roles', fn ($q) => $q->where('name', 'team-member'))->first() ?? $admin;
 
         $clients = Client::orderBy('id')->take(4)->get();
         $projects = Project::with(['client', 'tasks.status'])->orderBy('id')->take(4)->get();
@@ -78,12 +77,13 @@ class DemoBusinessSeeder extends Seeder
         }
 
         $rows = $query->orderBy('id')->get();
-        $grouped = $rows->groupBy(fn($row) => implode('|', array_map(fn($column) => (string) $row->{$column}, $columns)));
+        $grouped = $rows->groupBy(fn ($row) => implode('|', array_map(fn ($column) => (string) $row->{$column}, $columns)));
 
         foreach ($grouped as $group) {
             $group->skip(1)->each(function ($row) {
                 if (method_exists($row, 'forceDelete')) {
                     $row->forceDelete();
+
                     return;
                 }
 
@@ -269,7 +269,7 @@ class DemoBusinessSeeder extends Seeder
                     'amount' => $paidAmount,
                     'payment_date' => now()->subDays(2)->toDateString(),
                     'payment_method' => 'bank_transfer',
-                    'transaction_reference' => 'DEMO-' . $invoice->id,
+                    'transaction_reference' => 'DEMO-'.$invoice->id,
                     'notes' => 'Demo payment',
                     'received_by' => $receiver?->id ?? $creator?->id ?? 1,
                 ]);
@@ -291,7 +291,7 @@ class DemoBusinessSeeder extends Seeder
                         'project_id' => $project->id,
                         'client_id' => $project->client_id,
                         'invoice_id' => null,
-                        'title' => 'عقد خدمة مرتبط بالمشروع ' . $project->name,
+                        'title' => 'عقد خدمة مرتبط بالمشروع '.$project->name,
                         'description' => 'عقد تجريبي يوضح الربط بين المشروع والعقد.',
                         'start_date' => now()->subDays(3 + $index)->toDateString(),
                         'end_date' => now()->addMonths(2 + $index)->toDateString(),
@@ -317,7 +317,7 @@ class DemoBusinessSeeder extends Seeder
                     'project_id' => $invoice->project_id,
                     'client_id' => $invoice->client_id,
                     'invoice_id' => $invoice->id,
-                    'title' => 'عقد خدمة مرتبط بالفاتورة ' . $invoice->invoice_number,
+                    'title' => 'عقد خدمة مرتبط بالفاتورة '.$invoice->invoice_number,
                     'description' => 'عقد تجريبي يوضح الربط بين الفاتورة والعقد.',
                     'start_date' => now()->subDays(3 + $index)->toDateString(),
                     'end_date' => now()->addMonths(2 + $index)->toDateString(),
@@ -429,7 +429,7 @@ class DemoBusinessSeeder extends Seeder
 
         foreach ($templates as $index => $items) {
             $serviceType = $serviceTypes[$index] ?? null;
-            if (!$serviceType) {
+            if (! $serviceType) {
                 continue;
             }
 

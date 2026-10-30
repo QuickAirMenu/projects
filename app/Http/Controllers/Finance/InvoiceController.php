@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StoreInvoiceRequest;
 use App\Models\Client;
-use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\Quote;
 use App\Models\Setting;
-use Mpdf\Mpdf;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
+use Mpdf\Mpdf;
 
 class InvoiceController extends Controller
 {
@@ -22,22 +21,31 @@ class InvoiceController extends Controller
     {
         $this->authorize('viewAny', Invoice::class);
 
-        $query = Invoice::with(['client','project'])->latest();
-        if ($request->payment_status) $query->where('payment_status', $request->payment_status);
-        if ($request->client_id)      $query->where('client_id', $request->client_id);
-        if ($request->invoice_type)   $query->where('invoice_type', $request->invoice_type);
-        if ($request->trashed) $query->onlyTrashed();
+        $query = Invoice::with(['client', 'project'])->latest();
+        if ($request->payment_status) {
+            $query->where('payment_status', $request->payment_status);
+        }
+        if ($request->client_id) {
+            $query->where('client_id', $request->client_id);
+        }
+        if ($request->invoice_type) {
+            $query->where('invoice_type', $request->invoice_type);
+        }
+        if ($request->trashed) {
+            $query->onlyTrashed();
+        }
 
         $invoices = $query->paginate(15)->withQueryString();
-        $clients  = Client::orderBy('name')->get();
-        $stats    = [
+        $clients = Client::orderBy('name')->get();
+        $stats = [
             'total_invoiced' => Invoice::sum('total'),
-            'total_paid'     => Invoice::sum('paid_amount'),
-            'unpaid'         => Invoice::where('payment_status','unpaid')->sum('remaining_amount'),
-            'overdue'        => Invoice::where('payment_status','overdue')->count(),
+            'total_paid' => Invoice::sum('paid_amount'),
+            'unpaid' => Invoice::where('payment_status', 'unpaid')->sum('remaining_amount'),
+            'overdue' => Invoice::where('payment_status', 'overdue')->count(),
         ];
         $trashed = $request->has('trashed');
-        return view('finance.invoices.index', compact('invoices','clients','stats','trashed'));
+
+        return view('finance.invoices.index', compact('invoices', 'clients', 'stats', 'trashed'));
     }
 
     public function create()
@@ -45,7 +53,7 @@ class InvoiceController extends Controller
         $this->authorize('create', Invoice::class);
 
         $projects = Project::with('client')->orderBy('name')->get();
-        $clients  = Client::orderBy('name')->get();
+        $clients = Client::orderBy('name')->get();
         $availableQuotes = collect();
 
         $prefillData = null;
@@ -55,7 +63,7 @@ class InvoiceController extends Controller
                 'quote' => $quote,
                 'client_id' => request('client_id', $quote->client_id),
                 'description' => request('description', $quote->subject),
-                'items' => $quote->items->map(fn($item) => [
+                'items' => $quote->items->map(fn ($item) => [
                     'description' => $item->description,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
@@ -82,7 +90,7 @@ class InvoiceController extends Controller
             }
 
             if ($quote && $quote->items->count()) {
-                $prefillData['items'] = $quote->items->map(fn($item) => [
+                $prefillData['items'] = $quote->items->map(fn ($item) => [
                     'description' => $item->description,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
@@ -90,7 +98,7 @@ class InvoiceController extends Controller
             }
         }
 
-        return view('finance.invoices.create', compact('projects','clients','prefillData', 'availableQuotes'));
+        return view('finance.invoices.create', compact('projects', 'clients', 'prefillData', 'availableQuotes'));
     }
 
     public function store(StoreInvoiceRequest $request)
@@ -98,6 +106,7 @@ class InvoiceController extends Controller
         $this->authorize('create', Invoice::class);
 
         $invoice = $this->invoiceService->createInvoice($request->validated());
+
         return redirect()->route('invoices.show', $invoice)
             ->with('success', __('messages.created_successfully'));
     }
@@ -106,7 +115,8 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', $invoice);
 
-        $invoice->load(['client','project','items','payments','contract']);
+        $invoice->load(['client', 'project', 'items', 'payments', 'contract']);
+
         return view('finance.invoices.show', compact('invoice'));
     }
 
@@ -115,7 +125,7 @@ class InvoiceController extends Controller
         $this->authorize('view', $invoice);
 
         $invoice->load(['client', 'project', 'items', 'createdBy']);
-        $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
+        $settings = Setting::whereIn('key', ['company_name', 'company_name_ar', 'company_logo', 'company_email', 'company_phone', 'company_address', 'currency_symbol'])
             ->pluck('value', 'key')
             ->toArray();
 
@@ -128,6 +138,7 @@ class InvoiceController extends Controller
         ]);
         $html = view('pdf.invoice', compact('invoice', 'settings'))->render();
         $mpdf->WriteHTML($html);
+
         return response($mpdf->Output("invoice-{$invoice->invoice_number}.pdf", 'S'), 200)
             ->header('Content-Type', 'application/pdf');
     }
@@ -138,8 +149,9 @@ class InvoiceController extends Controller
 
         $invoice->load('items');
         $projects = Project::orderBy('name')->get();
-        $clients  = Client::orderBy('name')->get();
-        return view('finance.invoices.create', compact('invoice','projects','clients'));
+        $clients = Client::orderBy('name')->get();
+
+        return view('finance.invoices.create', compact('invoice', 'projects', 'clients'));
     }
 
     public function update(StoreInvoiceRequest $request, Invoice $invoice)
@@ -157,6 +169,7 @@ class InvoiceController extends Controller
         $this->authorize('delete', $invoice);
 
         $invoice->delete();
+
         return redirect()->route('invoices.index')
             ->with('success', __('messages.deleted_successfully'));
     }
@@ -166,6 +179,7 @@ class InvoiceController extends Controller
         $this->authorize('update', $invoice);
 
         $invoice->restore();
+
         return redirect()->route('invoices.index')->with('success', __('messages.restored_successfully'));
     }
 

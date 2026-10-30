@@ -1,4 +1,8 @@
 <?php
+
+use App\Models\ClientPortalAccount;
+use App\Models\User;
+
 return [
     'defaults' => ['guard' => 'web', 'passwords' => 'users'],
     'guards' => [
@@ -10,10 +14,10 @@ return [
         ],
     ],
     'providers' => [
-        'users' => ['driver' => 'eloquent', 'model' => App\Models\User::class],
+        'users' => ['driver' => 'eloquent', 'model' => User::class],
         'clients_portal' => [
             'driver' => 'eloquent',
-            'model' => App\Models\ClientPortalAccount::class,
+            'model' => ClientPortalAccount::class,
         ],
     ],
     'passwords' => [

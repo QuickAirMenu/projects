@@ -29,7 +29,7 @@ return new class extends Migration
             $table->text('rejection_reason')->nullable();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
-            
+
             // Indexes
             $table->index('request_number');
             $table->index('project_id');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Mail\UserInvitationMail;
 use App\Models\User;
+use App\Services\MailConfigService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -22,42 +23,50 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $query = User::with('roles')->latest();
-        if ($request->search) $query->where(fn($q) => $q->where('name','like',"%{$request->search}%")->orWhere('email','like',"%{$request->search}%"));
-        if ($request->role)   $query->whereHas('roles', fn($q) => $q->where('name', $request->role));
-        if ($request->has('status')) $query->where('is_active', $request->status);
+        if ($request->search) {
+            $query->where(fn ($q) => $q->where('name', 'like', "%{$request->search}%")->orWhere('email', 'like', "%{$request->search}%"));
+        }
+        if ($request->role) {
+            $query->whereHas('roles', fn ($q) => $q->where('name', $request->role));
+        }
+        if ($request->has('status')) {
+            $query->where('is_active', $request->status);
+        }
         $users = $query->paginate(15)->withQueryString();
         $roles = Role::all();
-        return view('users.index', compact('users','roles'));
+
+        return view('users.index', compact('users', 'roles'));
     }
 
     public function create()
     {
         $roles = Role::all();
+
         return view('users.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name'       => 'required|string|max:255',
-            'email'      => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
-            'job_title'  => 'nullable|string|max:100',
-            'job_level'  => 'nullable|in:' . implode(',', array_keys(User::JOB_LEVELS)),
-            'phone'      => 'nullable|string|max:20',
-            'role'       => 'required|exists:roles,name',
-            'language'   => 'nullable|in:ar,en',
-            'send_invite'=> 'nullable|boolean',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
+            'job_title' => 'nullable|string|max:100',
+            'job_level' => 'nullable|in:'.implode(',', array_keys(User::JOB_LEVELS)),
+            'phone' => 'nullable|string|max:20',
+            'role' => 'required|exists:roles,name',
+            'language' => 'nullable|in:ar,en',
+            'send_invite' => 'nullable|boolean',
         ]);
 
         $user = User::create([
-            'name'       => $request->name,
-            'email'      => $request->email,
-            'password'   => Hash::make(Str::random(32)),
-            'job_title'  => $request->job_title,
-            'job_level'  => $request->job_level,
-            'phone'      => $request->phone,
-            'language'   => $request->language ?? 'ar',
-            'is_active'  => true,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make(Str::random(32)),
+            'job_title' => $request->job_title,
+            'job_level' => $request->job_level,
+            'phone' => $request->phone,
+            'language' => $request->language ?? 'ar',
+            'is_active' => true,
         ]);
         $user->assignRole($request->role);
 
@@ -69,14 +78,14 @@ class UserController extends Controller
             ]);
 
             try {
-                app(\App\Services\MailConfigService::class)->applyDynamicMailConfig();
+                app(MailConfigService::class)->applyDynamicMailConfig();
                 if (config('mail.mailers.smtp.host')) {
                     Mail::to($user->email)->send(
                         new UserInvitationMail($user, route('invitation.setup', $token))
                     );
                 }
             } catch (\Throwable $e) {
-                Log::error('User invitation email failed: ' . $e->getMessage());
+                Log::error('User invitation email failed: '.$e->getMessage());
             }
         }
 
@@ -89,29 +98,33 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load('roles');
+
         return view('users.show', compact('user'));
     }
 
     public function edit(User $user)
     {
         $roles = Role::all();
-        return view('users.edit', compact('user','roles'));
+
+        return view('users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users,email,'.$user->id,
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'job_title' => 'nullable|string|max:100',
-            'job_level' => 'nullable|in:' . implode(',', array_keys(User::JOB_LEVELS)),
-            'phone'     => 'nullable|string|max:20',
-            'role'      => 'required|exists:roles,name',
-            'language'  => 'nullable|in:ar,en',
+            'job_level' => 'nullable|in:'.implode(',', array_keys(User::JOB_LEVELS)),
+            'phone' => 'nullable|string|max:20',
+            'role' => 'required|exists:roles,name',
+            'language' => 'nullable|in:ar,en',
         ]);
 
-        $user->update($request->only(['name','email','job_title','job_level','phone','language']));
-        if ($request->password) $user->update(['password' => Hash::make($request->password)]);
+        $user->update($request->only(['name', 'email', 'job_title', 'job_level', 'phone', 'language']));
+        if ($request->password) {
+            $user->update(['password' => Hash::make($request->password)]);
+        }
         $user->syncRoles([$request->role]);
 
         return redirect()->route('users.index')
@@ -120,8 +133,11 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->id === auth()->id()) return back()->with('error', __('messages.cannot_delete_self'));
+        if ($user->id === auth()->id()) {
+            return back()->with('error', __('messages.cannot_delete_self'));
+        }
         $user->delete();
+
         return redirect()->route('users.index')->with('success', __('messages.deleted_successfully'));
     }
 
@@ -138,14 +154,14 @@ class UserController extends Controller
         ]);
 
         try {
-            app(\App\Services\MailConfigService::class)->applyDynamicMailConfig();
+            app(MailConfigService::class)->applyDynamicMailConfig();
             if (config('mail.mailers.smtp.host')) {
                 Mail::to($user->email)->send(
                     new UserInvitationMail($user, route('invitation.setup', $token))
                 );
             }
         } catch (\Throwable $e) {
-            Log::error('User invitation resend failed: ' . $e->getMessage());
+            Log::error('User invitation resend failed: '.$e->getMessage());
         }
 
         return back()->with('success', __('users.invite_resent'));
@@ -153,7 +169,8 @@ class UserController extends Controller
 
     public function toggleStatus(User $user)
     {
-        $user->update(['is_active' => !$user->is_active]);
+        $user->update(['is_active' => ! $user->is_active]);
+
         return redirect()->route('users.index')
             ->with('success', $user->is_active ? __('users.user_activated') : __('users.user_deactivated'));
     }

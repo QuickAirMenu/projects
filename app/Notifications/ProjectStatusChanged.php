@@ -12,17 +12,20 @@ class ProjectStatusChanged extends Notification
 
     public function __construct(public Project $project, public mixed $oldStatusId) {}
 
-    public function via(object $notifiable): array { return ['database']; }
+    public function via(object $notifiable): array
+    {
+        return ['database'];
+    }
 
     public function toArray(object $notifiable): array
     {
         return [
-            'type'    => 'project_status_changed',
-            'title'   => __('notifications.project_status_changed'),
+            'type' => 'project_status_changed',
+            'title' => __('notifications.project_status_changed'),
             'message' => __('notifications.project_status_msg', ['project' => $this->project->name]),
-            'url'     => route('projects.show', $this->project->id),
-            'icon'    => 'fa-folder',
-            'color'   => 'purple',
+            'url' => route('projects.show', $this->project->id),
+            'icon' => 'fa-folder',
+            'color' => 'purple',
         ];
     }
 }

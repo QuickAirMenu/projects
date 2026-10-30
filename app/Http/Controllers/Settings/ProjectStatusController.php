@@ -11,19 +11,20 @@ class ProjectStatusController extends Controller
     public function index()
     {
         $statuses = ProjectStatus::orderBy('sort_order')->get();
+
         return view('settings.project-statuses', compact('statuses'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name_ar'    => 'required|string|max:100',
-            'name_en'    => 'required|string|max:100',
-            'slug'       => 'required|string|max:100|unique:project_statuses,slug',
-            'color'      => 'required|string|max:7',
-            'icon'       => 'nullable|string|max:50',
+            'name_ar' => 'required|string|max:100',
+            'name_en' => 'required|string|max:100',
+            'slug' => 'required|string|max:100|unique:project_statuses,slug',
+            'color' => 'required|string|max:7',
+            'icon' => 'nullable|string|max:50',
             'sort_order' => 'nullable|integer',
-            'is_active'  => 'boolean',
+            'is_active' => 'boolean',
         ]);
 
         ProjectStatus::create($data);
@@ -37,8 +38,8 @@ class ProjectStatusController extends Controller
         $data = $request->validate([
             'name_ar' => 'required|string|max:100',
             'name_en' => 'required|string|max:100',
-            'color'   => 'required|string|max:7',
-            'icon'    => 'nullable|string|max:50',
+            'color' => 'required|string|max:7',
+            'icon' => 'nullable|string|max:50',
             'sort_order' => 'nullable|integer',
             'is_active' => 'boolean',
         ]);
@@ -52,6 +53,7 @@ class ProjectStatusController extends Controller
     public function destroy(ProjectStatus $projectStatus)
     {
         $projectStatus->delete();
+
         return redirect()->route('settings.project-statuses.index')
             ->with('success', __('common.deleted_successfully'));
     }

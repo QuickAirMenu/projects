@@ -2,9 +2,9 @@ name: Run Tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, master, staging]
   pull_request:
-    branches: [main]
+    branches: [main, master, staging]
 
 jobs:
   tests:
@@ -45,6 +45,12 @@ jobs:
 
       - name: Build assets
         run: npm run build
+
+      - name: Run Pint
+        run: ./vendor/bin/pint --test
+
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyse --no-progress
 
       - name: Run tests
         run: php artisan test

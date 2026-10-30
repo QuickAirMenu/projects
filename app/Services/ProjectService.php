@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Project;
-use App\Models\ProjectWorkflowStep;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -36,20 +35,20 @@ class ProjectService
             $teamMembers = $data['team_members'] ?? [];
             unset($data['team_members']);
 
-            $data['created_by']     = Auth::id();
+            $data['created_by'] = Auth::id();
             $data['project_number'] = $this->generateProjectNumber();
 
             $project = Project::create($data);
 
             // Attach team members
-            if (!empty($teamMembers)) {
+            if (! empty($teamMembers)) {
                 $project->teamMembers()->sync($teamMembers);
             }
 
             // Create default workflow steps
             foreach ($this->defaultWorkflowSteps as $order => $step) {
                 $project->workflowSteps()->create([
-                    'step_name'  => app()->getLocale() === 'ar' ? $step['name_ar'] : $step['name_en'],
+                    'step_name' => app()->getLocale() === 'ar' ? $step['name_ar'] : $step['name_en'],
                     'step_order' => $order + 1,
                 ]);
             }
@@ -78,31 +77,31 @@ class ProjectService
     }
 
     /**
+     * Calculate and update project progress based on task completion.
+     */
+    public function recalculateProgress(Project $project): void
+    {
+        $total = $project->tasks()->whereNull('parent_task_id')->count();
+        $completed = $project->tasks()->whereNull('parent_task_id')
+            ->whereHas('status', fn ($q) => $q->where('slug', 'done'))
+            ->count();
+
+        $percentage = $total > 0 ? round(($completed / $total) * 100) : 0;
+        $project->update(['progress_percentage' => $percentage]);
+    }
+
+    /**
      * Generate unique project number: PRJ-YYYYMM-XXXX.
      */
     protected function generateProjectNumber(): string
     {
-        $prefix = 'PRJ-' . date('Ym') . '-';
-        $last   = Project::withTrashed()->where('project_number', 'like', $prefix . '%')
+        $prefix = 'PRJ-'.date('Ym').'-';
+        $last = Project::withTrashed()->where('project_number', 'like', $prefix.'%')
             ->orderByDesc('project_number')
             ->first();
 
         $seq = $last ? (int) substr($last->project_number, -4) + 1 : 1;
 
-        return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
-    }
-
-    /**
-     * Calculate and update project progress based on task completion.
-     */
-    public function recalculateProgress(Project $project): void
-    {
-        $total     = $project->tasks()->whereNull('parent_task_id')->count();
-        $completed = $project->tasks()->whereNull('parent_task_id')
-            ->whereHas('status', fn($q) => $q->where('slug', 'done'))
-            ->count();
-
-        $percentage = $total > 0 ? round(($completed / $total) * 100) : 0;
-        $project->update(['progress_percentage' => $percentage]);
+        return $prefix.str_pad($seq, 4, '0', STR_PAD_LEFT);
     }
 }

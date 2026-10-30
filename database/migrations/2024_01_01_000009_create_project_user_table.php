@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('role', 50)->nullable()->comment('designer, developer, content writer, etc.');
             $table->timestamp('assigned_at')->useCurrent();
             $table->timestamps();
-            
+
             // Unique constraint
             $table->unique(['project_id', 'user_id']);
-            
+
             // Indexes
             $table->index('project_id');
             $table->index('user_id');

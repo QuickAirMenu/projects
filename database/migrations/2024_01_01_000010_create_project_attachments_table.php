@@ -21,7 +21,7 @@ return new class extends Migration
             $table->bigInteger('file_size')->comment('in bytes');
             $table->text('description')->nullable();
             $table->timestamps();
-            
+
             // Indexes
             $table->index('project_id');
             $table->index('uploaded_by');

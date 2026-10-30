@@ -7,9 +7,9 @@ use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Mail\ProjectHandoffMail;
 use App\Models\Client;
-use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\ProjectStatus;
+use App\Models\Quote;
 use App\Models\ServiceType;
 use App\Models\Task;
 use App\Models\User;
@@ -29,14 +29,20 @@ class ProjectController extends Controller
         $query = Project::with(['client', 'status', 'manager', 'serviceType'])->latest();
 
         if ($request->search) {
-            $query->where(fn($q) => $q
+            $query->where(fn ($q) => $q
                 ->where('name', 'like', "%{$request->search}%")
                 ->orWhere('project_number', 'like', "%{$request->search}%")
             );
         }
-        if ($request->status_id) $query->where('status_id', $request->status_id);
-        if ($request->priority)   $query->where('priority', $request->priority);
-        if ($request->client_id)  $query->where('client_id', $request->client_id);
+        if ($request->status_id) {
+            $query->where('status_id', $request->status_id);
+        }
+        if ($request->priority) {
+            $query->where('priority', $request->priority);
+        }
+        if ($request->client_id) {
+            $query->where('client_id', $request->client_id);
+        }
 
         $showArchived = $request->has('archived') && $request->archived == '1';
         if ($showArchived) {
@@ -48,16 +54,16 @@ class ProjectController extends Controller
         // Scope by role
         $query->visibleTo(auth()->user());
 
-        $projects  = $query->paginate(15)->withQueryString();
-        $statuses  = ProjectStatus::where('is_active', true)->orderBy('sort_order')->get();
-        $clients   = Client::orderBy('name')->get();
+        $projects = $query->paginate(15)->withQueryString();
+        $statuses = ProjectStatus::where('is_active', true)->orderBy('sort_order')->get();
+        $clients = Client::orderBy('name')->get();
 
         $stats = [
-            'total'     => Project::count(),
-            'active'    => Project::whereHas('status', fn($q) => $q->whereIn('slug', ['in-progress','sent-to-client','revisions']))->count(),
-            'overdue'   => Project::where('deadline', '<', now())->whereHas('status', fn($q) => $q->whereNotIn('slug', ['completed','closed','cancelled']))->count(),
-            'completed' => Project::whereHas('status', fn($q) => $q->where('slug', 'completed'))->count(),
-            'archived'  => Project::where('is_archived', true)->count(),
+            'total' => Project::count(),
+            'active' => Project::whereHas('status', fn ($q) => $q->whereIn('slug', ['in-progress', 'sent-to-client', 'revisions']))->count(),
+            'overdue' => Project::where('deadline', '<', now())->whereHas('status', fn ($q) => $q->whereNotIn('slug', ['completed', 'closed', 'cancelled']))->count(),
+            'completed' => Project::whereHas('status', fn ($q) => $q->where('slug', 'completed'))->count(),
+            'archived' => Project::where('is_archived', true)->count(),
         ];
 
         return view('projects.index', compact('projects', 'statuses', 'clients', 'stats', 'showArchived'));
@@ -67,15 +73,15 @@ class ProjectController extends Controller
     {
         $this->authorize('create', Project::class);
 
-        $clients      = Client::where('status', '!=', 'inactive')->orderBy('name')->get();
-        $statuses     = ProjectStatus::where('is_active', true)->orderBy('sort_order')->get();
+        $clients = Client::where('status', '!=', 'inactive')->orderBy('name')->get();
+        $statuses = ProjectStatus::where('is_active', true)->orderBy('sort_order')->get();
         $serviceTypes = ServiceType::where('is_active', true)->orderBy('sort_order')->get();
-        $managers     = User::where('is_active', true)->whereHas('roles', fn($q) => $q->whereIn('name', ['super-admin','admin','project-manager']))->orderBy('name')->get();
-        $teamMembers  = User::where('is_active', true)->orderBy('name')->get();
+        $managers = User::where('is_active', true)->whereHas('roles', fn ($q) => $q->whereIn('name', ['super-admin', 'admin', 'project-manager']))->orderBy('name')->get();
+        $teamMembers = User::where('is_active', true)->orderBy('name')->get();
 
         $sourceQuote = null;
         if (request()->filled('quote_id')) {
-            $sourceQuote = \App\Models\Quote::with('client')->find(request('quote_id'));
+            $sourceQuote = Quote::with('client')->find(request('quote_id'));
         }
 
         return view('projects.create', compact('clients', 'statuses', 'serviceTypes', 'managers', 'teamMembers', 'sourceQuote'));
@@ -88,8 +94,8 @@ class ProjectController extends Controller
         $project = $this->projectService->createProject($request->validated());
 
         if ($request->filled('source_quote_id')) {
-            $quote = \App\Models\Quote::find($request->input('source_quote_id'));
-            if ($quote && !$quote->converted_to_project_id) {
+            $quote = Quote::find($request->input('source_quote_id'));
+            if ($quote && ! $quote->converted_to_project_id) {
                 $quote->update(['converted_to_project_id' => $project->id]);
             }
         }
@@ -101,7 +107,7 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         $this->authorize('view', $project);
-        $project->load(['client','status','serviceType','manager','teamMembers','attachments.uploadedBy','invoices']);
+        $project->load(['client', 'status', 'serviceType', 'manager', 'teamMembers', 'attachments.uploadedBy', 'invoices']);
         $project->setRelation('rootTasks', $project->tasks()
             ->whereNull('parent_task_id')
             ->with(['status', 'assignedUser'])
@@ -111,26 +117,28 @@ class ProjectController extends Controller
         $project->setRelation('workflowSteps', $project->workflowSteps()
             ->orderBy('step_order')
             ->get());
+
         return view('projects.show', compact('project'));
     }
 
     public function edit(Project $project)
     {
         $this->authorize('update', $project);
-        $clients      = Client::orderBy('name')->get();
-        $statuses     = ProjectStatus::where('is_active', true)->orderBy('sort_order')->get();
+        $clients = Client::orderBy('name')->get();
+        $statuses = ProjectStatus::where('is_active', true)->orderBy('sort_order')->get();
         $serviceTypes = ServiceType::where('is_active', true)->orderBy('sort_order')->get();
-        $managers     = User::where('is_active', true)->whereHas('roles', fn($q) => $q->whereIn('name', ['super-admin','admin','project-manager']))->orderBy('name')->get();
-        $teamMembers  = User::where('is_active', true)->orderBy('name')->get();
+        $managers = User::where('is_active', true)->whereHas('roles', fn ($q) => $q->whereIn('name', ['super-admin', 'admin', 'project-manager']))->orderBy('name')->get();
+        $teamMembers = User::where('is_active', true)->orderBy('name')->get();
         $selectedTeam = $project->teamMembers->pluck('id')->toArray();
 
-        return view('projects.edit', compact('project','clients','statuses','serviceTypes','managers','teamMembers','selectedTeam'));
+        return view('projects.edit', compact('project', 'clients', 'statuses', 'serviceTypes', 'managers', 'teamMembers', 'selectedTeam'));
     }
 
     public function update(UpdateProjectRequest $request, Project $project)
     {
         $this->authorize('update', $project);
         $this->projectService->updateProject($project, $request->validated());
+
         return redirect()->route('projects.show', $project)
             ->with('success', __('messages.updated_successfully'));
     }
@@ -139,6 +147,7 @@ class ProjectController extends Controller
     {
         $this->authorize('delete', $project);
         $project->delete();
+
         return redirect()->route('projects.index')
             ->with('success', __('messages.deleted_successfully'));
     }
@@ -147,6 +156,7 @@ class ProjectController extends Controller
     {
         $this->authorize('update', $project);
         $project->update(['is_archived' => true, 'archived_at' => now()]);
+
         return back()->with('success', __('project.archived_success'));
     }
 
@@ -154,6 +164,7 @@ class ProjectController extends Controller
     {
         $this->authorize('update', $project);
         $project->update(['is_archived' => false, 'archived_at' => null]);
+
         return back()->with('success', __('project.unarchived_success'));
     }
 
@@ -227,6 +238,7 @@ class ProjectController extends Controller
         $this->authorize('viewAny', Project::class);
 
         $projects = Project::visibleTo(auth()->user())->orderBy('name')->get(['id', 'name']);
+
         return view('projects.calendar', compact('projects'));
     }
 
@@ -244,9 +256,9 @@ class ProjectController extends Controller
         $events = $tasks->map(function ($task) {
             $colors = [
                 'urgent' => '#ef4444',
-                'high'   => '#f97316',
+                'high' => '#f97316',
                 'medium' => '#3b82f6',
-                'low'    => '#6b7280',
+                'low' => '#6b7280',
             ];
             $color = $colors[$task->priority] ?? '#6b7280';
 
@@ -254,15 +266,15 @@ class ProjectController extends Controller
             $statusName = $locale === 'ar' ? ($task->status->name_ar ?? '') : ($task->status->name_en ?? '');
 
             return [
-                'id'      => (string) $task->id,
-                'title'   => $task->project->name . ' — ' . $task->title,
-                'start'   => $task->due_date->format('Y-m-d'),
-                'url'     => route('tasks.show', $task),
-                'color'   => $color,
+                'id' => (string) $task->id,
+                'title' => $task->project->name.' — '.$task->title,
+                'start' => $task->due_date->format('Y-m-d'),
+                'url' => route('tasks.show', $task),
+                'color' => $color,
                 'textColor' => '#ffffff',
                 'extendedProps' => [
-                    'project'  => $task->project->name,
-                    'status'   => $statusName,
+                    'project' => $task->project->name,
+                    'status' => $statusName,
                     'priority' => $task->priority,
                 ],
             ];
@@ -279,6 +291,7 @@ class ProjectController extends Controller
         }])->visibleTo($user);
 
         $projects = $query->get();
+
         return view('projects.timeline', compact('projects'));
     }
 }

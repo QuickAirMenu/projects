@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class UserInvitationController extends Controller
 {
@@ -21,7 +22,7 @@ class UserInvitationController extends Controller
     public function completeSetup(Request $request, string $token)
     {
         $request->validate([
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)],
+            'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
         $user = User::where('invitation_token', $token)

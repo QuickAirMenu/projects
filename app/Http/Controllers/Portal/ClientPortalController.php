@@ -35,16 +35,16 @@ class ClientPortalController extends Controller
         ]);
 
         $client = Client::where('email', $data['email'])->first();
-        if (!$client) {
+        if (! $client) {
             return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
         }
 
         $account = ClientPortalAccount::where('client_id', $client->id)->first();
-        if (!$account || !$account->is_active || !$account->email_verified_at) {
+        if (! $account || ! $account->is_active || ! $account->email_verified_at) {
             return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
         }
 
-        if (!Auth::guard('client')->attempt(['client_id' => $client->id, 'password' => $data['password']])) {
+        if (! Auth::guard('client')->attempt(['client_id' => $client->id, 'password' => $data['password']])) {
             return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
         }
 
@@ -144,7 +144,7 @@ class ClientPortalController extends Controller
 
         abort_unless($attachment->project->client_id === $portalAccount->client_id, 403);
 
-        if (!$attachment->file_path) {
+        if (! $attachment->file_path) {
             abort(404);
         }
 
@@ -164,7 +164,7 @@ class ClientPortalController extends Controller
 
         $invoices = Invoice::query()
             ->select(['id', 'project_id', 'invoice_number', 'invoice_date', 'total', 'remaining_amount', 'payment_status', 'due_date'])
-            ->whereHas('project', fn($q) => $q->where('client_id', $portalAccount->client_id))
+            ->whereHas('project', fn ($q) => $q->where('client_id', $portalAccount->client_id))
             ->with('project:id,name')
             ->latest()
             ->paginate(15);
@@ -182,7 +182,7 @@ class ClientPortalController extends Controller
         );
 
         $invoice->load(['client', 'project', 'items', 'createdBy']);
-        $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
+        $settings = Setting::whereIn('key', ['company_name', 'company_name_ar', 'company_logo', 'company_email', 'company_phone', 'company_address', 'currency_symbol'])
             ->pluck('value', 'key')
             ->toArray();
 
@@ -195,6 +195,7 @@ class ClientPortalController extends Controller
         ]);
         $html = view('pdf.invoice', compact('invoice', 'settings'))->render();
         $mpdf->WriteHTML($html);
+
         return response($mpdf->Output("invoice-{$invoice->invoice_number}.pdf", 'S'), 200)
             ->header('Content-Type', 'application/pdf');
     }
@@ -223,7 +224,7 @@ class ClientPortalController extends Controller
         abort_unless($quote->client_id === $portalAccount->client_id, 403);
 
         $quote->load(['client', 'items.serviceType', 'createdBy']);
-        $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
+        $settings = Setting::whereIn('key', ['company_name', 'company_name_ar', 'company_logo', 'company_email', 'company_phone', 'company_address', 'currency_symbol'])
             ->pluck('value', 'key')
             ->toArray();
 
@@ -237,6 +238,7 @@ class ClientPortalController extends Controller
         $html = view('pdf.quote', compact('quote', 'settings'))->render();
         $mpdf->WriteHTML($html);
         $filename = "quote-{$quote->quote_number}.pdf";
+
         return response($mpdf->Output($filename, 'S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
@@ -246,6 +248,7 @@ class ClientPortalController extends Controller
     {
         $portalAccount = Auth::guard('client')->user();
         $client = Client::findOrFail($portalAccount->client_id);
+
         return view('portal.profile', compact('client', 'portalAccount'));
     }
 
@@ -273,7 +276,7 @@ class ClientPortalController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        if (!Hash::check($data['current_password'], $portalAccount->password)) {
+        if (! Hash::check($data['current_password'], $portalAccount->password)) {
             return back()->withErrors(['current_password' => __('auth.password')])->onlyInput('current_password');
         }
 
@@ -294,12 +297,12 @@ class ClientPortalController extends Controller
         ]);
 
         $client = Client::where('email', $data['email'])->first();
-        if (!$client) {
+        if (! $client) {
             return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
         }
 
         $account = ClientPortalAccount::where('client_id', $client->id)->first();
-        if (!$account) {
+        if (! $account) {
             return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
         }
 
@@ -318,7 +321,7 @@ class ClientPortalController extends Controller
                 'client' => $client,
                 'token' => $token,
                 'settings' => $settings,
-            ], function ($message) use ($client, $settings) {
+            ], function ($message) use ($client) {
                 $message->to($client->email, $client->name)
                     ->subject(app()->isLocale('ar')
                         ? 'إعادة تعيين كلمة المرور - بوابة العميل'
@@ -366,7 +369,7 @@ class ClientPortalController extends Controller
 
         $payments = Payment::query()
             ->select(['id', 'invoice_id', 'payment_number', 'amount', 'payment_date', 'payment_method', 'transaction_reference', 'proof_file_path', 'proof_file_name', 'notes'])
-            ->whereHas('invoice.project', fn($q) => $q->where('client_id', $portalAccount->client_id))
+            ->whereHas('invoice.project', fn ($q) => $q->where('client_id', $portalAccount->client_id))
             ->with('invoice:id,invoice_number')
             ->latest()
             ->paginate(15);
@@ -383,13 +386,13 @@ class ClientPortalController extends Controller
             403
         );
 
-        if (!$payment->proof_file_path) {
+        if (! $payment->proof_file_path) {
             abort(404);
         }
 
         return Storage::disk('private')->download(
             $payment->proof_file_path,
-            $payment->proof_file_name ?? 'proof-' . $payment->payment_number . '.' . pathinfo($payment->proof_file_path, PATHINFO_EXTENSION)
+            $payment->proof_file_name ?? 'proof-'.$payment->payment_number.'.'.pathinfo($payment->proof_file_path, PATHINFO_EXTENSION)
         );
     }
 
@@ -418,7 +421,7 @@ class ClientPortalController extends Controller
         }
 
         $contract->load(['client', 'project', 'invoice', 'createdBy']);
-        $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
+        $settings = Setting::whereIn('key', ['company_name', 'company_name_ar', 'company_logo', 'company_email', 'company_phone', 'company_address', 'currency_symbol'])
             ->pluck('value', 'key')
             ->toArray();
 
@@ -431,6 +434,7 @@ class ClientPortalController extends Controller
         ]);
         $html = view('pdf.contract', compact('contract', 'settings'))->render();
         $mpdf->WriteHTML($html);
+
         return response($mpdf->Output("contract-{$contract->contract_number}.pdf", 'S'), 200)
             ->header('Content-Type', 'application/pdf');
     }

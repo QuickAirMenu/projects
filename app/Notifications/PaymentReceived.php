@@ -12,17 +12,20 @@ class PaymentReceived extends Notification
 
     public function __construct(public Payment $payment) {}
 
-    public function via(object $notifiable): array { return ['database']; }
+    public function via(object $notifiable): array
+    {
+        return ['database'];
+    }
 
     public function toArray(object $notifiable): array
     {
         return [
-            'type'    => 'payment_received',
-            'title'   => __('notifications.payment_received'),
+            'type' => 'payment_received',
+            'title' => __('notifications.payment_received'),
             'message' => __('notifications.payment_received_msg', ['amount' => number_format($this->payment->amount, 2)]),
-            'url'     => route('invoices.show', $this->payment->invoice_id),
-            'icon'    => 'fa-money-bill-wave',
-            'color'   => 'green',
+            'url' => route('invoices.show', $this->payment->invoice_id),
+            'icon' => 'fa-money-bill-wave',
+            'color' => 'green',
         ];
     }
 }

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             // Indexes
             $table->index('project_id');
             $table->index(['project_id', 'step_order']);

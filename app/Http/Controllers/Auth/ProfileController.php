@@ -28,20 +28,20 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|max:255|unique:users,email,' . $user->id,
-            'phone'     => 'nullable|string|max:20',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
             'job_title' => 'nullable|string|max:100',
-            'job_level' => 'nullable|in:' . implode(',', array_keys(User::JOB_LEVELS)),
-            'language'  => 'nullable|in:ar,en',
-            'avatar'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'job_level' => 'nullable|in:'.implode(',', array_keys(User::JOB_LEVELS)),
+            'language' => 'nullable|in:ar,en',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $data = $request->only(['name', 'email', 'phone', 'job_title', 'job_level', 'language']);
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
-                Storage::delete('public/' . $user->avatar);
+                Storage::delete('public/'.$user->avatar);
             }
             $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
@@ -63,12 +63,12 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password'         => ['required', 'confirmed', Password::min(8)],
+            'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
         $user = Auth::user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => __('common.wrong_current_password')]);
         }
 

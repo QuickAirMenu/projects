@@ -16,18 +16,21 @@ class StorePaymentRequest extends FormRequest
         'proof_of_payment',
     ];
 
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     public function rules(): array
     {
         return [
-            'invoice_id'            => 'required|exists:invoices,id',
-            'amount'                => 'required|numeric|min:0.01',
-            'payment_date'          => 'required|date',
-            'payment_method'        => 'required|in:bank_transfer,cash,cheque,card,online,other',
+            'invoice_id' => 'required|exists:invoices,id',
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|in:bank_transfer,cash,cheque,card,online,other',
             'transaction_reference' => 'nullable|string|max:255',
-            'notes'                 => 'nullable|string',
-            'proof_of_payment'      => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,webp',
+            'notes' => 'nullable|string',
+            'proof_of_payment' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,webp',
         ];
     }
 

@@ -11,18 +11,19 @@ class TaskStatusController extends Controller
     public function index()
     {
         $statuses = TaskStatus::orderBy('sort_order')->get();
+
         return view('settings.task-statuses', compact('statuses'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name_ar'    => 'required|string|max:100',
-            'name_en'    => 'required|string|max:100',
-            'slug'       => 'required|string|max:100|unique:task_statuses,slug',
-            'color'      => 'required|string|max:7',
+            'name_ar' => 'required|string|max:100',
+            'name_en' => 'required|string|max:100',
+            'slug' => 'required|string|max:100|unique:task_statuses,slug',
+            'color' => 'required|string|max:7',
             'sort_order' => 'nullable|integer',
-            'is_active'  => 'boolean',
+            'is_active' => 'boolean',
         ]);
 
         TaskStatus::create($data);
@@ -36,7 +37,7 @@ class TaskStatusController extends Controller
         $data = $request->validate([
             'name_ar' => 'required|string|max:100',
             'name_en' => 'required|string|max:100',
-            'color'   => 'required|string|max:7',
+            'color' => 'required|string|max:7',
             'sort_order' => 'nullable|integer',
             'is_active' => 'boolean',
         ]);
@@ -50,6 +51,7 @@ class TaskStatusController extends Controller
     public function destroy(TaskStatus $taskStatus)
     {
         $taskStatus->delete();
+
         return redirect()->route('settings.task-statuses.index')
             ->with('success', __('common.deleted_successfully'));
     }

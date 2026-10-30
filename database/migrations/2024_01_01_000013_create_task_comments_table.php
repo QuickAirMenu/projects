@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('is_internal')->default(true)->comment('Internal comments vs client-visible');
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('task_id');
             $table->index('user_id');

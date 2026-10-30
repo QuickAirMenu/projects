@@ -11,21 +11,23 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles       = Role::withCount('users')->get();
+        $roles = Role::withCount('users')->get();
         $permissions = Permission::orderBy('name')->get();
+
         return view('users.roles', compact('roles', 'permissions'));
     }
 
     public function create()
     {
         $permissions = Permission::orderBy('name')->get();
+
         return view('users.roles-create', compact('permissions'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:100|unique:roles,name',
+            'name' => 'required|string|max:100|unique:roles,name',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,id',
         ]);
@@ -41,16 +43,17 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
-        $permissions        = Permission::orderBy('name')->get();
-        $rolePermissionIds  = $role->permissions->pluck('id')->toArray();
+        $permissions = Permission::orderBy('name')->get();
+        $rolePermissionIds = $role->permissions->pluck('id')->toArray();
+
         return view('users.roles-edit', compact('role', 'permissions', 'rolePermissionIds'));
     }
 
     public function update(Request $request, Role $role)
     {
         $request->validate([
-            'name'          => 'required|string|max:100|unique:roles,name,' . $role->id,
-            'permissions'   => 'nullable|array',
+            'name' => 'required|string|max:100|unique:roles,name,'.$role->id,
+            'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,id',
         ]);
 
@@ -69,6 +72,7 @@ class RoleController extends Controller
         }
 
         $role->delete();
+
         return redirect()->route('roles.index')
             ->with('success', __('common.deleted_successfully'));
     }

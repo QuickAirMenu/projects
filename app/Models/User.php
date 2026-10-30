@@ -6,31 +6,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles, LogsActivity;
+    use HasApiTokens, HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
-    const JOB_LEVELS = [
-        'intern'  => 'Intern / Trainee',
-        'junior'  => 'Junior',
-        'mid'     => 'Mid-Level / Specialist',
-        'senior'  => 'Senior',
-        'lead'    => 'Lead',
+    public const JOB_LEVELS = [
+        'intern' => 'Intern / Trainee',
+        'junior' => 'Junior',
+        'mid' => 'Mid-Level / Specialist',
+        'senior' => 'Senior',
+        'lead' => 'Lead',
         'manager' => 'Manager',
-        'head'    => 'Head / Director',
-        'vp'      => 'VP / Vice President',
-        'clevel'  => 'C-Level',
+        'head' => 'Head / Director',
+        'vp' => 'VP / Vice President',
+        'clevel' => 'C-Level',
     ];
 
     protected $fillable = [
@@ -84,7 +84,7 @@ class User extends Authenticatable
     /**
      * Relationships
      */
-    
+
     // Projects managed by this user
     public function managedProjects()
     {
@@ -138,7 +138,6 @@ class User extends Authenticatable
     /**
      * Scopes
      */
-    
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -152,7 +151,6 @@ class User extends Authenticatable
     /**
      * Accessors & Mutators
      */
-    
     public function getAvatarUrlAttribute()
     {
         return $this->avatar ? Storage::url($this->avatar) : user_avatar($this);

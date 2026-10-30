@@ -15,13 +15,13 @@ class TaskCommentController extends Controller
         $this->authorize('update', $task);
 
         $request->validate([
-            'comment'     => 'required|string|max:5000',
+            'comment' => 'required|string|max:5000',
             'is_internal' => 'boolean',
         ]);
 
         $comment = $task->comments()->create([
-            'user_id'     => Auth::id(),
-            'comment'     => $request->comment,
+            'user_id' => Auth::id(),
+            'comment' => $request->comment,
             'is_internal' => $request->boolean('is_internal', true),
         ]);
 

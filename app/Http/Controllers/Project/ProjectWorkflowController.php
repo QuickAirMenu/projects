@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectWorkflowStep;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProjectWorkflowController extends Controller
@@ -16,6 +15,7 @@ class ProjectWorkflowController extends Controller
     public function show(Project $project)
     {
         $steps = $project->workflowSteps()->orderBy('step_order')->get();
+
         return view('projects.workflow', compact('project', 'steps'));
     }
 
@@ -27,7 +27,7 @@ class ProjectWorkflowController extends Controller
         $this->authorize('update', $project);
 
         $step->update([
-            'completed'    => true,
+            'completed' => true,
             'completed_by' => Auth::id(),
             'completed_at' => now(),
         ]);
@@ -44,7 +44,7 @@ class ProjectWorkflowController extends Controller
         $this->authorize('update', $project);
 
         $step->update([
-            'completed'    => false,
+            'completed' => false,
             'completed_by' => null,
             'completed_at' => null,
         ]);

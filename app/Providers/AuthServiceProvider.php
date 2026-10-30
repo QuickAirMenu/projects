@@ -23,14 +23,14 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        Client::class   => ClientPolicy::class,
-        Project::class  => ProjectPolicy::class,
-        Task::class     => TaskPolicy::class,
-        Quote::class    => QuotePolicy::class,
-        Invoice::class  => InvoicePolicy::class,
-        Payment::class  => PaymentPolicy::class,
+        Client::class => ClientPolicy::class,
+        Project::class => ProjectPolicy::class,
+        Task::class => TaskPolicy::class,
+        Quote::class => QuotePolicy::class,
+        Invoice::class => InvoicePolicy::class,
+        Payment::class => PaymentPolicy::class,
         Contract::class => ContractPolicy::class,
-        User::class     => UserPolicy::class,
+        User::class => UserPolicy::class,
     ];
 
     public function boot(): void

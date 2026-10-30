@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Client extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -58,7 +58,6 @@ class Client extends Model
     /**
      * Relationships
      */
-    
     public function assignedTo()
     {
         return $this->belongsTo(User::class, 'assigned_to');
@@ -107,7 +106,6 @@ class Client extends Model
     /**
      * Scopes
      */
-    
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
@@ -129,18 +127,17 @@ class Client extends Model
     }
 
     /**
-     * Recalculate lifetime_value from the sum of all paid amounts on non-deleted invoices.
+     * Recalculate lifetime_value from the sum of all non-deleted project budgets.
      */
     public function recalculateLifetimeValue(): void
     {
-        $this->lifetime_value = $this->invoices()->sum('paid_amount');
+        $this->lifetime_value = $this->projects()->sum('budget');
         $this->save();
     }
 
     /**
      * Accessors
      */
-    
     public function getFullNameAttribute()
     {
         return $this->company_name ?: $this->name;
@@ -149,13 +146,14 @@ class Client extends Model
     public function getStatusBadgeAttribute()
     {
         $badges = [
-            'active' => ['color' => 'success', 'text' => __('client.status_active')],
-            'potential' => ['color' => 'info', 'text' => __('client.status_potential')],
-            'inactive' => ['color' => 'secondary', 'text' => __('client.status_inactive')],
-            'vip' => ['color' => 'warning', 'text' => __('client.status_vip')],
+            'active' => ['color' => 'success', 'text' => __('common.status.active')],
+            'potential' => ['color' => 'info', 'text' => __('common.status.potential')],
+            'inactive' => ['color' => 'secondary', 'text' => __('common.status.inactive')],
+            'vip' => ['color' => 'warning', 'text' => __('common.status.vip')],
         ];
 
         $badge = $badges[$this->status] ?? $badges['potential'];
+
         return status_badge($badge['text'], $badge['color']);
     }
 }

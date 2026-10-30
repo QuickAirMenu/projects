@@ -10,18 +10,18 @@ trait HasActivityLog
 {
     public static function bootHasActivityLog(): void
     {
-        static::created(fn($model) => activity()
+        static::created(fn ($model) => activity()
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->log('created'));
 
-        static::updated(fn($model) => activity()
+        static::updated(fn ($model) => activity()
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->withProperties(['changed' => $model->getDirty()])
             ->log('updated'));
 
-        static::deleted(fn($model) => activity()
+        static::deleted(fn ($model) => activity()
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->log('deleted'));

@@ -20,16 +20,19 @@ class PaymentController extends Controller
     {
         $this->authorize('viewAny', Payment::class);
 
-        $query = Payment::with(['invoice.client','invoice.project','receiver'])->latest();
-        if ($request->trashed) $query->onlyTrashed();
+        $query = Payment::with(['invoice.client', 'invoice.project', 'receiver'])->latest();
+        if ($request->trashed) {
+            $query->onlyTrashed();
+        }
         $payments = $query->paginate(20);
         $stats = [
-            'total_received'  => Payment::sum('amount'),
-            'this_month'      => Payment::whereMonth('payment_date', now()->month)->sum('amount'),
-            'count'           => Payment::count(),
+            'total_received' => Payment::sum('amount'),
+            'this_month' => Payment::whereMonth('payment_date', now()->month)->sum('amount'),
+            'count' => Payment::count(),
         ];
         $trashed = $request->has('trashed');
-        return view('finance.payments.index', compact('payments','stats','trashed'));
+
+        return view('finance.payments.index', compact('payments', 'stats', 'trashed'));
     }
 
     public function store(StorePaymentRequest $request)
@@ -136,6 +139,7 @@ class PaymentController extends Controller
         $invoice = $payment->invoice;
         $payment->restore();
         $this->invoiceService->recalculateInvoiceTotals($invoice);
+
         return redirect()->route('payments.index')->with('success', __('messages.restored_successfully'));
     }
 
@@ -143,7 +147,7 @@ class PaymentController extends Controller
     {
         $this->authorize('view', $payment);
 
-        if (!$payment->proof_file_path) {
+        if (! $payment->proof_file_path) {
             abort(404);
         }
 
@@ -157,7 +161,7 @@ class PaymentController extends Controller
     {
         $this->authorize('view', $payment);
 
-        if (!$payment->proof_file_path) {
+        if (! $payment->proof_file_path) {
             abort(404);
         }
 
@@ -166,14 +170,14 @@ class PaymentController extends Controller
 
         return response($content)
             ->header('Content-Type', $mime)
-            ->header('Content-Disposition', 'inline; filename="' . ($payment->proof_file_name ?? basename($payment->proof_file_path)) . '"');
+            ->header('Content-Disposition', 'inline; filename="'.($payment->proof_file_name ?? basename($payment->proof_file_path)).'"');
     }
 
     protected function storeProofOfPayment(UploadedFile $file, string $paymentNumber): string
     {
-        $directory = 'payments/' . $paymentNumber;
+        $directory = 'payments/'.$paymentNumber;
 
-        if (!str_starts_with((string) $file->getMimeType(), 'image/') || blank(config('workspace.tinify.api_key'))) {
+        if (! str_starts_with((string) $file->getMimeType(), 'image/') || blank(config('workspace.tinify.api_key'))) {
             return $file->store($directory, 'private');
         }
 
@@ -182,7 +186,7 @@ class PaymentController extends Controller
             return $file->store($directory, 'private');
         }
 
-        $path = $directory . '/' . $file->hashName();
+        $path = $directory.'/'.$file->hashName();
         Storage::disk('private')->put($path, $compressed);
 
         return $path;
@@ -202,12 +206,12 @@ class PaymentController extends Controller
                 ->post('https://api.tinify.com/shrink');
 
             $location = $response->header('Location');
-            if (!$response->successful() || blank($location)) {
+            if (! $response->successful() || blank($location)) {
                 return null;
             }
 
             $download = Http::timeout(120)->get($location);
-            if (!$download->successful()) {
+            if (! $download->successful()) {
                 return null;
             }
 

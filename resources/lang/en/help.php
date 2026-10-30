@@ -1,4 +1,5 @@
 <?php
+
 return [
     'title' => 'Help Center',
     'subtitle' => 'Comprehensive usage guide for :app platform',

@@ -75,7 +75,7 @@
 
             <!-- Welcome link -->
             <div class="text-center mt-4">
-                <a href="{{ route('welcome') }}" class="text-sm text-blue-600 hover:underline">
+                <a href="https://i-projects.net" class="text-sm text-blue-600 hover:underline">
                     <i class="fas fa-home me-1"></i>الصفحة الرئيسية
                 </a>
             </div>

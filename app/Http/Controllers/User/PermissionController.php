@@ -11,6 +11,7 @@ class PermissionController extends Controller
     public function index()
     {
         $permissions = Permission::orderBy('name')->paginate(30);
+
         return view('users.permissions', compact('permissions'));
     }
 
@@ -26,6 +27,7 @@ class PermissionController extends Controller
     public function destroy(Permission $permission)
     {
         $permission->delete();
+
         return redirect()->route('permissions.index')
             ->with('success', __('common.deleted_successfully'));
     }

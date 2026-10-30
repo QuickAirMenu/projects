@@ -11,7 +11,8 @@ class SettingController extends Controller
 {
     public function index()
     {
-        $settings = Setting::all()->groupBy('group')->map(fn($group) => $group->pluck('value', 'key'));
+        $settings = Setting::all()->groupBy('group')->map(fn ($group) => $group->pluck('value', 'key'));
+
         return view('settings.index', compact('settings'));
     }
 
@@ -62,8 +63,8 @@ class SettingController extends Controller
             if ($key === 'mail_password') {
                 $value = Crypt::encryptString($value);
             }
-            if ($key === 'company_website' && $value && !str_starts_with($value, 'http')) {
-                $value = 'https://' . $value;
+            if ($key === 'company_website' && $value && ! str_starts_with($value, 'http')) {
+                $value = 'https://'.$value;
             }
             Setting::updateOrCreate(
                 ['key' => $key],

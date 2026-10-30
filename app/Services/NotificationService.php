@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Task;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
-use App\Notifications\TaskAssigned;
 use App\Notifications\ProjectStatusChanged;
+use App\Notifications\TaskAssigned;
 use App\Notifications\TaskDeadlineApproaching;
 
 class NotificationService
@@ -40,7 +40,7 @@ class NotificationService
             ->whereNotNull('assigned_to')
             ->whereNotNull('due_date')
             ->whereBetween('due_date', [now(), now()->addDays(2)])
-            ->whereHas('status', fn($q) => $q->whereNotIn('slug', ['done']))
+            ->whereHas('status', fn ($q) => $q->whereNotIn('slug', ['done']))
             ->get();
 
         foreach ($tasks as $task) {

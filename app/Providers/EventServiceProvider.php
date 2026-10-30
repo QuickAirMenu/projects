@@ -13,6 +13,11 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
     ];
+
     public function boot(): void {}
-    public function shouldDiscoverEvents(): bool { return false; }
+
+    public function shouldDiscoverEvents(): bool
+    {
+        return false;
+    }
 }

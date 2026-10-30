@@ -21,7 +21,7 @@ return new class extends Migration
             $table->dateTime('communication_date');
             $table->date('follow_up_date')->nullable();
             $table->timestamps();
-            
+
             // Indexes
             $table->index('client_id');
             $table->index('user_id');

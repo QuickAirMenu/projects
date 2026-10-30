@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ClientWelcomeMail;
+use App\Mail\QuoteSentMail;
 use App\Models\Client;
 use App\Models\Contract;
 use App\Models\Invoice;
@@ -11,40 +13,52 @@ use App\Models\ProjectAttachment;
 use App\Models\ProjectStatus;
 use App\Models\Quote;
 use App\Models\QuoteItem;
-use App\Models\Setting;
 use App\Models\ServiceType;
 use App\Models\ServiceTypeItem;
+use App\Models\Setting;
 use App\Models\Task;
 use App\Models\TaskStatus;
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use RuntimeException;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
-use RuntimeException;
 
 class CoreRoutesTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $user;
+
     protected Client $client;
+
     protected ServiceType $serviceType;
+
     protected ProjectStatus $projectStatus;
+
     protected TaskStatus $taskStatus;
+
     protected Project $project;
+
     protected Quote $quote;
+
     protected Quote $convertibleQuote;
+
     protected Invoice $invoice;
+
     protected Contract $contract;
+
     protected Task $task;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(RolePermissionSeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->user = User::create([
@@ -299,7 +313,7 @@ class CoreRoutesTest extends TestCase
         $this->post(route('quotes.send', $draftQuote))
             ->assertRedirect(route('quotes.show', $draftQuote));
 
-        Mail::assertSent(\App\Mail\QuoteSentMail::class);
+        Mail::assertSent(QuoteSentMail::class);
         $this->assertSame('sent', $draftQuote->fresh()->status);
     }
 
@@ -309,7 +323,8 @@ class CoreRoutesTest extends TestCase
 
         Setting::updateOrCreate(['key' => 'mail_host'], ['value' => 'smtp.example.com', 'type' => 'string', 'group' => 'mail']);
 
-        Mail::shouldReceive('to')->andReturn(new class {
+        Mail::shouldReceive('to')->andReturn(new class
+        {
             public function send($mail): void
             {
                 throw new RuntimeException('SMTP boom');
@@ -326,7 +341,7 @@ class CoreRoutesTest extends TestCase
     public function test_seeded_demo_credentials_work_and_seed_output_marks_them_demo_only(): void
     {
         $this->artisan('db:seed', [
-            '--class' => \Database\Seeders\DatabaseSeeder::class,
+            '--class' => DatabaseSeeder::class,
             '--force' => true,
         ])->expectsOutputToContain('Demo credentials only (not for production):');
 
@@ -361,7 +376,7 @@ class CoreRoutesTest extends TestCase
             'is_active' => 1,
         ]);
 
-        Mail::assertSent(\App\Mail\ClientWelcomeMail::class);
+        Mail::assertSent(ClientWelcomeMail::class);
     }
 
     public function test_quote_can_convert_to_invoice_and_invoice_create_prefills_quote_data(): void

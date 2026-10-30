@@ -34,22 +34,6 @@ class ChangeRequest extends Model
         'approved_at' => 'datetime',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($changeRequest) {
-            if (!$changeRequest->request_number) {
-                $lastCR = self::latest('id')->first();
-                $lastNumber = $lastCR ? (int) substr($lastCR->request_number, -4) : 0;
-                $changeRequest->request_number = generate_number(
-                    workspace_config('change_request.number_prefix', 'CR'),
-                    $lastNumber
-                );
-            }
-        });
-    }
-
     public function project()
     {
         return $this->belongsTo(Project::class);
@@ -85,6 +69,23 @@ class ChangeRequest extends Model
         ];
 
         $badge = $badges[$this->status] ?? $badges['pending'];
+
         return status_badge($badge['text'], $badge['color']);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($changeRequest) {
+            if (! $changeRequest->request_number) {
+                $lastCR = self::latest('id')->first();
+                $lastNumber = $lastCR ? (int) substr($lastCR->request_number, -4) : 0;
+                $changeRequest->request_number = generate_number(
+                    workspace_config('change_request.number_prefix', 'CR'),
+                    $lastNumber
+                );
+            }
+        });
     }
 }

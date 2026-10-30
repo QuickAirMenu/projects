@@ -14,7 +14,7 @@ trait Translatable
     public function getNameAttribute(): string
     {
         $locale = app()->getLocale();
-        $col    = "name_{$locale}";
+        $col = "name_{$locale}";
 
         return $this->attributes[$col]
             ?? $this->attributes['name_ar']
@@ -28,7 +28,7 @@ trait Translatable
     public function getDescriptionAttribute(): ?string
     {
         $locale = app()->getLocale();
-        $col    = "description_{$locale}";
+        $col = "description_{$locale}";
 
         return $this->attributes[$col]
             ?? $this->attributes['description_ar']

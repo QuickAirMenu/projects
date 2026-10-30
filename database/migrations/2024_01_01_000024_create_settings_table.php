@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('type', ['string', 'number', 'boolean', 'json'])->default('string');
             $table->string('group', 100)->default('general');
             $table->timestamps();
-            
+
             // Indexes
             $table->index('key');
             $table->index('group');

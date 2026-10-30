@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('logged_date');
             $table->boolean('billable')->default(true);
             $table->timestamps();
-            
+
             // Indexes
             $table->index('task_id');
             $table->index('user_id');

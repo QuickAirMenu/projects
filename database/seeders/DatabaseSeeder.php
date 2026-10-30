@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('🎉 Air Menu | Workspace seeded successfully!');
         $this->command->info('');
         $this->command->info('Demo credentials only (not for production):');
-        $this->command->info('  Shared demo password: ' . UserSeeder::DEMO_PASSWORD);
+        $this->command->info('  Shared demo password: '.UserSeeder::DEMO_PASSWORD);
         $this->command->info('  Super Admin : admin@airmenu.net');
         $this->command->info('  Admin       : mohamed@airmenu.net');
         $this->command->info('  PM          : sara@airmenu.net');

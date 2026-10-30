@@ -1,0 +1,14 @@
+parameters:
+    level: 3
+    paths:
+        - app
+        - routes
+    excludePaths:
+        - app/Console/Kernel.php
+        - app/Exceptions/Handler.php
+        - bootstrap/cache/*
+        - storage/*
+        - vendor/*
+        - routes/console.php
+    parallel:
+        maximumNumberOfProcesses: 1

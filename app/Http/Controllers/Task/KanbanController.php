@@ -18,7 +18,7 @@ class KanbanController extends Controller
 
         $query = Task::with(['project', 'assignedUser', 'status'])
             ->whereNull('parent_task_id')
-            ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
+            ->when($request->project_id, fn ($q) => $q->where('project_id', $request->project_id))
             ->visibleTo(auth()->user());
 
         $tasks = $query->get()->groupBy('status_id');
@@ -34,12 +34,12 @@ class KanbanController extends Controller
         $this->authorize('update', $task);
 
         $request->validate([
-            'status_id'  => 'required|exists:task_statuses,id',
+            'status_id' => 'required|exists:task_statuses,id',
             'sort_order' => 'nullable|integer',
         ]);
 
         $task->update([
-            'status_id'  => $request->status_id,
+            'status_id' => $request->status_id,
             'sort_order' => $request->sort_order ?? $task->sort_order,
         ]);
 

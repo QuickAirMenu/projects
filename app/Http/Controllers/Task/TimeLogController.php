@@ -15,18 +15,18 @@ class TimeLogController extends Controller
         $this->authorize('update', $task);
 
         $request->validate([
-            'hours'       => 'required|numeric|min:0.25|max:24',
+            'hours' => 'required|numeric|min:0.25|max:24',
             'logged_date' => 'required|date|before_or_equal:today',
             'description' => 'nullable|string|max:500',
-            'billable'    => 'boolean',
+            'billable' => 'boolean',
         ]);
 
         $log = $task->timeLogs()->create([
-            'user_id'     => Auth::id(),
-            'hours'       => $request->hours,
+            'user_id' => Auth::id(),
+            'hours' => $request->hours,
             'logged_date' => $request->logged_date,
             'description' => $request->description,
-            'billable'    => $request->boolean('billable', true),
+            'billable' => $request->boolean('billable', true),
         ]);
 
         // Update actual_hours on the task
@@ -41,7 +41,7 @@ class TimeLogController extends Controller
 
     public function destroy(TimeLog $log)
     {
-        $task   = $log->task;
+        $task = $log->task;
         $this->authorize('update', $task);
         $taskId = $log->task_id;
         $log->delete();

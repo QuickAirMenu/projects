@@ -17,7 +17,7 @@ class TaskChecklistController extends Controller
         $request->validate(['item' => 'required|string|max:500']);
 
         $item = $task->checklists()->create([
-            'item'       => $request->item,
+            'item' => $request->item,
             'sort_order' => $task->checklists()->count(),
         ]);
 
@@ -34,14 +34,14 @@ class TaskChecklistController extends Controller
 
         $request->validate([
             'is_completed' => 'boolean',
-            'item'         => 'nullable|string|max:500',
+            'item' => 'nullable|string|max:500',
         ]);
 
         $data = [];
         if ($request->has('is_completed')) {
-            $data['is_completed']  = $request->boolean('is_completed');
-            $data['completed_by']  = $request->boolean('is_completed') ? Auth::id() : null;
-            $data['completed_at']  = $request->boolean('is_completed') ? now() : null;
+            $data['is_completed'] = $request->boolean('is_completed');
+            $data['completed_by'] = $request->boolean('is_completed') ? Auth::id() : null;
+            $data['completed_at'] = $request->boolean('is_completed') ? now() : null;
         }
         if ($request->filled('item')) {
             $data['item'] = $request->item;

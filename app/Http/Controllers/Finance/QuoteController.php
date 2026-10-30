@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers\Finance;
 
-use App\Mail\QuoteSentMail;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StoreQuoteRequest;
+use App\Mail\QuoteSentMail;
 use App\Models\Client;
-use App\Models\Invoice;
-use App\Models\ProjectStatus;
 use App\Models\Quote;
 use App\Models\QuoteView;
-use App\Models\Setting;
 use App\Models\ServiceType;
+use App\Models\Setting;
 use App\Services\MailConfigService;
 use App\Services\QuoteService;
-use Mpdf\Mpdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Mpdf\Mpdf;
 
 class QuoteController extends Controller
 {
@@ -26,41 +24,49 @@ class QuoteController extends Controller
     {
         $this->authorize('viewAny', Quote::class);
 
-        $query = Quote::with(['client','creator'])->latest();
-        if ($request->status)    $query->where('status', $request->status);
-        if ($request->client_id) $query->where('client_id', $request->client_id);
-        if ($request->trashed) $query->onlyTrashed();
-        $quotes  = $query->paginate(15)->withQueryString();
+        $query = Quote::with(['client', 'creator'])->latest();
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->client_id) {
+            $query->where('client_id', $request->client_id);
+        }
+        if ($request->trashed) {
+            $query->onlyTrashed();
+        }
+        $quotes = $query->paginate(15)->withQueryString();
         $clients = Client::orderBy('name')->get();
         $unconvertedQuotes = Quote::whereNull('converted_to_project_id');
-        $stats   = [
-            'total'                      => Quote::count(),
-            'unconverted_count'          => (clone $unconvertedQuotes)->count(),
-            'unconverted_amount'         => (clone $unconvertedQuotes)->sum('total'),
+        $stats = [
+            'total' => Quote::count(),
+            'unconverted_count' => (clone $unconvertedQuotes)->count(),
+            'unconverted_amount' => (clone $unconvertedQuotes)->sum('total'),
             'approved_unconverted_amount' => Quote::approved()
                 ->whereNull('converted_to_project_id')
                 ->sum('total'),
-            'expired_unconverted_count'   => (clone $unconvertedQuotes)
+            'expired_unconverted_count' => (clone $unconvertedQuotes)
                 ->whereDate('valid_until', '<', now())
                 ->count(),
-            'conversion_rate'            => Quote::count() > 0
+            'conversion_rate' => Quote::count() > 0
                 ? round((Quote::whereNotNull('converted_to_project_id')->count() / Quote::count()) * 100, 1)
                 : 0,
         ];
         $trashed = $request->has('trashed');
-        return view('finance.quotes.index', compact('quotes','clients','stats','trashed'));
+
+        return view('finance.quotes.index', compact('quotes', 'clients', 'stats', 'trashed'));
     }
 
     public function create()
     {
         $this->authorize('create', Quote::class);
 
-        $clients      = Client::where('status','!=','inactive')->orderBy('name')->get();
-        $serviceTypes = ServiceType::with(['defaultItems' => fn($q) => $q->orderBy('sort_order')])
-            ->where('is_active',true)
+        $clients = Client::where('status', '!=', 'inactive')->orderBy('name')->get();
+        $serviceTypes = ServiceType::with(['defaultItems' => fn ($q) => $q->orderBy('sort_order')])
+            ->where('is_active', true)
             ->orderBy('sort_order')
             ->get();
-        return view('finance.quotes.create', compact('clients','serviceTypes'));
+
+        return view('finance.quotes.create', compact('clients', 'serviceTypes'));
     }
 
     public function store(StoreQuoteRequest $request)
@@ -68,6 +74,7 @@ class QuoteController extends Controller
         $this->authorize('create', Quote::class);
 
         $quote = $this->quoteService->createQuote($request->validated());
+
         return redirect()->route('quotes.show', $quote)
             ->with('success', __('messages.created_successfully'));
     }
@@ -76,7 +83,7 @@ class QuoteController extends Controller
     {
         $this->authorize('view', $quote);
 
-        $quote->load(['client','items.serviceType','creator','invoice','approvedBy']);
+        $quote->load(['client', 'items.serviceType', 'creator', 'invoice', 'approvedBy']);
 
         $recentViews = $quote->views()->latest('viewed_at')->limit(10)->get();
 
@@ -86,12 +93,12 @@ class QuoteController extends Controller
             $phone = $this->normalizeWhatsAppNumber($sharePhone);
             $message = rawurlencode(
                 "مرحباً {$quote->client->name}،\n\n"
-                . "تجدون مرفقاً عرض السعر رقم {$quote->quote_number}\n"
-                . ($quote->subject ? "الموضوع: {$quote->subject}\n" : "")
-                . "الإجمالي: " . format_currency($quote->total) . "\n\n"
-                . "للاطلاع على التفاصيل وتحميل نسخة PDF:\n"
-                . route('quotes.public', $quote->public_token) . "\n\n"
-                . "مع تحيات فريق " . config('app.name')
+                ."تجدون مرفقاً عرض السعر رقم {$quote->quote_number}\n"
+                .($quote->subject ? "الموضوع: {$quote->subject}\n" : '')
+                .'الإجمالي: '.format_currency($quote->total)."\n\n"
+                ."للاطلاع على التفاصيل وتحميل نسخة PDF:\n"
+                .route('quotes.public', $quote->public_token)."\n\n"
+                .'مع تحيات فريق '.config('app.name')
             );
             if ($phone) {
                 $whatsappUrl = "https://wa.me/{$phone}?text={$message}";
@@ -101,31 +108,12 @@ class QuoteController extends Controller
         return view('finance.quotes.show', compact('quote', 'whatsappUrl', 'recentViews'));
     }
 
-    private function normalizeWhatsAppNumber(string $phone): ?string
-    {
-        $digits = preg_replace('/\D+/', '', $phone);
-
-        if ($digits === '') {
-            return null;
-        }
-
-        if (str_starts_with($digits, '966')) {
-            return $digits;
-        }
-
-        if (preg_match('/^0?5\d{8}$/', $digits)) {
-            return '966' . ltrim($digits, '0');
-        }
-
-        return $digits;
-    }
-
     public function pdf(Quote $quote)
     {
         $this->authorize('view', $quote);
 
         $quote->load(['client', 'items.serviceType', 'createdBy']);
-        $settings = Setting::whereIn('key', ['company_name','company_name_ar','company_logo','company_email','company_phone','company_address','currency_symbol'])
+        $settings = Setting::whereIn('key', ['company_name', 'company_name_ar', 'company_logo', 'company_email', 'company_phone', 'company_address', 'currency_symbol'])
             ->pluck('value', 'key')
             ->toArray();
 
@@ -139,6 +127,7 @@ class QuoteController extends Controller
         $html = view('pdf.quote', compact('quote', 'settings'))->render();
         $mpdf->WriteHTML($html);
         $filename = "quote-{$quote->quote_number}.pdf";
+
         return response($mpdf->Output($filename, 'S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
@@ -149,9 +138,10 @@ class QuoteController extends Controller
         $this->authorize('update', $quote);
 
         $quote->load('items');
-        $clients      = Client::orderBy('name')->get();
-        $serviceTypes = ServiceType::with(['defaultItems' => fn($q) => $q->orderBy('sort_order')])->where('is_active',true)->orderBy('sort_order')->get();
-        return view('finance.quotes.create', compact('quote','clients','serviceTypes'));
+        $clients = Client::orderBy('name')->get();
+        $serviceTypes = ServiceType::with(['defaultItems' => fn ($q) => $q->orderBy('sort_order')])->where('is_active', true)->orderBy('sort_order')->get();
+
+        return view('finance.quotes.create', compact('quote', 'clients', 'serviceTypes'));
     }
 
     public function update(StoreQuoteRequest $request, Quote $quote)
@@ -184,6 +174,7 @@ class QuoteController extends Controller
         $this->authorize('delete', $quote);
 
         $quote->delete();
+
         return redirect()->route('quotes.index')
             ->with('success', __('messages.deleted_successfully'));
     }
@@ -193,6 +184,7 @@ class QuoteController extends Controller
         $this->authorize('update', $quote);
 
         $quote->restore();
+
         return redirect()->route('quotes.index')->with('success', __('messages.restored_successfully'));
     }
 
@@ -227,7 +219,7 @@ class QuoteController extends Controller
         $quote->update(['status' => 'sent', 'sent_at' => now()]);
 
         $sharePhone = $quote->client?->whatsapp ?: $quote->client?->phone;
-        if (!$sharePhone) {
+        if (! $sharePhone) {
             return redirect()->route('quotes.show', $quote)
                 ->with('error', __('finance.no_whatsapp_number'));
         }
@@ -235,17 +227,17 @@ class QuoteController extends Controller
         $phone = $this->normalizeWhatsAppNumber($sharePhone);
         $message = rawurlencode(
             "مرحباً {$quote->client->name}،\n\n"
-            . "تجدون مرفقاً عرض السعر رقم {$quote->quote_number}\n"
-            . ($quote->subject ? "الموضوع: {$quote->subject}\n" : "")
-            . "الإجمالي: " . format_currency($quote->total) . "\n\n"
-            . "للاطلاع على التفاصيل وتحميل نسخة PDF:\n"
-            . route('quotes.public', $quote->public_token) . "\n\n"
-            . "مع تحيات فريق " . config('app.name')
+            ."تجدون مرفقاً عرض السعر رقم {$quote->quote_number}\n"
+            .($quote->subject ? "الموضوع: {$quote->subject}\n" : '')
+            .'الإجمالي: '.format_currency($quote->total)."\n\n"
+            ."للاطلاع على التفاصيل وتحميل نسخة PDF:\n"
+            .route('quotes.public', $quote->public_token)."\n\n"
+            .'مع تحيات فريق '.config('app.name')
         );
 
         $whatsappUrl = $phone ? "https://wa.me/{$phone}?text={$message}" : null;
 
-        if (!$whatsappUrl) {
+        if (! $whatsappUrl) {
             return redirect()->route('quotes.show', $quote)
                 ->with('error', __('finance.invalid_whatsapp_number'));
         }
@@ -364,8 +356,8 @@ class QuoteController extends Controller
             ->firstOrFail();
 
         $settings = Setting::whereIn('key', [
-            'company_name','company_name_ar','company_logo',
-            'company_email','company_phone','company_address','currency_symbol'
+            'company_name', 'company_name_ar', 'company_logo',
+            'company_email', 'company_phone', 'company_address', 'currency_symbol',
         ])->pluck('value', 'key')->toArray();
 
         $mpdf = new Mpdf([
@@ -378,6 +370,7 @@ class QuoteController extends Controller
         $html = view('pdf.quote', compact('quote', 'settings'))->render();
         $mpdf->WriteHTML($html);
         $filename = "quote-{$quote->quote_number}.pdf";
+
         return response($mpdf->Output($filename, 'S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
@@ -388,13 +381,33 @@ class QuoteController extends Controller
         $this->authorize('update', $quote);
 
         $data = $request->validate([
-            'status_id'       => 'required|exists:project_statuses,id',
+            'status_id' => 'required|exists:project_statuses,id',
             'service_type_id' => 'required|exists:service_types,id',
-            'manager_id'      => 'required|exists:users,id',
+            'manager_id' => 'required|exists:users,id',
         ]);
         $project = $this->quoteService->convertToProject($quote, $data);
         $quote->update(['status' => 'approved', 'approved_at' => now()]);
+
         return redirect()->route('projects.show', $project)
             ->with('success', __('finance.quote_converted_to_project'));
+    }
+
+    private function normalizeWhatsAppNumber(string $phone): ?string
+    {
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '966')) {
+            return $digits;
+        }
+
+        if (preg_match('/^0?5\d{8}$/', $digits)) {
+            return '966'.ltrim($digits, '0');
+        }
+
+        return $digits;
     }
 }

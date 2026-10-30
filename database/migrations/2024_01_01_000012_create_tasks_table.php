@@ -31,7 +31,7 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('project_id');
             $table->index('parent_task_id');

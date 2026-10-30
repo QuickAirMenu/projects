@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Quote extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'quote_number',
@@ -68,41 +68,6 @@ class Quote extends Model
     }
 
     /**
-     * Boot method
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($quote) {
-            if (!$quote->quote_number) {
-                $lastQuote = self::withTrashed()->latest('id')->first();
-                $lastNumber = $lastQuote ? (int) substr($lastQuote->quote_number, -4) : 0;
-                $quote->quote_number = generate_number(
-                    workspace_config('quote.number_prefix', 'QT'),
-                    $lastNumber
-                );
-            }
-
-            if (!$quote->public_token) {
-                $quote->public_token = Str::random(10);
-            }
-
-            // Set default valid until date
-            if (!$quote->valid_until) {
-                $quote->valid_until = now()->addDays(workspace_config('quote.valid_days', 30));
-            }
-
-            // Calculate totals (only if not already set by service)
-            if (!$quote->subtotal || !$quote->total) {
-                $quote->tax_amount = ($quote->subtotal * $quote->tax_percentage) / 100;
-                $quote->total = $quote->subtotal + $quote->tax_amount - $quote->discount_amount;
-            }
-        });
-
-    }
-
-    /**
      * Relationships
      */
     public function client()
@@ -138,11 +103,6 @@ class Quote extends Model
     public function convertedProject()
     {
         return $this->belongsTo(Project::class, 'converted_to_project_id');
-    }
-
-    public function views()
-    {
-        return $this->hasMany(QuoteView::class);
     }
 
     /**
@@ -192,6 +152,42 @@ class Quote extends Model
         ];
 
         $badge = $badges[$this->status] ?? $badges['draft'];
+
         return status_badge($badge['text'], $badge['color']);
+    }
+
+    /**
+     * Boot method
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($quote) {
+            if (! $quote->quote_number) {
+                $lastQuote = self::withTrashed()->latest('id')->first();
+                $lastNumber = $lastQuote ? (int) substr($lastQuote->quote_number, -4) : 0;
+                $quote->quote_number = generate_number(
+                    workspace_config('quote.number_prefix', 'QT'),
+                    $lastNumber
+                );
+            }
+
+            if (! $quote->public_token) {
+                $quote->public_token = Str::random(10);
+            }
+
+            // Set default valid until date
+            if (! $quote->valid_until) {
+                $quote->valid_until = now()->addDays(workspace_config('quote.valid_days', 30));
+            }
+
+            // Calculate totals (only if not already set by service)
+            if (! $quote->subtotal || ! $quote->total) {
+                $quote->tax_amount = ($quote->subtotal * $quote->tax_percentage) / 100;
+                $quote->total = $quote->subtotal + $quote->tax_amount - $quote->discount_amount;
+            }
+        });
+
     }
 }

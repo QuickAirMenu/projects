@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use App\Models\Task;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class TaskAssigned extends Notification
@@ -21,12 +20,12 @@ class TaskAssigned extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type'       => 'task_assigned',
-            'title'      => __('notifications.task_assigned'),
-            'message'    => __('notifications.task_assigned_msg', ['task' => $this->task->title]),
-            'url'        => route('tasks.show', $this->task->id),
-            'icon'       => 'fa-tasks',
-            'color'      => 'blue',
+            'type' => 'task_assigned',
+            'title' => __('notifications.task_assigned'),
+            'message' => __('notifications.task_assigned_msg', ['task' => $this->task->title]),
+            'url' => route('tasks.show', $this->task->id),
+            'icon' => 'fa-tasks',
+            'color' => 'blue',
         ];
     }
 }

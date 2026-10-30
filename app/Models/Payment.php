@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Payment extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'invoice_id',
@@ -42,25 +42,6 @@ class Payment extends Model
     }
 
     /**
-     * Boot method
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($payment) {
-            if (!$payment->payment_number) {
-                $lastPayment = self::withTrashed()->latest('id')->first();
-                $lastNumber = $lastPayment ? (int) substr($lastPayment->payment_number, -4) : 0;
-                $payment->payment_number = generate_number(
-                    workspace_config('payment.number_prefix', 'PAY'),
-                    $lastNumber
-                );
-            }
-        });
-    }
-
-    /**
      * Relationships
      */
     public function invoice()
@@ -84,6 +65,26 @@ class Payment extends Model
     public function getPaymentMethodTextAttribute()
     {
         $methods = workspace_config('payment.methods', []);
+
         return $methods[$this->payment_method] ?? $this->payment_method;
+    }
+
+    /**
+     * Boot method
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($payment) {
+            if (! $payment->payment_number) {
+                $lastPayment = self::withTrashed()->latest('id')->first();
+                $lastNumber = $lastPayment ? (int) substr($lastPayment->payment_number, -4) : 0;
+                $payment->payment_number = generate_number(
+                    workspace_config('payment.number_prefix', 'PAY'),
+                    $lastNumber
+                );
+            }
+        });
     }
 }

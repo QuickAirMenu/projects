@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
     'title' => 'Technical Support',
     'subtitle' => 'We are here to help. Contact us through any of the following channels.',
     'whatsapp' => 'WhatsApp',

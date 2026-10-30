@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ChangeRequest\StoreChangeRequestRequest;
 use App\Models\ChangeRequest;
 use App\Models\Project;
+use App\Services\ChangeRequestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\ChangeRequestService;
 
 class ChangeRequestController extends Controller
 {
@@ -32,7 +32,7 @@ class ChangeRequestController extends Controller
         }
 
         $changeRequests = $query->paginate(15);
-        $projects       = Project::orderBy('name')->get();
+        $projects = Project::orderBy('name')->get();
 
         return view('change-requests.index', compact('changeRequests', 'projects'));
     }
@@ -42,6 +42,7 @@ class ChangeRequestController extends Controller
         abort_unless(Auth::user()->can('create-change-requests'), 403);
 
         $projects = Project::orderBy('name')->get();
+
         return view('change-requests.create', compact('projects'));
     }
 
@@ -60,6 +61,7 @@ class ChangeRequestController extends Controller
         abort_unless(Auth::user()->can('view-change-requests'), 403);
 
         $changeRequest->load(['project', 'project.client', 'creator', 'approver']);
+
         return view('change-requests.show', compact('changeRequest'));
     }
 
@@ -68,7 +70,7 @@ class ChangeRequestController extends Controller
         abort_unless(Auth::user()->hasAnyRole(['super-admin', 'admin', 'finance']), 403);
 
         $changeRequest->update([
-            'status'      => 'approved',
+            'status' => 'approved',
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
@@ -84,10 +86,10 @@ class ChangeRequestController extends Controller
         $request->validate(['rejection_reason' => 'required|string|max:1000']);
 
         $changeRequest->update([
-            'status'           => 'rejected',
+            'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason,
-            'approved_by'      => Auth::id(),
-            'approved_at'      => now(),
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
         ]);
 
         return redirect()->route('change-requests.show', $changeRequest)

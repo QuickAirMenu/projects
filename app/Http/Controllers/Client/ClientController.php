@@ -25,7 +25,7 @@ class ClientController extends Controller
         $query = Client::with(['assignedUser', 'projects'])->latest();
 
         if ($request->search) {
-            $query->where(fn($q) => $q
+            $query->where(fn ($q) => $q
                 ->where('name', 'like', "%{$request->search}%")
                 ->orWhere('company_name', 'like', "%{$request->search}%")
                 ->orWhere('email', 'like', "%{$request->search}%")
@@ -39,10 +39,10 @@ class ClientController extends Controller
         $clients = $query->paginate(15)->withQueryString();
 
         $stats = [
-            'total'    => Client::count(),
-            'active'   => Client::where('status', 'active')->count(),
-            'vip'      => Client::where('status', 'vip')->count(),
-            'potential'=> Client::where('status', 'potential')->count(),
+            'total' => Client::count(),
+            'active' => Client::where('status', 'active')->count(),
+            'vip' => Client::where('status', 'vip')->count(),
+            'potential' => Client::where('status', 'potential')->count(),
         ];
 
         return view('clients.index', compact('clients', 'stats'));
@@ -53,6 +53,7 @@ class ClientController extends Controller
         $this->authorize('create', Client::class);
 
         $users = User::where('is_active', true)->orderBy('name')->get();
+
         return view('clients.create', compact('users'));
     }
 
@@ -77,6 +78,7 @@ class ClientController extends Controller
         $this->authorize('view', $client);
 
         $client->load(['projects.status', 'communications.user', 'assignedUser', 'portalAccount']);
+
         return view('clients.show', compact('client'));
     }
 
@@ -84,7 +86,7 @@ class ClientController extends Controller
     {
         $this->authorize('update', $client);
 
-        if (!$client->email) {
+        if (! $client->email) {
             return back()->with('error', __('messages.client_no_email'));
         }
 
@@ -102,6 +104,7 @@ class ClientController extends Controller
         $this->authorize('update', $client);
 
         $users = User::where('is_active', true)->orderBy('name')->get();
+
         return view('clients.edit', compact('client', 'users'));
     }
 
@@ -110,6 +113,7 @@ class ClientController extends Controller
         $this->authorize('update', $client);
 
         $client->update($request->validated());
+
         return redirect()->route('clients.show', $client)
             ->with('success', __('messages.updated_successfully'));
     }
@@ -119,6 +123,7 @@ class ClientController extends Controller
         $this->authorize('delete', $client);
 
         $client->delete();
+
         return redirect()->route('clients.index')
             ->with('success', __('messages.deleted_successfully'));
     }
@@ -128,7 +133,7 @@ class ClientController extends Controller
         $setupToken = Str::random(64);
 
         $account = ClientPortalAccount::firstOrNew(['client_id' => $client->id]);
-        if (!$account->exists) {
+        if (! $account->exists) {
             $account->password = Str::random(32);
         }
 
@@ -141,11 +146,11 @@ class ClientController extends Controller
         try {
             app(MailConfigService::class)->applyDynamicMailConfig();
 
-            if (!blank(config('mail.mailers.smtp.host'))) {
+            if (! blank(config('mail.mailers.smtp.host'))) {
                 Mail::to($client->email)->send(new ClientWelcomeMail($client, route('portal.setup', $account->setup_token)));
             }
         } catch (\Throwable $e) {
-            Log::error('Client welcome email failed: ' . $e->getMessage());
+            Log::error('Client welcome email failed: '.$e->getMessage());
         }
     }
 }

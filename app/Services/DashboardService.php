@@ -16,14 +16,14 @@ class DashboardService
         $user = Auth::user();
 
         $projectQuery = Project::active();
-        $taskQuery    = Task::whereNull('parent_task_id');
+        $taskQuery = Task::whereNull('parent_task_id');
         $canViewFinancialStats = $user->hasAnyRole(['super-admin', 'admin', 'finance']);
 
         // Scope data per role
-        if (!$user->hasAnyRole(['super-admin', 'admin', 'finance'])) {
-            $projectQuery->where(fn($q) => $q
+        if (! $user->hasAnyRole(['super-admin', 'admin', 'finance'])) {
+            $projectQuery->where(fn ($q) => $q
                 ->where('manager_id', $user->id)
-                ->orWhereHas('teamMembers', fn($t) => $t->where('users.id', $user->id))
+                ->orWhereHas('teamMembers', fn ($t) => $t->where('users.id', $user->id))
             );
             $taskQuery->where('assigned_to', $user->id);
         }
@@ -43,21 +43,21 @@ class DashboardService
             ->first();
 
         $stats = [
-            'total_projects'  => (int) $projectStats->total,
+            'total_projects' => (int) $projectStats->total,
             'active_projects' => (int) $projectStats->active,
             'completed_projects' => (int) $projectStats->completed,
             'overdue_projects_count' => (int) $projectStats->overdue,
-            'my_tasks'       => (int) $taskStats->total,
-            'overdue_tasks'  => (int) $taskStats->overdue,
+            'my_tasks' => (int) $taskStats->total,
+            'overdue_tasks' => (int) $taskStats->overdue,
         ];
 
         // Cached financial stats (60s) - these are global totals shared across all users
         $financialStats = $canViewFinancialStats
-            ? Cache::remember('dashboard_financial_stats', 60, fn() => [
-                'total_clients'   => Client::count(),
-                'active_clients'  => Client::where('status', 'active')->count(),
+            ? Cache::remember('dashboard_financial_stats', 60, fn () => [
+                'total_clients' => Client::count(),
+                'active_clients' => Client::where('status', 'active')->count(),
                 'unpaid_invoices' => Invoice::where('payment_status', '!=', 'paid')->sum('remaining_amount'),
-                'total_invoiced'  => Invoice::sum('total'),
+                'total_invoiced' => Invoice::sum('total'),
                 'total_collected' => Invoice::sum('paid_amount'),
             ])
             : [];
@@ -67,14 +67,14 @@ class DashboardService
         $myTasks = Task::with(['project', 'status'])
             ->whereNull('parent_task_id')
             ->where('assigned_to', $user->id)
-            ->whereHas('status', fn($q) => $q->whereNotIn('slug', ['done']))
+            ->whereHas('status', fn ($q) => $q->whereNotIn('slug', ['done']))
             ->orderBy('due_date')
             ->take(6)
             ->get();
         $overdueProjects = (clone $projectQuery)
             ->with(['client', 'status', 'manager'])
             ->where('deadline', '<', now())
-            ->whereHas('status', fn($q) => $q->whereNotIn('slug', ['completed', 'closed', 'cancelled']))
+            ->whereHas('status', fn ($q) => $q->whereNotIn('slug', ['completed', 'closed', 'cancelled']))
             ->orderBy('deadline')
             ->take(3)
             ->get();

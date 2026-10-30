@@ -28,10 +28,10 @@ class ProjectReportController extends Controller
         $projects = $query->latest()->paginate(20);
 
         $stats = [
-            'total'       => Project::count(),
-            'in_progress' => Project::whereHas('status', fn($q) => $q->where('slug', 'in-progress'))->count(),
-            'completed'   => Project::whereHas('status', fn($q) => $q->where('slug', 'completed'))->count(),
-            'overdue'     => Project::where('deadline', '<', now())->whereHas('status', fn($q) => $q->whereNotIn('slug', ['completed', 'closed', 'cancelled']))->count(),
+            'total' => Project::count(),
+            'in_progress' => Project::whereHas('status', fn ($q) => $q->where('slug', 'in-progress'))->count(),
+            'completed' => Project::whereHas('status', fn ($q) => $q->where('slug', 'completed'))->count(),
+            'overdue' => Project::where('deadline', '<', now())->whereHas('status', fn ($q) => $q->whereNotIn('slug', ['completed', 'closed', 'cancelled']))->count(),
         ];
 
         return view('reports.projects', compact('projects', 'statuses', 'stats'));

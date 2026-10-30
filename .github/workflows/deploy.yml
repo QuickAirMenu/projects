@@ -4,13 +4,19 @@ on:
   workflow_run:
     workflows: ["Run Tests"]
     types: [completed]
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    environment: production
+    strategy:
+      matrix:
+        instance:
+          - { name: "iprojects_app", path: "/home/u227212075/domains/i-projects.net/iprojects_app" }
+          - { name: "topaccounts_app", path: "/home/u227212075/domains/i-projects.net/topaccounts_app" }
+          - { name: "demo_app", path: "/home/u227212075/domains/i-projects.net/demo_app" }
+          - { name: "iprojects_stg_app", path: "/home/u227212075/domains/i-projects.net/iprojects_stg_app" }
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +46,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.SSH_HOST }}
           REMOTE_PORT: ${{ secrets.SSH_PORT }}
           REMOTE_USER: ${{ secrets.SSH_USER }}
-          TARGET: ${{ secrets.SSH_PATH }}
+          TARGET: ${{ matrix.instance.path }}
           SOURCE: .
           ARGS: -avz --delete --include='public/build/***' --include='resources/views/***' --include='resources/lang/***' --include='resources/css/***' --include='resources/js/***' --include='app/***' --include='routes/***' --include='config/***' --include='composer.json' --include='composer.lock' --exclude='*'
 
@@ -52,7 +58,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.SSH_PATH }}
+            cd ${{ matrix.instance.path }}
             composer install --no-dev --optimize-autoloader
             php artisan migrate --force
             php artisan optimize:clear

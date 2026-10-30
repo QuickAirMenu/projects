@@ -1,16 +1,19 @@
 <?php
 
+use App\Models\Setting;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
-if (!function_exists('workspace_config')) {
+if (! function_exists('workspace_config')) {
     /**
      * Get workspace configuration value
      */
     function workspace_config($key, $default = null)
     {
         if ($key === 'company_logo') {
-            $logo = \App\Models\Setting::where('key', 'company_logo')->value('value') ?: config('workspace.company_logo', $default);
+            $logo = Setting::where('key', 'company_logo')->value('value') ?: config('workspace.company_logo', $default);
 
             if (blank($logo)) {
                 return $default;
@@ -20,28 +23,28 @@ if (!function_exists('workspace_config')) {
                 return $logo;
             }
 
-            return \Illuminate\Support\Facades\Storage::url($logo);
+            return Storage::url($logo);
         }
 
         return config("workspace.{$key}", $default);
     }
 }
 
-if (!function_exists('portal_setting')) {
+if (! function_exists('portal_setting')) {
     function portal_setting(string $key, $default = '0'): string
     {
-        return \App\Models\Setting::where('key', $key)->value('value') ?? $default;
+        return Setting::where('key', $key)->value('value') ?? $default;
     }
 }
 
-if (!function_exists('pdf_logo_data')) {
+if (! function_exists('pdf_logo_data')) {
     /**
      * Resolve the company logo into a PDF-safe image source.
      */
     function pdf_logo_data($logo = null)
     {
         if (blank($logo)) {
-            $logo = \App\Models\Setting::where('key', 'company_logo')->value('value') ?: config('workspace.company_logo');
+            $logo = Setting::where('key', 'company_logo')->value('value') ?: config('workspace.company_logo');
         }
 
         if (blank($logo)) {
@@ -57,9 +60,9 @@ if (!function_exists('pdf_logo_data')) {
 
             if ($content !== false) {
                 $extension = strtolower(pathinfo(parse_url($logo, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
-                $mime = $extension === 'svg' ? 'image/svg+xml' : 'image/' . ($extension ?: 'png');
+                $mime = $extension === 'svg' ? 'image/svg+xml' : 'image/'.($extension ?: 'png');
 
-                return 'data:' . $mime . ';base64,' . base64_encode($content);
+                return 'data:'.$mime.';base64,'.base64_encode($content);
             }
 
             return $logo;
@@ -67,15 +70,15 @@ if (!function_exists('pdf_logo_data')) {
 
         $paths = [
             public_path(ltrim($logo, '/')),
-            storage_path('app/public/' . ltrim(preg_replace('#^storage/#', '', $logo), '/')),
+            storage_path('app/public/'.ltrim(preg_replace('#^storage/#', '', $logo), '/')),
         ];
 
         foreach ($paths as $path) {
             if (is_file($path)) {
                 $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-                $mime = $extension === 'svg' ? 'image/svg+xml' : 'image/' . ($extension ?: 'png');
+                $mime = $extension === 'svg' ? 'image/svg+xml' : 'image/'.($extension ?: 'png');
 
-                return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+                return 'data:'.$mime.';base64,'.base64_encode(file_get_contents($path));
             }
         }
 
@@ -83,7 +86,7 @@ if (!function_exists('pdf_logo_data')) {
     }
 }
 
-if (!function_exists('format_currency')) {
+if (! function_exists('format_currency')) {
     /**
      * Format number as currency
      */
@@ -91,51 +94,60 @@ if (!function_exists('format_currency')) {
     {
         $locale = $locale ?? app()->getLocale();
         $symbol = $locale === 'ar' ? workspace_config('currency.symbol') : workspace_config('currency.symbol_en');
-        
-        return number_format($amount, 2) . ' ' . $symbol;
+
+        return number_format($amount, 2).' '.$symbol;
     }
 }
 
-if (!function_exists('format_date')) {
+if (! function_exists('format_date')) {
     /**
      * Format date according to workspace settings
      */
     function format_date($date, $format = null)
     {
-        if (!$date) return '-';
-        
+        if (! $date) {
+            return '-';
+        }
+
         $format = $format ?? workspace_config('date_format');
-        return \Carbon\Carbon::parse($date)->format($format);
+
+        return Carbon::parse($date)->format($format);
     }
 }
 
-if (!function_exists('format_datetime')) {
+if (! function_exists('format_datetime')) {
     /**
      * Format datetime according to workspace settings
      */
     function format_datetime($datetime, $format = null)
     {
-        if (!$datetime) return '-';
-        
+        if (! $datetime) {
+            return '-';
+        }
+
         $format = $format ?? workspace_config('datetime_format');
-        return \Carbon\Carbon::parse($datetime)->format($format);
+
+        return Carbon::parse($datetime)->format($format);
     }
 }
 
-if (!function_exists('human_date')) {
+if (! function_exists('human_date')) {
     /**
      * Get human-readable date
      */
     function human_date($date, $locale = null)
     {
-        if (!$date) return '-';
-        
+        if (! $date) {
+            return '-';
+        }
+
         $locale = $locale ?? app()->getLocale();
-        return \Carbon\Carbon::parse($date)->locale($locale)->diffForHumans();
+
+        return Carbon::parse($date)->locale($locale)->diffForHumans();
     }
 }
 
-if (!function_exists('generate_number')) {
+if (! function_exists('generate_number')) {
     /**
      * Generate unique number for entities (project, invoice, quote, etc.)
      */
@@ -181,7 +193,7 @@ if (!function_exists('generate_number')) {
     }
 }
 
-if (!function_exists('status_badge')) {
+if (! function_exists('status_badge')) {
     /**
      * Get status badge HTML
      */
@@ -195,14 +207,14 @@ if (!function_exists('status_badge')) {
             'info' => 'bg-cyan-100 text-cyan-800',
             'secondary' => 'bg-gray-100 text-gray-800',
         ];
-        
+
         $color = $colors[$type] ?? $colors['primary'];
-        
+
         return "<span class='px-2 py-1 text-xs font-semibold rounded-full {$color}'>{$status}</span>";
     }
 }
 
-if (!function_exists('priority_badge')) {
+if (! function_exists('priority_badge')) {
     /**
      * Get priority badge HTML
      */
@@ -214,9 +226,9 @@ if (!function_exists('priority_badge')) {
             'high' => ['color' => 'bg-orange-100 text-orange-800', 'icon' => 'fa-arrow-up', 'text' => __('common.priority.high')],
             'urgent' => ['color' => 'bg-red-100 text-red-800', 'icon' => 'fa-exclamation', 'text' => __('common.priority.urgent')],
         ];
-        
+
         $badge = $badges[$priority] ?? $badges['medium'];
-        
+
         return "<span class='inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full {$badge['color']}'>
                     <i class='fas {$badge['icon']} mr-1'></i>
                     {$badge['text']}
@@ -224,7 +236,7 @@ if (!function_exists('priority_badge')) {
     }
 }
 
-if (!function_exists('payment_status_badge')) {
+if (! function_exists('payment_status_badge')) {
     /**
      * Get payment status badge
      */
@@ -236,21 +248,21 @@ if (!function_exists('payment_status_badge')) {
             'paid' => ['color' => 'success', 'text' => __('finance.payment_status.paid')],
             'overdue' => ['color' => 'danger', 'text' => __('finance.payment_status.overdue')],
         ];
-        
+
         $badge = $badges[$status] ?? $badges['unpaid'];
-        
+
         return status_badge($badge['text'], $badge['color']);
     }
 }
 
-if (!function_exists('file_icon')) {
+if (! function_exists('file_icon')) {
     /**
      * Get file icon based on extension
      */
     function file_icon($filename)
     {
         $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        
+
         $icons = [
             'pdf' => 'fa-file-pdf text-red-500',
             'doc' => 'fa-file-word text-blue-500',
@@ -266,61 +278,64 @@ if (!function_exists('file_icon')) {
             'zip' => 'fa-file-archive text-gray-500',
             'rar' => 'fa-file-archive text-gray-500',
         ];
-        
+
         return $icons[$extension] ?? 'fa-file text-gray-400';
     }
 }
 
-if (!function_exists('file_size_format')) {
+if (! function_exists('file_size_format')) {
     /**
      * Format file size in human-readable format
      */
     function file_size_format($bytes)
     {
         if ($bytes >= 1073741824) {
-            return number_format($bytes / 1073741824, 2) . ' GB';
+            return number_format($bytes / 1073741824, 2).' GB';
         } elseif ($bytes >= 1048576) {
-            return number_format($bytes / 1048576, 2) . ' MB';
+            return number_format($bytes / 1048576, 2).' MB';
         } elseif ($bytes >= 1024) {
-            return number_format($bytes / 1024, 2) . ' KB';
-        } else {
-            return $bytes . ' bytes';
+            return number_format($bytes / 1024, 2).' KB';
         }
+
+        return $bytes.' bytes';
+
     }
 }
 
-if (!function_exists('calculate_progress')) {
+if (! function_exists('calculate_progress')) {
     /**
      * Calculate progress percentage
      */
     function calculate_progress($completed, $total)
     {
-        if ($total == 0) return 0;
-        
+        if ($total == 0) {
+            return 0;
+        }
+
         return round(($completed / $total) * 100);
     }
 }
 
-if (!function_exists('user_avatar')) {
+if (! function_exists('user_avatar')) {
     /**
      * Get user avatar URL or initials
      */
     function user_avatar($user, $size = 40)
     {
         if ($user->avatar) {
-            return \Illuminate\Support\Facades\Storage::url($user->avatar);
+            return Storage::url($user->avatar);
         }
-        
+
         // Generate initials avatar
         $initials = strtoupper(substr($user->name, 0, 2));
         $colors = ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'bg-pink-500'];
         $color = $colors[ord($user->name[0]) % count($colors)];
-        
+
         return "https://ui-avatars.com/api/?name={$initials}&size={$size}&background=random";
     }
 }
 
-if (!function_exists('can_user')) {
+if (! function_exists('can_user')) {
     /**
      * Check if user has permission
      */
@@ -330,7 +345,7 @@ if (!function_exists('can_user')) {
     }
 }
 
-if (!function_exists('has_role')) {
+if (! function_exists('has_role')) {
     /**
      * Check if user has role
      */
@@ -340,7 +355,7 @@ if (!function_exists('has_role')) {
     }
 }
 
-if (!function_exists('activity_icon')) {
+if (! function_exists('activity_icon')) {
     /**
      * Get activity icon based on type
      */
@@ -355,12 +370,12 @@ if (!function_exists('activity_icon')) {
             'commented' => 'fa-comment text-blue-500',
             'uploaded' => 'fa-upload text-cyan-500',
         ];
-        
+
         return $icons[$type] ?? 'fa-circle text-gray-400';
     }
 }
 
-if (!function_exists('is_rtl')) {
+if (! function_exists('is_rtl')) {
     /**
      * Check if current locale is RTL
      */
@@ -370,7 +385,7 @@ if (!function_exists('is_rtl')) {
     }
 }
 
-if (!function_exists('direction')) {
+if (! function_exists('direction')) {
     /**
      * Get text direction based on locale
      */

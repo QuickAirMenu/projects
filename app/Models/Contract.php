@@ -1,4 +1,5 @@
 <?php
+
 // app/Models/Contract.php
 
 namespace App\Models;
@@ -39,22 +40,6 @@ class Contract extends Model
         'signed_at' => 'datetime',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($contract) {
-            if (!$contract->contract_number) {
-                $lastContract = self::withTrashed()->latest('id')->first();
-                $lastNumber = $lastContract ? (int) substr($lastContract->contract_number, -4) : 0;
-                $contract->contract_number = generate_number(
-                    workspace_config('contract.number_prefix', 'CNT'),
-                    $lastNumber
-                );
-            }
-        });
-    }
-
     public function project()
     {
         return $this->belongsTo(Project::class);
@@ -78,5 +63,21 @@ class Contract extends Model
     public function creator()
     {
         return $this->createdBy();
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($contract) {
+            if (! $contract->contract_number) {
+                $lastContract = self::withTrashed()->latest('id')->first();
+                $lastNumber = $lastContract ? (int) substr($lastContract->contract_number, -4) : 0;
+                $contract->contract_number = generate_number(
+                    workspace_config('contract.number_prefix', 'CNT'),
+                    $lastNumber
+                );
+            }
+        });
     }
 }

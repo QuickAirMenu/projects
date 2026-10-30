@@ -20,15 +20,15 @@ class TaskDeadlineApproaching extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type'    => 'task_deadline',
-            'title'   => __('notifications.task_deadline_approaching'),
+            'type' => 'task_deadline',
+            'title' => __('notifications.task_deadline_approaching'),
             'message' => __('notifications.task_deadline_msg', [
                 'task' => $this->task->title,
                 'date' => $this->task->due_date?->format('Y-m-d'),
             ]),
-            'url'     => route('tasks.show', $this->task->id),
-            'icon'    => 'fa-clock',
-            'color'   => 'orange',
+            'url' => route('tasks.show', $this->task->id),
+            'icon' => 'fa-clock',
+            'color' => 'orange',
         ];
     }
 }

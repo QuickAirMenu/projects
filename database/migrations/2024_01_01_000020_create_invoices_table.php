@@ -32,7 +32,7 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('invoice_number');
             $table->index('project_id');

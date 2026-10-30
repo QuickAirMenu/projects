@@ -3,28 +3,29 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Models\ServiceTypeItem;
 use App\Models\ServiceType;
+use App\Models\ServiceTypeItem;
 use Illuminate\Http\Request;
 
 class ServiceTypeController extends Controller
 {
     public function index()
     {
-        $serviceTypes = ServiceType::with(['defaultItems' => fn($q) => $q->orderBy('sort_order')])->orderBy('sort_order')->get();
+        $serviceTypes = ServiceType::with(['defaultItems' => fn ($q) => $q->orderBy('sort_order')])->orderBy('sort_order')->get();
+
         return view('settings.service-types', compact('serviceTypes'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name_ar'        => 'required|string|max:255',
-            'name_en'        => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
             'description_ar' => 'nullable|string',
             'description_en' => 'nullable|string',
-            'icon'           => 'nullable|string|max:50',
-            'color'          => 'required|string|max:7',
-            'is_active'      => 'boolean',
+            'icon' => 'nullable|string|max:50',
+            'color' => 'required|string|max:7',
+            'is_active' => 'boolean',
         ]);
 
         ServiceType::create($data);
@@ -41,12 +42,12 @@ class ServiceTypeController extends Controller
     public function update(Request $request, ServiceType $serviceType)
     {
         $data = $request->validate([
-            'name_ar'   => 'required|string|max:255',
-            'name_en'   => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
             'description_ar' => 'nullable|string',
             'description_en' => 'nullable|string',
-            'icon'     => 'nullable|string|max:50',
-            'color'     => 'required|string|max:7',
+            'icon' => 'nullable|string|max:50',
+            'color' => 'required|string|max:7',
             'is_active' => 'boolean',
         ]);
 
@@ -59,6 +60,7 @@ class ServiceTypeController extends Controller
     public function destroy(ServiceType $serviceType)
     {
         $serviceType->delete();
+
         return redirect()->route('settings.service-types.index')
             ->with('success', __('common.deleted_successfully'));
     }
@@ -89,8 +91,8 @@ class ServiceTypeController extends Controller
 
         $data = $request->validate([
             'description' => 'required|string',
-            'quantity'    => 'required|integer|min:1',
-            'unit_price'  => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:1',
+            'unit_price' => 'required|numeric|min:0',
         ]);
 
         $item->update($data);

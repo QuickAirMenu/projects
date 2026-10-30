@@ -22,17 +22,17 @@ class ActivityLogger
         if (
             $request->user() &&
             in_array($request->method(), $this->logMethods) &&
-            !$this->shouldSkip($request)
+            ! $this->shouldSkip($request)
         ) {
             ActivityLog::create([
-                'log_name'    => 'http',
-                'description' => $request->method() . ' ' . $request->path(),
+                'log_name' => 'http',
+                'description' => $request->method().' '.$request->path(),
                 'causer_type' => get_class($request->user()),
-                'causer_id'   => $request->user()->id,
-                'properties'  => json_encode([
-                    'ip'     => $request->ip(),
+                'causer_id' => $request->user()->id,
+                'properties' => json_encode([
+                    'ip' => $request->ip(),
                     'method' => $request->method(),
-                    'url'    => $request->fullUrl(),
+                    'url' => $request->fullUrl(),
                     'status' => $response->getStatusCode(),
                 ]),
             ]);
@@ -48,6 +48,7 @@ class ActivityLogger
                 return true;
             }
         }
+
         return false;
     }
 }

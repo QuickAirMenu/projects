@@ -3,7 +3,6 @@
 namespace App\Traits;
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * HasAttachments — provides a generic storeAttachment() helper.
@@ -31,11 +30,12 @@ trait HasAttachments
     public static function humanFileSize(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB'];
-        $i     = 0;
+        $i = 0;
         while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
             $i++;
         }
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

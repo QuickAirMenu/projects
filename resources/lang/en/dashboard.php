@@ -1,4 +1,5 @@
 <?php
+
 return [
     'welcome_onboard' => 'Welcome to :app 🎉',
     'get_started' => 'To start your journey, follow these quick steps:',

@@ -19,19 +19,19 @@ class ProjectAttachmentController extends Controller
         $this->authorize('update', $project);
 
         $request->validate([
-            'file'        => 'required|file|max:20480', // 20MB max
+            'file' => 'required|file|max:20480', // 20MB max
             'description' => 'nullable|string|max:500',
         ]);
 
         $file = $request->file('file');
-        $path = $file->store('projects/' . $project->id, 'private');
+        $path = $file->store('projects/'.$project->id, 'private');
 
         $project->attachments()->create([
             'uploaded_by' => Auth::id(),
-            'file_name'   => $file->getClientOriginalName(),
-            'file_path'   => $path,
-            'file_type'   => $file->getClientMimeType(),
-            'file_size'   => $file->getSize(),
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+            'file_type' => $file->getClientMimeType(),
+            'file_size' => $file->getSize(),
             'description' => $request->description,
         ]);
 
@@ -61,7 +61,7 @@ class ProjectAttachmentController extends Controller
     {
         $this->authorize('view', $attachment->project);
 
-        if (!$attachment->file_path) {
+        if (! $attachment->file_path) {
             abort(404);
         }
 

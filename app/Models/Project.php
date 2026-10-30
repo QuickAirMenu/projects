@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -73,29 +73,8 @@ class Project extends Model
     }
 
     /**
-     * Boot method
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        // Generate project number on creating
-        static::creating(function ($project) {
-            if (!$project->project_number) {
-                $lastProject = self::withTrashed()->latest('id')->first();
-                $lastNumber = $lastProject ? (int) substr($lastProject->project_number, -4) : 0;
-                $project->project_number = generate_number(
-                    workspace_config('project.number_prefix', 'PRJ'),
-                    $lastNumber
-                );
-            }
-        });
-    }
-
-    /**
      * Relationships
      */
-    
     public function client()
     {
         return $this->belongsTo(Client::class);
@@ -167,7 +146,6 @@ class Project extends Model
     /**
      * Scopes
      */
-    
     public function scopeActive($query)
     {
         return $query->where('is_archived', false);
@@ -191,7 +169,7 @@ class Project extends Model
     public function scopeOverdue($query)
     {
         return $query->where('deadline', '<', now())
-            ->whereNotIn('status_id', function($q) {
+            ->whereNotIn('status_id', function ($q) {
                 $q->select('id')
                     ->from('project_statuses')
                     ->whereIn('slug', ['completed', 'closed', 'cancelled']);
@@ -203,27 +181,30 @@ class Project extends Model
         return $query->where('manager_id', $managerId);
     }
 
-    public function scopeVisibleTo($query, \App\Models\User $user)
+    public function scopeVisibleTo($query, User $user)
     {
-        if ($user->hasAnyRole(['super-admin', 'admin', 'finance'])) return $query;
-        return $query->where(fn($q) => $q
+        if ($user->hasAnyRole(['super-admin', 'admin', 'finance'])) {
+            return $query;
+        }
+
+        return $query->where(fn ($q) => $q
             ->where('manager_id', $user->id)
-            ->orWhereHas('teamMembers', fn($t) => $t->where('users.id', $user->id))
+            ->orWhereHas('teamMembers', fn ($t) => $t->where('users.id', $user->id))
         );
     }
 
     /**
      * Accessors
      */
-    
     public function getIsOverdueAttribute()
     {
-        if (!$this->deadline) {
+        if (! $this->deadline) {
             return false;
         }
 
         $completedStatuses = ['completed', 'closed', 'cancelled'];
-        return $this->deadline->isPast() && !in_array($this->status->slug, $completedStatuses);
+
+        return $this->deadline->isPast() && ! in_array($this->status->slug, $completedStatuses);
     }
 
     public function getPriorityBadgeAttribute()
@@ -243,7 +224,7 @@ class Project extends Model
 
     public function getCompletedTasksCountAttribute()
     {
-        return $this->tasks()->whereHas('status', function($q) {
+        return $this->tasks()->whereHas('status', function ($q) {
             $q->where('slug', 'done');
         })->count();
     }
@@ -253,6 +234,27 @@ class Project extends Model
         if ($this->relationLoaded('tasks')) {
             return $this->tasks->count();
         }
+
         return $this->tasks()->count();
+    }
+
+    /**
+     * Boot method
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Generate project number on creating
+        static::creating(function ($project) {
+            if (! $project->project_number) {
+                $lastProject = self::withTrashed()->latest('id')->first();
+                $lastNumber = $lastProject ? (int) substr($lastProject->project_number, -4) : 0;
+                $project->project_number = generate_number(
+                    workspace_config('project.number_prefix', 'PRJ'),
+                    $lastNumber
+                );
+            }
+        });
     }
 }

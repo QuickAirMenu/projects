@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->integer('sort_order')->default(0);
             $table->timestamps();
-            
+
             // Indexes
             $table->index('task_id');
             $table->index('is_completed');

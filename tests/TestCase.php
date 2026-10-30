@@ -30,9 +30,9 @@ abstract class TestCase extends BaseTestCase
         $this->prepareMigratedSchema();
 
         $this->artisan('migrate', [
-            '--path'     => $this->migrationsTempPath(),
+            '--path' => $this->migrationsTempPath(),
             '--realpath' => true,
-            '--force'    => true,
+            '--force' => true,
         ]);
 
         $this->app[Kernel::class]->setArtisan(null);
@@ -47,7 +47,7 @@ abstract class TestCase extends BaseTestCase
     protected function prepareMigratedSchema(): void
     {
         $source = realpath(__DIR__.'/../database/migrations');
-        $temp   = $this->migrationsTempPath();
+        $temp = $this->migrationsTempPath();
 
         if (! is_dir($temp)) {
             mkdir($temp, 0755, true);

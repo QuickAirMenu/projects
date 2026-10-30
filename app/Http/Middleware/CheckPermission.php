@@ -13,11 +13,11 @@ class CheckPermission
      */
     public function handle(Request $request, Closure $next, string $permission): Response
     {
-        if (!$request->user()) {
+        if (! $request->user()) {
             return redirect()->route('login');
         }
 
-        if (!$request->user()->can($permission)) {
+        if (! $request->user()->can($permission)) {
             abort(403, __('common.unauthorized'));
         }
 

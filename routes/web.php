@@ -49,7 +49,7 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 });
 
-Route::get('/welcome', fn() => view('welcome'))->name('welcome');
+// Route::get('/welcome', fn() => view('welcome'))->name('welcome'); // Disabled on subdomains
 
 // Language switch
 Route::get('lang/{locale}', function ($locale) {
@@ -383,4 +383,13 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('payments', [ExportController::class, 'payments'])->name('payments');
         Route::get('contracts', [ExportController::class, 'contracts'])->name('contracts');
     });
+});
+
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'app' => config('app.name'),
+        'env' => config('app.env'),
+        'timestamp' => now()->toIso8601String(),
+    ]);
 });

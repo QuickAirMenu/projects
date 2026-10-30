@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignId('received_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
-            
+
             // Indexes
             $table->index('invoice_id');
             $table->index('payment_number');

@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Invoice extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'invoice_number',
@@ -56,51 +56,6 @@ class Invoice extends Model
             ->logOnly(['invoice_number', 'total', 'payment_status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    /**
-     * Boot method
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($invoice) {
-            if (!$invoice->invoice_number) {
-                $lastInvoice = self::withTrashed()->latest('id')->first();
-                $lastNumber = $lastInvoice ? (int) substr($lastInvoice->invoice_number, -4) : 0;
-                $invoice->invoice_number = generate_number(
-                    workspace_config('invoice.number_prefix', 'INV'),
-                    $lastNumber
-                );
-            }
-
-            $discountType     = $invoice->discount_type ?? 'fixed';
-            $discountValue    = ($invoice->discount_value ?: $invoice->discount_amount) ?? 0;
-            $discountAmount   = $discountType === 'percentage'
-                ? round(($invoice->subtotal ?? 0) * $discountValue / 100, 2)
-                : $discountValue;
-
-            $invoice->discount_value    = $discountValue;
-            $invoice->discount_amount   = $discountAmount;
-            $invoice->tax_amount        = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
-            $invoice->total             = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
-            $invoice->remaining_amount  = $invoice->total;
-        });
-
-        static::updating(function (Invoice $invoice) {
-            $discountType     = $invoice->discount_type ?? 'fixed';
-            $discountValue    = ($invoice->discount_value ?: $invoice->discount_amount) ?? 0;
-            $discountAmount   = $discountType === 'percentage'
-                ? round(($invoice->subtotal ?? 0) * $discountValue / 100, 2)
-                : $discountValue;
-
-            $invoice->discount_value    = $discountValue;
-            $invoice->discount_amount   = $discountAmount;
-            $invoice->tax_amount        = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
-            $invoice->total             = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
-            $invoice->remaining_amount  = max(0, $invoice->total - ($invoice->paid_amount ?? 0));
-        });
     }
 
     /**
@@ -166,5 +121,50 @@ class Invoice extends Model
     public function getPaymentStatusBadgeAttribute()
     {
         return payment_status_badge($this->payment_status);
+    }
+
+    /**
+     * Boot method
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($invoice) {
+            if (! $invoice->invoice_number) {
+                $lastInvoice = self::withTrashed()->latest('id')->first();
+                $lastNumber = $lastInvoice ? (int) substr($lastInvoice->invoice_number, -4) : 0;
+                $invoice->invoice_number = generate_number(
+                    workspace_config('invoice.number_prefix', 'INV'),
+                    $lastNumber
+                );
+            }
+
+            $discountType = $invoice->discount_type ?? 'fixed';
+            $discountValue = $invoice->discount_value ?? ($invoice->discount_amount ?? 0);
+            $discountAmount = $discountType === 'percentage'
+                ? round(($invoice->subtotal ?? 0) * $discountValue / 100, 2)
+                : $discountValue;
+
+            $invoice->discount_value = $discountValue;
+            $invoice->discount_amount = $discountAmount;
+            $invoice->tax_amount = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
+            $invoice->total = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
+            $invoice->remaining_amount = $invoice->total;
+        });
+
+        static::updating(function (Invoice $invoice) {
+            $discountType = $invoice->discount_type ?? 'fixed';
+            $discountValue = $invoice->discount_value ?? ($invoice->discount_amount ?? 0);
+            $discountAmount = $discountType === 'percentage'
+                ? round(($invoice->subtotal ?? 0) * $discountValue / 100, 2)
+                : $discountValue;
+
+            $invoice->discount_value = $discountValue;
+            $invoice->discount_amount = $discountAmount;
+            $invoice->tax_amount = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
+            $invoice->total = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
+            $invoice->remaining_amount = max(0, $invoice->total - ($invoice->paid_amount ?? 0));
+        });
     }
 }

@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -14,64 +15,64 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create Permissions
         $permissions = [
             // User Management
             'manage-users',
             'manage-roles',
-            
+
             // Client Management
             'view-clients',
             'create-clients',
             'edit-clients',
             'delete-clients',
-            
+
             // Project Management
             'view-projects',
             'create-projects',
             'edit-projects',
             'delete-projects',
             'archive-projects',
-            
+
             // Task Management
             'view-tasks',
             'create-tasks',
             'edit-tasks',
             'delete-tasks',
             'assign-tasks',
-            
+
             // Financial
             'view-quotes',
             'create-quotes',
             'edit-quotes',
             'delete-quotes',
             'send-quotes',
-            
+
             'view-contracts',
             'create-contracts',
             'edit-contracts',
             'delete-contracts',
-            
+
             'view-invoices',
             'create-invoices',
             'edit-invoices',
             'delete-invoices',
-            
+
             'view-payments',
             'create-payments',
             'delete-payments',
-            
+
             // Change Requests
             'view-change-requests',
             'create-change-requests',
             'approve-change-requests',
-            
+
             // Reports
             'view-reports',
             'view-financials',
-            
+
             // Settings
             'manage-settings',
         ];

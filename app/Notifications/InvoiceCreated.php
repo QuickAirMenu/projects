@@ -12,17 +12,20 @@ class InvoiceCreated extends Notification
 
     public function __construct(public Invoice $invoice) {}
 
-    public function via(object $notifiable): array { return ['database']; }
+    public function via(object $notifiable): array
+    {
+        return ['database'];
+    }
 
     public function toArray(object $notifiable): array
     {
         return [
-            'type'    => 'invoice_created',
-            'title'   => __('notifications.invoice_created'),
+            'type' => 'invoice_created',
+            'title' => __('notifications.invoice_created'),
             'message' => __('notifications.invoice_created_msg', ['number' => $this->invoice->invoice_number]),
-            'url'     => route('invoices.show', $this->invoice->id),
-            'icon'    => 'fa-file-invoice',
-            'color'   => 'green',
+            'url' => route('invoices.show', $this->invoice->id),
+            'icon' => 'fa-file-invoice',
+            'color' => 'green',
         ];
     }
 }

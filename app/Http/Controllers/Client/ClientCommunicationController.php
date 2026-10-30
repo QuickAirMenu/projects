@@ -18,20 +18,20 @@ class ClientCommunicationController extends Controller
         $this->authorize('update', $client);
 
         $request->validate([
-            'type'             => 'required|in:call,email,meeting,whatsapp,other',
-            'subject'          => 'nullable|string|max:255',
-            'message'          => 'required|string',
+            'type' => 'required|in:call,email,meeting,whatsapp,other',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'required|string',
             'communication_date' => 'required|date',
-            'follow_up_date'   => 'nullable|date|after:today',
+            'follow_up_date' => 'nullable|date|after:today',
         ]);
 
         $client->communications()->create([
-            'user_id'            => Auth::id(),
-            'type'               => $request->type,
-            'subject'            => $request->subject,
-            'message'            => $request->message,
+            'user_id' => Auth::id(),
+            'type' => $request->type,
+            'subject' => $request->subject,
+            'message' => $request->message,
             'communication_date' => $request->communication_date,
-            'follow_up_date'     => $request->follow_up_date,
+            'follow_up_date' => $request->follow_up_date,
         ]);
 
         return redirect()->route('clients.show', $client)

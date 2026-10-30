@@ -20,13 +20,13 @@ class ChangeRequestService
 
     protected function generateRequestNumber(): string
     {
-        $prefix = 'CR-' . date('Ym') . '-';
-        $last = ChangeRequest::withTrashed()->where('request_number', 'like', $prefix . '%')
+        $prefix = 'CR-'.date('Ym').'-';
+        $last = ChangeRequest::withTrashed()->where('request_number', 'like', $prefix.'%')
             ->orderByDesc('request_number')
             ->first();
 
         $seq = $last ? (int) substr($last->request_number, -4) + 1 : 1;
 
-        return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad($seq, 4, '0', STR_PAD_LEFT);
     }
 }
