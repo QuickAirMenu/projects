@@ -156,6 +156,11 @@ class Quote extends Model
         return status_badge($badge['text'], $badge['color']);
     }
 
+    public function views()
+    {
+        return $this->hasMany(QuoteView::class);
+    }
+
     /**
      * Boot method
      */

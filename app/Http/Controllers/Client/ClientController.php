@@ -65,7 +65,7 @@ class ClientController extends Controller
         $data['created_by'] = Auth::id();
         $client = Client::create($data);
 
-        if ($client->email && $request->boolean('send_invite')) {
+        if ($client->email) {
             $this->sendPortalInvite($client);
         }
 

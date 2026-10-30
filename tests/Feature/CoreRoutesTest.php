@@ -66,7 +66,7 @@ class CoreRoutesTest extends TestCase
             'email' => 'admin@example.com',
             'password' => 'password',
             'is_active' => true,
-            'language' => 'ar',
+            'language' => 'en',
         ]);
         $this->user->assignRole('super-admin');
 
@@ -243,15 +243,15 @@ class CoreRoutesTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $this->get(route('quotes.index'))->assertOk()->assertSee('Approved & Unconverted');
-        $this->get(route('quotes.index'))->assertOk()->assertSee('Unconverted Value');
+        $this->get(route('quotes.index'))->assertOk()->assertSeeText('Approved & Unconverted');
+        $this->get(route('quotes.index'))->assertOk()->assertSeeText('Unconverted Value');
         $this->get(route('quotes.create'))
             ->assertOk()
             ->assertSee('service_type_id', false);
 
         $this->get(route('quotes.show', $this->convertibleQuote))
             ->assertOk()
-            ->assertSee('Send via WhatsApp')
+            ->assertSeeText('Send via WhatsApp')
             ->assertSee('https://wa.me/966500000000?text=', false)
             ->assertSee(route('quotes.pdf', $this->convertibleQuote), false)
             ->assertSee('convert-to-invoice', false);
@@ -304,7 +304,7 @@ class CoreRoutesTest extends TestCase
 
         $this->get(route('quotes.show', $draftQuote))
             ->assertOk()
-            ->assertSee('Send via WhatsApp')
+            ->assertSeeText('Send via WhatsApp')
             ->assertSee('https://wa.me/966551234567?text=', false);
 
         $this->get(route('quotes.public', $draftQuote->public_token))
