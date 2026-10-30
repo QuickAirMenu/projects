@@ -1,47 +1,49 @@
 <?php
-use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\Auth\UserInvitationController;
 use App\Http\Controllers\BulkActionController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\Dashboard\DashboardController;
-use App\Http\Controllers\Client\ClientController;
+use App\Http\Controllers\ChangeRequest\ChangeRequestController;
 use App\Http\Controllers\Client\ClientCommunicationController;
-use App\Http\Controllers\Project\ProjectController;
-use App\Http\Controllers\Project\ProjectAttachmentController;
-use App\Http\Controllers\Project\ProjectWorkflowController;
-use App\Http\Controllers\Task\TaskController;
-use App\Http\Controllers\Task\TaskCommentController;
-use App\Http\Controllers\Task\TaskChecklistController;
-use App\Http\Controllers\Task\TimeLogController;
-use App\Http\Controllers\Task\KanbanController;
-use App\Http\Controllers\Finance\QuoteController;
+use App\Http\Controllers\Client\ClientController;
+use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\Finance\ContractController;
 use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
-use App\Http\Controllers\ChangeRequest\ChangeRequestController;
-use App\Http\Controllers\Report\ReportController;
-use App\Http\Controllers\Report\ProjectReportController;
-use App\Http\Controllers\Report\TaskReportController;
+use App\Http\Controllers\Finance\QuoteController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Portal\ClientPortalController;
+use App\Http\Controllers\Project\ProjectAttachmentController;
+use App\Http\Controllers\Project\ProjectController;
+use App\Http\Controllers\Project\ProjectWorkflowController;
 use App\Http\Controllers\Report\FinanceReportController;
+use App\Http\Controllers\Report\PerformanceReportController;
+use App\Http\Controllers\Report\ProjectReportController;
+use App\Http\Controllers\Report\ReportController;
+use App\Http\Controllers\Report\TaskReportController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Setting\SettingController;
+use App\Http\Controllers\Settings\ProjectStatusController;
+use App\Http\Controllers\Settings\ServiceTypeController;
+use App\Http\Controllers\Settings\TaskStatusController;
+use App\Http\Controllers\Task\KanbanController;
+use App\Http\Controllers\Task\TaskChecklistController;
+use App\Http\Controllers\Task\TaskCommentController;
+use App\Http\Controllers\Task\TaskController;
+use App\Http\Controllers\Task\TimeLogController;
+use App\Http\Controllers\User\PermissionController;
+use App\Http\Controllers\User\RoleController;
+use App\Http\Controllers\User\UserController;
 use App\Mail\SupportMail;
 use App\Models\Setting;
 use App\Services\MailConfigService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Http\Controllers\Report\PerformanceReportController;
-use App\Http\Controllers\Portal\ClientPortalController;
-use App\Http\Controllers\Setting\SettingController;
-use App\Http\Controllers\Settings\ServiceTypeController;
-use App\Http\Controllers\Settings\ProjectStatusController;
-use App\Http\Controllers\Settings\TaskStatusController;
-use App\Http\Controllers\User\UserController;
-use App\Http\Controllers\Auth\UserInvitationController;
-use App\Http\Controllers\User\RoleController;
-use App\Http\Controllers\User\PermissionController;
-use App\Http\Controllers\ExportController;
-use App\Http\Controllers\ImportController;
+use Illuminate\Support\Facades\Route;
 
 // Guest
 Route::middleware('guest')->group(function () {
@@ -53,12 +55,15 @@ Route::middleware('guest')->group(function () {
 
 // Language switch
 Route::get('lang/{locale}', function ($locale) {
-    if (in_array($locale, ['ar', 'en'])) { session(['locale' => $locale]); }
+    if (in_array($locale, ['ar', 'en'])) {
+        session(['locale' => $locale]);
+    }
+
     return redirect()->back();
 })->name('lang.switch');
 
 // Help center
-Route::get('/help', fn() => view('help'))->name('help');
+Route::get('/help', fn () => view('help'))->name('help');
 
 // Public quotes
 Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->middleware('throttle:30,1')->name('quotes.public');
@@ -80,21 +85,21 @@ Route::prefix('portal')->name('portal.')->group(function () {
     Route::post('/reset-password/{token}', [ClientPortalController::class, 'completeResetPassword'])->name('reset-password.post');
 
     Route::middleware(['auth:client'])->group(function () {
-        Route::get('/dashboard',          [ClientPortalController::class, 'dashboard'])->name('dashboard');
-        Route::get('/invoices',           [ClientPortalController::class, 'invoices'])->name('invoices');
+        Route::get('/dashboard', [ClientPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/invoices', [ClientPortalController::class, 'invoices'])->name('invoices');
         Route::get('/invoices/{invoice}/pdf', [ClientPortalController::class, 'downloadInvoicePdf'])->name('invoices.pdf');
-        Route::get('/quotes',             [ClientPortalController::class, 'quotes'])->name('quotes');
+        Route::get('/quotes', [ClientPortalController::class, 'quotes'])->name('quotes');
         Route::get('/quotes/{quote}/pdf', [ClientPortalController::class, 'downloadQuotePdf'])->name('quotes.pdf');
         Route::get('/attachments/{attachment}/download', [ClientPortalController::class, 'downloadAttachment'])->name('attachments.download');
         Route::get('/projects/{project}', [ClientPortalController::class, 'projectShow'])->name('projects.show');
-        Route::get('/payments',           [ClientPortalController::class, 'payments'])->name('payments');
+        Route::get('/payments', [ClientPortalController::class, 'payments'])->name('payments');
         Route::get('/payments/{payment}/proof', [ClientPortalController::class, 'downloadPaymentProof'])->name('payments.proof');
-        Route::get('/contracts',          [ClientPortalController::class, 'contracts'])->name('contracts');
+        Route::get('/contracts', [ClientPortalController::class, 'contracts'])->name('contracts');
         Route::get('/contracts/{contract}/pdf', [ClientPortalController::class, 'downloadContractPdf'])->name('contracts.pdf');
-        Route::get('/profile',            [ClientPortalController::class, 'profile'])->name('profile');
-        Route::put('/profile',            [ClientPortalController::class, 'updateProfile'])->name('profile.update');
-        Route::put('/profile/password',   [ClientPortalController::class, 'updatePassword'])->name('profile.password');
-        Route::post('/logout',            [ClientPortalController::class, 'logout'])->name('logout');
+        Route::get('/profile', [ClientPortalController::class, 'profile'])->name('profile');
+        Route::put('/profile', [ClientPortalController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profile/password', [ClientPortalController::class, 'updatePassword'])->name('profile.password');
+        Route::post('/logout', [ClientPortalController::class, 'logout'])->name('logout');
     });
 });
 
@@ -106,11 +111,11 @@ Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSe
 Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::post('logout', [LogoutController::class, 'logout'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/support', fn() => view('support'))->name('support');
-    Route::post('/support', function (\Illuminate\Http\Request $request) {
+    Route::get('/support', fn () => view('support'))->name('support');
+    Route::post('/support', function (Request $request) {
         $request->validate([
-            'subject'    => 'required|string|max:255',
-            'message'    => 'required|string|max:5000',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240',
         ]);
 
@@ -132,14 +137,14 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
 
                 if ($request->hasFile('attachment')) {
                     $mail->attach($request->file('attachment')->getRealPath(), [
-                        'as'   => $request->file('attachment')->getClientOriginalName(),
+                        'as' => $request->file('attachment')->getClientOriginalName(),
                         'mime' => $request->file('attachment')->getMimeType(),
                     ]);
                 }
 
                 Mail::to($toEmail)->send($mail);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             report($e);
         }
 
@@ -154,7 +159,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 
     // Notifications
-    Route::prefix('notifications')->name('notifications.')->group(function() {
+    Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::post('{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
         Route::post('read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
