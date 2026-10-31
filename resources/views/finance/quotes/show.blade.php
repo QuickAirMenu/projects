@@ -31,7 +31,7 @@
         </form>
         @endif
         @if(in_array($quote->status, ['draft', 'sent', 'approved']) && $whatsappUrl)
-        <form action="{{ route('quotes.send-whatsapp', $quote) }}" method="POST">
+        <form action="{{ route('quotes.send-whatsapp', $quote) }}" method="POST" data-whatsapp-url="{{ $whatsappUrl }}">
             @csrf
             <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fab fa-whatsapp me-2"></i>{{ __('finance.send_via_whatsapp') }}</button>
         </form>
