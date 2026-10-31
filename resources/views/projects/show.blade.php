@@ -208,7 +208,7 @@
                 @if(!$step->completed)
                 <form action="{{ route('projects.workflow.complete', [$project, $step]) }}" method="POST" class="ms-auto">
                     @csrf
-                    <button type="submit" class="text-xs text-blue-600 hover:underline">✓</button>
+                    <button type="submit" class="text-xs text-blue-600 hover:underline"><i class="fas fa-check"></i></button>
                 </form>
                 @endif
             </div>

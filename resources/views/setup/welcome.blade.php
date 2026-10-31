@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iProjects - إعداد النظام</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>body{font-family:'Cairo',sans-serif}</style>
 </head>
 <body class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden">
         <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 text-center">
-            <div class="text-5xl mb-3">🚀</div>
+            <div class="mb-3">
+                <i class="fas fa-rocket text-5xl"></i>
+            </div>
             <h1 class="text-3xl font-bold">مرحباً بك في iProjects</h1>
             <p class="text-indigo-100 mt-2">نظام إدارة المشاريع والمالية</p>
             <p class="text-indigo-200 text-sm mt-1">إعداد النظام لأول مرة — يستغرق دقيقة واحدة</p>
@@ -105,7 +108,7 @@
             <div class="pt-2">
                 <button type="submit"
                     class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3.5 rounded-xl text-lg transition shadow-lg">
-                    إعداد النظام الآن 🚀
+                    <i class="fas fa-rocket me-2"></i>إعداد النظام الآن
                 </button>
                 <p class="text-center text-gray-400 text-xs mt-3">سيتم إنشاء حساب المدير + الإعدادات الأولية + الأرقام التسلسلية</p>
             </div>

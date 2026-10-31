@@ -27,7 +27,7 @@
     <div class="icon"><i class="fas {{ $quote->status === 'approved' ? 'fa-check-circle text-green-600' : 'fa-file-signature' }}"></i></div>
 
     @if($quote->status === 'approved')
-        <h1 style="color:#065f46">✅ تم اعتماد هذا العرض مسبقاً</h1>
+        <h1 style="color:#065f46"><i class="fas fa-check-circle"></i> تم اعتماد هذا العرض مسبقاً</h1>
         <p>تم اعتماد عرض السعر رقم {{ $quote->quote_number }} في {{ $quote->approved_at?->format('Y-m-d H:i') }}</p>
     @elseif($quote->status === 'rejected')
         <h1 style="color:#991b1b">تم طلب تعديل على هذا العرض</h1>

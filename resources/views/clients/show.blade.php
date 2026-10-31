@@ -133,10 +133,10 @@
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                     <select name="type" required class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="call">📞 {{ __('messages.call') }}</option>
-                        <option value="email">📧 Email</option>
-                        <option value="meeting">🤝 {{ __('messages.meeting') }}</option>
-                        <option value="whatsapp">💬 WhatsApp</option>
+                        <option value="call"><i class="fas fa-phone"></i> {{ __('messages.call') }}</option>
+                        <option value="email"><i class="fas fa-envelope"></i> Email</option>
+                        <option value="meeting"><i class="fas fa-handshake"></i> {{ __('messages.meeting') }}</option>
+                        <option value="whatsapp"><i class="fas fa-comment"></i> WhatsApp</option>
                         <option value="other">{{ __('messages.other') }}</option>
                     </select>
                     <input type="datetime-local" name="communication_date" value="{{ now()->format('Y-m-d\TH:i') }}" required

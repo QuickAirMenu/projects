@@ -19,7 +19,7 @@
 <body>
 <div class="wrap">
     <div class="card">
-        <h1>📬 رسالة دعم فني جديدة</h1>
+        <h1><i class="fas fa-inbox"></i> رسالة دعم فني جديدة</h1>
         <div class="meta">
             <p><strong>المرسل:</strong> {{ $senderName }}</p>
             <p><strong>البريد:</strong> {{ $senderEmail }}</p>
