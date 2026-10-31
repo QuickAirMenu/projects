@@ -59,7 +59,92 @@
         @endforeach
     </div>
 
-    {{-- Main Grid --}}
+        {{-- Charts --}}
+    <div class="grid grid-cols-1 {{ $canViewFinancialStats ? 'lg:grid-cols-3' : 'lg:grid-cols-1' }} gap-5">
+
+        @if($canViewFinancialStats)
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-chart-column text-emerald-600"></i>
+                    {{ __('common.collections_last_6_months') }}
+                </h2>
+                <div class="flex items-center gap-3 text-xs text-gray-600">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-blue-500 inline-block"></span>{{ __('common.invoiced') }}</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>{{ __('common.collected') }}</span>
+                </div>
+            </div>
+            <div class="px-5 py-5">
+                @php
+                    $maxVal = max(1, max($collectionsTrend['invoiced'] ?: [0]), max($collectionsTrend['collected'] ?: [0]));
+                @endphp
+                <div class="flex items-end justify-between gap-2 sm:gap-3 h-48">
+                    @foreach($collectionsTrend['labels'] as $i => $label)
+                        @php
+                            $inv = $collectionsTrend['invoiced'][$i] ?? 0;
+                            $col = $collectionsTrend['collected'][$i] ?? 0;
+                            $invH = round(($inv / $maxVal) * 100, 1);
+                            $colH = round(($col / $maxVal) * 100, 1);
+                        @endphp
+                        <div class="flex-1 flex flex-col items-center justify-end gap-1 h-full group">
+                            <div class="w-full flex items-end justify-center gap-1 h-full">
+                                <div class="w-1/2 bg-blue-500/80 rounded-t transition-all group-hover:bg-blue-600" style="height: {{ $invH }}%" title="{{ number_format($inv, 2) }}"></div>
+                                <div class="w-1/2 bg-emerald-500/80 rounded-t transition-all group-hover:bg-emerald-600" style="height: {{ $colH }}%" title="{{ number_format($col, 2) }}"></div>
+                            </div>
+                            <span class="text-[10px] text-gray-500 whitespace-nowrap">{{ $label }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+
+        {{-- Projects by status --}}
+        <div class="bg-white rounded-xl border border-gray-200">
+            <div class="px-5 py-4 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-indigo-600"></i>
+                    {{ __('common.projects_by_status') }}
+                </h2>
+            </div>
+            <div class="px-5 py-5">
+                @php
+                    $totalStatus = array_sum(array_column($projectsByStatus, 'count'));
+                    $segments = [];
+                    $acc = 0;
+                    foreach ($projectsByStatus as $row) {
+                        $pct = $totalStatus > 0 ? ($row['count'] / $totalStatus) * 100 : 0;
+                        $segments[] = $row['color'].' '.round($acc, 2).'% '.round($acc + $pct, 2).'%';
+                        $acc += $pct;
+                    }
+                    $gradient = $segments ? 'conic-gradient('.implode(', ', $segments).')' : 'conic-gradient(#e5e7eb 0% 100%)';
+                @endphp
+                @if($totalStatus > 0)
+                <div class="flex items-center gap-5">
+                    <div class="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0 rounded-full" style="background: {{ $gradient }}">
+                        <div class="absolute inset-[22%] bg-white rounded-full flex flex-col items-center justify-center">
+                            <span class="text-xl font-bold text-gray-900">{{ $totalStatus }}</span>
+                            <span class="text-[10px] text-gray-500">{{ __('common.projects') }}</span>
+                        </div>
+                    </div>
+                    <ul class="flex-1 space-y-1.5 min-w-0">
+                        @foreach($projectsByStatus as $row)
+                        <li class="flex items-center gap-2 text-xs">
+                            <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background: {{ $row['color'] }}"></span>
+                            <span class="text-gray-600 truncate flex-1">{{ $row['label'] }}</span>
+                            <span class="font-semibold text-gray-900">{{ $row['count'] }}</span>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+                @else
+                <p class="text-sm text-gray-500 text-center py-8">{{ __('common.no_data') }}</p>
+                @endif
+            </div>
+        </div>
+    </div>
+
+{{-- Main Grid --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         {{-- Recent Projects --}}

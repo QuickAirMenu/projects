@@ -104,4 +104,8 @@ return [
     'export_contracts' => 'Export Contracts',
     'import_export' => 'Import & Export',
     'download_excel' => 'Download Excel',
+    'invoiced' => 'Invoiced',
+    'collected' => 'Collected',
+    'collections_last_6_months' => 'Invoiced vs Collected (Last 6 Months)',
+    'projects_by_status' => 'Projects by Status',
 ];

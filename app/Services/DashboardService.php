@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\Task;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -79,6 +80,87 @@ class DashboardService
             ->take(3)
             ->get();
 
-        return compact('stats', 'financialStats', 'canViewFinancialStats', 'recentProjects', 'myTasks', 'overdueProjects');
+        $collectionsTrend = $canViewFinancialStats
+            ? $this->getCollectionsTrend()
+            : ['labels' => [], 'invoiced' => [], 'collected' => []];
+
+        $projectsByStatus = $this->getProjectsByStatus(clone $projectQuery);
+
+        return compact(
+            'stats',
+            'financialStats',
+            'canViewFinancialStats',
+            'recentProjects',
+            'myTasks',
+            'overdueProjects',
+            'collectionsTrend',
+            'projectsByStatus'
+        );
+    }
+
+    /**
+     * Last 6 months: invoiced vs collected amounts (portable across MySQL/SQLite).
+     */
+    private function getCollectionsTrend(): array
+    {
+        $start = now()->startOfMonth()->subMonths(5);
+
+        $invoices = Invoice::query()
+            ->where(function ($q) use ($start) {
+                $q->where('invoice_date', '>=', $start->toDateString())
+                    ->orWhereNull('invoice_date');
+            })
+            ->get(['invoice_date', 'total', 'paid_amount']);
+
+        $labels = [];
+        $invoiced = [];
+        $collected = [];
+
+        for ($i = 0; $i < 6; $i++) {
+            $month = $start->copy()->addMonths($i);
+            $key = $month->format('Y-m');
+            $labels[] = $month->translatedFormat('M Y');
+            $invoiced[$key] = 0.0;
+            $collected[$key] = 0.0;
+        }
+
+        foreach ($invoices as $invoice) {
+            if (! $invoice->invoice_date) {
+                continue;
+            }
+            $key = Carbon::parse($invoice->invoice_date)->format('Y-m');
+            if (! isset($invoiced[$key])) {
+                continue;
+            }
+            $invoiced[$key] += (float) $invoice->total;
+            $collected[$key] += (float) $invoice->paid_amount;
+        }
+
+        return [
+            'labels' => $labels,
+            'invoiced' => array_values($invoiced),
+            'collected' => array_values($collected),
+        ];
+    }
+
+    /**
+     * Distribution of projects across their statuses (role-scoped).
+     */
+    private function getProjectsByStatus($projectQuery): array
+    {
+        $rows = $projectQuery
+            ->join('project_statuses', 'project_statuses.id', '=', 'projects.status_id')
+            ->selectRaw('project_statuses.name_ar, project_statuses.name_en, project_statuses.color, COUNT(*) as total')
+            ->groupBy('project_statuses.id', 'project_statuses.name_ar', 'project_statuses.name_en', 'project_statuses.color')
+            ->orderByDesc('total')
+            ->get();
+
+        $isArabic = app()->getLocale() === 'ar';
+
+        return $rows->map(fn ($row) => [
+            'label' => $isArabic ? ($row->name_ar ?: $row->name_en) : ($row->name_en ?: $row->name_ar),
+            'count' => (int) $row->total,
+            'color' => $row->color ?: '#6B7280',
+        ])->all();
     }
 }
