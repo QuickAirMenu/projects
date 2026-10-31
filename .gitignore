@@ -48,3 +48,5 @@ Thumbs.db
 !/storage/framework/sessions/.gitkeep
 /storage/framework/views/*
 !/storage/framework/views/.gitkeep
+bootstrap/cache/*.php
+!bootstrap/cache/.gitkeep
