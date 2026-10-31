@@ -5,6 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\ActivityLogger;
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\CheckSetup;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -44,6 +45,7 @@ class Kernel extends HttpKernel
         ValidatePostSize::class,
         TrimStrings::class,
         ConvertEmptyStringsToNull::class,
+        CheckSetup::class,
     ];
 
     protected $middlewareGroups = [

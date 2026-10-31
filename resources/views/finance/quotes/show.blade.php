@@ -30,7 +30,7 @@
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-check-circle me-2"></i>{{ __('finance.approve_quote') }}</button>
         </form>
         @endif
-        @if($quote->status === 'draft' && $whatsappUrl)
+        @if(in_array($quote->status, ['draft', 'sent', 'approved']) && $whatsappUrl)
         <form action="{{ route('quotes.send-whatsapp', $quote) }}" method="POST">
             @csrf
             <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fab fa-whatsapp me-2"></i>{{ __('finance.send_via_whatsapp') }}</button>

@@ -30,6 +30,7 @@ use App\Http\Controllers\Setting\SettingController;
 use App\Http\Controllers\Settings\ProjectStatusController;
 use App\Http\Controllers\Settings\ServiceTypeController;
 use App\Http\Controllers\Settings\TaskStatusController;
+use App\Http\Controllers\SetupController;
 use App\Http\Controllers\Task\KanbanController;
 use App\Http\Controllers\Task\TaskChecklistController;
 use App\Http\Controllers\Task\TaskCommentController;
@@ -398,3 +399,8 @@ Route::get('/health', function () {
         'timestamp' => now()->toIso8601String(),
     ]);
 });
+
+// Setup Wizard Routes
+Route::get('/setup/{token}', [SetupController::class, 'show'])->name('setup');
+Route::post('/setup/{token}', [SetupController::class, 'store'])->name('setup.post');
+Route::get('/setup-pending', [SetupController::class, 'pending'])->name('setup.pending');
