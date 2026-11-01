@@ -106,8 +106,18 @@
 
     @if($quote->notes || $quote->terms_and_conditions)
     <div class="notes">
-        @if($quote->notes)<h3>{{ __('finance.notes') }}</h3><p>{{ $quote->notes }}</p>@endif
-        @if($quote->terms_and_conditions)<h3 style="margin-top:10px">{{ __('finance.terms_and_conditions') }}</h3><p>{{ $quote->terms_and_conditions }}</p>@endif
+        @if($quote->notes)
+            <h3>{{ __('finance.notes') }}</h3>
+            @foreach(text_lines($quote->notes) as $line)
+                <p>{{ $line }}</p>
+            @endforeach
+        @endif
+        @if($quote->terms_and_conditions)
+            <h3 style="margin-top:10px">{{ __('finance.terms_and_conditions') }}</h3>
+            @foreach(text_lines($quote->terms_and_conditions) as $line)
+                <p>{{ $line }}</p>
+            @endforeach
+        @endif
     </div>
     @endif
 

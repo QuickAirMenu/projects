@@ -394,3 +394,20 @@ if (! function_exists('direction')) {
         return is_rtl() ? 'rtl' : 'ltr';
     }
 }
+
+if (! function_exists('text_lines')) {
+    /**
+     * Split a multi-line text block into clean, non-empty lines for rendering.
+     */
+    function text_lines($text): array
+    {
+        if (blank($text)) {
+            return [];
+        }
+
+        $normalized = str_replace(["\r\n", "\r"], "\n", (string) $text);
+        $lines = array_map('trim', explode("\n", $normalized));
+
+        return array_values(array_filter($lines, fn ($line) => $line !== ''));
+    }
+}

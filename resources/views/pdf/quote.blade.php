@@ -9,15 +9,15 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body{font-family:dejavusans,sans-serif;font-size:12px;color:#1f2937;margin:0}
-        .page{padding:28px}
+        body{font-family:dejavusans,sans-serif;font-size:11px;color:#1f2937;margin:0}
+        .page{padding:20px}
         .header{display:table;width:100%;margin-bottom:18px}
         .header > div{display:table-cell;vertical-align:top;width:50%}
-        .box{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:14px}
+        .box{border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px}
         .title{font-size:22px;font-weight:700;margin:0 0 6px}
         .sub,.muted{color:#6b7280}
         .sub{font-size:13px;margin:0}
-        .section-title{font-size:13px;font-weight:700;margin:0 0 8px}
+        .section-title{font-size:12px;font-weight:700;margin:0 0 5px}
         table{width:100%;border-collapse:collapse}
         th,td{border-bottom:1px solid #e5e7eb;padding:10px 8px;text-align:start}
         th{background:#f9fafb;font-size:11px}
@@ -78,11 +78,15 @@
     <div class="box">
         @if($quote->notes)
             <p class="section-title">{{ __('finance.notes') }}</p>
-            <p style="margin-top:0;white-space:pre-line">{{ $quote->notes }}</p>
+            @foreach(text_lines($quote->notes) as $line)
+                <p style="margin:0 0 2px 0;font-size:10px;line-height:1.55">{{ $line }}</p>
+            @endforeach
         @endif
         @if($quote->terms_and_conditions)
             <p class="section-title">{{ __('finance.terms_and_conditions') }}</p>
-            <p style="margin-top:0;white-space:pre-line">{{ $quote->terms_and_conditions }}</p>
+            @foreach(text_lines($quote->terms_and_conditions) as $line)
+                <p style="margin:0 0 2px 0;font-size:10px;line-height:1.55">{{ $line }}</p>
+            @endforeach
         @endif
     </div>
     @endif
