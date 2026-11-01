@@ -21,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // mPDF needs a larger PCRE backtrack limit for large HTML documents.
+        @ini_set('pcre.backtrack_limit', '100000000');
+
         // Register Observers
         Project::observe(ProjectObserver::class);
         Task::observe(TaskObserver::class);
