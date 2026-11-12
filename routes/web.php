@@ -314,6 +314,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('projects', [ProjectReportController::class, 'index'])->name('projects');
         Route::get('tasks', [TaskReportController::class, 'index'])->name('tasks');
         Route::get('finance', [FinanceReportController::class, 'index'])->name('finance');
+        Route::get('finance/export', [FinanceReportController::class, 'export'])->name('finance.export');
         Route::get('performance', [PerformanceReportController::class, 'index'])->name('performance');
     });
 

@@ -14,9 +14,14 @@
         <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.finance_report') }}</h1>
         <p class="text-gray-500 text-sm mt-1">{{ __('messages.invoices_payments') }}</p>
     </div>
-    <a href="{{ route('reports.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition">
-        <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
-    </a>
+    <div class="flex gap-2">
+        <a href="{{ route('reports.finance.export', request()->only(['from','to','payment_status'])) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm transition">
+            <i class="fas fa-file-excel me-2"></i>{{ __('messages.export') }}
+        </a>
+        <a href="{{ route('reports.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition">
+            <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
+        </a>
+    </div>
 </div>
 
 {{-- Financial KPIs --}}
@@ -40,7 +45,7 @@
 {{-- Monthly Chart Data --}}
 @if($monthlyData->count())
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
-    <h3 class="font-semibold text-gray-700 mb-4">{{ __('messages.monthly_performance') }} {{ now()->year }}</h3>
+    <h3 class="font-semibold text-gray-700 mb-4">{{ __('messages.monthly_performance') }} <span class="text-xs text-gray-400">{{ $from }} — {{ $to }}</span></h3>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead><tr class="border-b">
@@ -118,7 +123,33 @@
             @endforelse
         </tbody>
     </table>
-    @if($invoices->hasPages())
+    @if($topClients->count())
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+    <h3 class="font-semibold text-gray-700 mb-4">{{ __('messages.top_clients') }}</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead><tr class="border-b">
+                <th class="text-start py-2 text-gray-500">{{ __('client.client') }}</th>
+                <th class="text-end py-2 text-gray-500">{{ __('finance.total_invoiced') }}</th>
+                <th class="text-end py-2 text-gray-500">{{ __('messages.collected_label') }}</th>
+                <th class="text-end py-2 text-gray-500">{{ __('messages.invoices') }}</th>
+            </tr></thead>
+            <tbody>
+                @foreach($topClients as $tc)
+                <tr class="border-b last:border-0 hover:bg-gray-50">
+                    <td class="py-2 text-gray-700">{{ $tc->name }}</td>
+                    <td class="py-2 text-end text-gray-800 privacy-mask">{{ number_format($tc->total, 2) }}</td>
+                    <td class="py-2 text-end text-green-600 privacy-mask">{{ number_format($tc->paid, 2) }}</td>
+                    <td class="py-2 text-end text-gray-500">{{ $tc->count }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
+
+@if($invoices->hasPages())
     <div class="px-5 py-4 border-t">{{ $invoices->links() }}</div>
     @endif
 </div>

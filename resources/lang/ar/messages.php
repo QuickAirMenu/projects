@@ -174,4 +174,6 @@ return [
     'info' => 'معلومات',
     'breadcrumbs' => 'مسار التنقل',
     // Skeleton
+    'top_clients' => 'أعلى العملاء',
+    'invoices' => 'الفواتير',
 ];

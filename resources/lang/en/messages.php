@@ -174,4 +174,6 @@ return [
     'info' => 'Info',
     'breadcrumbs' => 'Breadcrumb',
     // Skeleton
+    'top_clients' => 'Top Clients',
+    'invoices' => 'Invoices',
 ];
