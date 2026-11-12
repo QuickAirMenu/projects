@@ -11,4 +11,10 @@ return [
     'invoice_created_msg' => 'تم إنشاء الفاتورة رقم :number',
     'payment_received' => 'تم استلام دفعة',
     'payment_received_msg' => 'تم استلام دفعة بقيمة :amount ر.س',
+    'title' => 'الإشعارات',
+    'unread' => 'غير مقروء',
+    'mark_all_read' => 'تعليم الكل كمقروء',
+    'mark_read' => 'تعليم كمقروء',
+    'view' => 'عرض',
+    'no_notifications' => 'لا توجد إشعارات',
 ];

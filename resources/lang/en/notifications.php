@@ -11,4 +11,10 @@ return [
     'invoice_created_msg' => 'Invoice #:number has been created',
     'payment_received' => 'Payment received',
     'payment_received_msg' => 'A payment of :amount SAR has been received',
+    'title' => 'Notifications',
+    'unread' => 'Unread',
+    'mark_all_read' => 'Mark all as read',
+    'mark_read' => 'Mark as read',
+    'view' => 'View',
+    'no_notifications' => 'No notifications',
 ];
