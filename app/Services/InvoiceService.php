@@ -136,6 +136,33 @@ class InvoiceService
         });
     }
 
+    /**
+     * Recalculate invoice paid/remaining/status from its (non-deleted) payments.
+     */
+    public function recalculateInvoiceTotals(Invoice $invoice): void
+    {
+        $invoice->refresh();
+
+        $totalPaid = (float) $invoice->payments()->sum('amount');
+        $total = (float) $invoice->total;
+        $remaining = max(0, $total - $totalPaid);
+
+        $status = 'unpaid';
+        if ($total > 0 && $totalPaid >= $total) {
+            $status = 'paid';
+        } elseif ($totalPaid > 0) {
+            $status = 'partially_paid';
+        } elseif ($invoice->due_date && $invoice->due_date < now()) {
+            $status = 'overdue';
+        }
+
+        $invoice->update([
+            'paid_amount' => $totalPaid,
+            'remaining_amount' => $remaining,
+            'payment_status' => $status,
+        ]);
+    }
+
     protected function generateInvoiceNumber(): string
     {
         $prefix = 'INV-'.date('Ym').'-';

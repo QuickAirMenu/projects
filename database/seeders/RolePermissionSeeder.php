@@ -62,6 +62,7 @@ class RolePermissionSeeder extends Seeder
 
             'view-payments',
             'create-payments',
+            'edit-payments',
             'delete-payments',
 
             // Change Requests
@@ -96,7 +97,7 @@ class RolePermissionSeeder extends Seeder
             'view-quotes', 'create-quotes', 'edit-quotes', 'delete-quotes', 'send-quotes',
             'view-contracts', 'create-contracts', 'edit-contracts', 'delete-contracts',
             'view-invoices', 'create-invoices', 'edit-invoices', 'delete-invoices',
-            'view-payments', 'create-payments', 'delete-payments',
+            'view-payments', 'create-payments', 'edit-payments', 'delete-payments',
             'view-change-requests', 'create-change-requests', 'approve-change-requests',
             'view-reports', 'view-financials',
         ]);
@@ -133,7 +134,7 @@ class RolePermissionSeeder extends Seeder
             'view-quotes', 'create-quotes', 'edit-quotes', 'send-quotes',
             'view-contracts', 'create-contracts', 'edit-contracts',
             'view-invoices', 'create-invoices', 'edit-invoices',
-            'view-payments', 'create-payments',
+            'view-payments', 'create-payments', 'edit-payments',
             'view-reports', 'view-financials',
         ]);
 
