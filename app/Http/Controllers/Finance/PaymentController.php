@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,11 +25,15 @@ class PaymentController extends Controller
         if ($request->trashed) {
             $query->onlyTrashed();
         }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
         $payments = $query->paginate(20);
         $stats = [
             'total_received' => Payment::sum('amount'),
             'this_month' => Payment::whereMonth('payment_date', now()->month)->sum('amount'),
             'count' => Payment::count(),
+            'pending_count' => Payment::where('status', 'pending')->count(),
         ];
         $trashed = $request->has('trashed');
 
@@ -57,6 +62,48 @@ class PaymentController extends Controller
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', __('messages.created_successfully'));
+    }
+
+    public function approve(Payment $payment)
+    {
+        $this->authorize('update', $payment);
+
+        if ($payment->status !== 'pending') {
+            return back()->with('error', __('messages.payment_already_reviewed'));
+        }
+
+        $payment->update([
+            'status' => 'approved',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'rejection_reason' => null,
+        ]);
+
+        $this->invoiceService->recalculateInvoiceTotals($payment->invoice);
+
+        return back()->with('success', __('messages.payment_approved'));
+    }
+
+    public function reject(Request $request, Payment $payment)
+    {
+        $this->authorize('update', $payment);
+
+        if ($payment->status !== 'pending') {
+            return back()->with('error', __('messages.payment_already_reviewed'));
+        }
+
+        $data = $request->validate([
+            'rejection_reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $payment->update([
+            'status' => 'rejected',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'rejection_reason' => $data['rejection_reason'] ?? null,
+        ]);
+
+        return back()->with('success', __('messages.payment_rejected'));
     }
 
     public function edit(Payment $payment)

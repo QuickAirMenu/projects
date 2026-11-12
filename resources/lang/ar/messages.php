@@ -177,4 +177,10 @@ return [
     'top_clients' => 'أعلى العملاء',
     'invoices' => 'الفواتير',
     'paid' => 'المدفوع',
+    'approve' => 'اعتماد',
+    'reject' => 'رفض',
+    'reject_confirm' => 'هل تريد رفض هذه الدفعة؟',
+    'payment_approved' => 'تم اعتماد الدفعة وتحديث الفاتورة.',
+    'payment_rejected' => 'تم رفض الدفعة.',
+    'payment_already_reviewed' => 'تمت مراجعة هذه الدفعة مسبقاً.',
 ];

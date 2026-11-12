@@ -17,4 +17,6 @@ return [
     'mark_read' => 'Mark as read',
     'view' => 'View',
     'no_notifications' => 'No notifications',
+    'payment_submitted' => 'Payment awaiting review',
+    'payment_submitted_msg' => 'A transfer receipt of :amount was uploaded for invoice :invoice — awaiting review',
 ];

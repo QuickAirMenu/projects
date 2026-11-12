@@ -11,7 +11,7 @@ use App\Models\ProjectStatus;
 use App\Models\Quote;
 use App\Models\ServiceType;
 use App\Models\User;
-use App\Notifications\PaymentReceived;
+use App\Notifications\PaymentSubmitted;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -146,6 +146,6 @@ class PortalQuoteActionsTest extends TestCase
         $payment = Payment::latest('id')->first();
         $this->assertNotNull($payment);
 
-        Notification::assertSentTo($this->admin, PaymentReceived::class);
+        Notification::assertSentTo($this->admin, PaymentSubmitted::class);
     }
 }

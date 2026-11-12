@@ -299,6 +299,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('{payment}/view-proof', [PaymentController::class, 'viewProof'])->name('view-proof');
         Route::put('{payment}', [PaymentController::class, 'update'])->name('update');
         Route::post('{payment}/restore', [PaymentController::class, 'restore'])->withTrashed()->name('restore');
+        Route::post('{payment}/approve', [PaymentController::class, 'approve'])->name('approve');
+        Route::post('{payment}/reject', [PaymentController::class, 'reject'])->name('reject');
         Route::delete('{payment}', [PaymentController::class, 'destroy'])->name('destroy');
     });
 

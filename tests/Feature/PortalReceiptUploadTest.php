@@ -119,14 +119,16 @@ class PortalReceiptUploadTest extends TestCase
         $payment = Payment::latest('id')->first();
         $this->assertNotNull($payment);
         $this->assertSame('bank_transfer', $payment->payment_method);
+        $this->assertSame('pending', $payment->status);
         $this->assertEquals(400.0, (float) $payment->amount);
         $this->assertNotNull($payment->proof_file_path);
         Storage::disk('private')->assertExists($payment->proof_file_path);
 
+        // Invoice must NOT change until admin approves
         $this->invoice->refresh();
-        $this->assertEquals(400.0, (float) $this->invoice->paid_amount);
-        $this->assertEquals(600.0, (float) $this->invoice->remaining_amount);
-        $this->assertSame('partially_paid', $this->invoice->payment_status);
+        $this->assertEquals(0.0, (float) $this->invoice->paid_amount);
+        $this->assertEquals(1000.0, (float) $this->invoice->remaining_amount);
+        $this->assertSame('unpaid', $this->invoice->payment_status);
     }
 
     public function test_amount_is_capped_to_remaining_balance(): void
@@ -139,8 +141,12 @@ class PortalReceiptUploadTest extends TestCase
             'receipt' => UploadedFile::fake()->image('receipt.jpg'),
         ])->assertRedirect(route('portal.invoices.show', $this->invoice));
 
+        $payment = Payment::latest('id')->first();
+        $this->assertSame('pending', $payment->status);
+        $this->assertEquals(1000.0, (float) $payment->amount);
+
         $this->invoice->refresh();
-        $this->assertSame('paid', $this->invoice->payment_status);
-        $this->assertEquals(0.0, (float) $this->invoice->remaining_amount);
+        $this->assertSame('unpaid', $this->invoice->payment_status);
+        $this->assertEquals(0.0, (float) $this->invoice->paid_amount);
     }
 }

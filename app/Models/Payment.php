@@ -18,6 +18,10 @@ class Payment extends Model
         'amount',
         'payment_date',
         'payment_method',
+        'status',
+        'reviewed_by',
+        'reviewed_at',
+        'rejection_reason',
         'transaction_reference',
         'notes',
         'proof_file_name',
@@ -27,8 +31,24 @@ class Payment extends Model
 
     protected $casts = [
         'payment_date' => 'date',
+        'reviewed_at' => 'datetime',
         'amount' => 'decimal:2',
     ];
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
 
     /**
      * Activity log options

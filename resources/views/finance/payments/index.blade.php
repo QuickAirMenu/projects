@@ -68,6 +68,7 @@
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">{{ __('finance.invoice') }}</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">{{ __('client.client') }}</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('finance.amount') }}</th>
+                <th class="text-start px-4 py-3 font-semibold text-gray-600">{{ __('messages.status') }}</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.payment_method') }}</th>
                 <th class="text-start px-4 py-3 font-semibold text-gray-600 hidden xl:table-cell">{{ __('finance.date') }}</th>
                 <th class="text-end px-5 py-3 font-semibold text-gray-600">{{ __('messages.actions') }}</th>
@@ -82,10 +83,31 @@
                 </td>
                 <td class="px-4 py-3 hidden lg:table-cell text-gray-600">{{ $payment->invoice?->client?->full_name }}</td>
                 <td class="px-4 py-3 font-bold text-green-600 privacy-mask">{{ number_format($payment->amount, 2) }} {{ __('messages.currency') }}</td>
+                <td class="px-4 py-3">
+                    @php
+                        $stColors = ['pending'=>'amber','approved'=>'emerald','rejected'=>'red'];
+                        $stc = $stColors[$payment->status] ?? 'gray';
+                    @endphp
+                    <span class="rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-{{ $stc }}-100 text-{{ $stc }}-700">{{ __('finance.payment_status_label.'.$payment->status) }}</span>
+                </td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ __('finance.method_'.$payment->payment_method) }}</td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ $payment->payment_date->format('Y-m-d') }}</td>
                 <td class="px-5 py-3">
                     <div class="flex items-center justify-end gap-2">
+                        @if($payment->status === 'pending' && ! $trashed)
+                        <form action="{{ route('payments.approve', $payment) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">
+                                <i class="fas fa-check"></i> {{ __('messages.approve') }}
+                            </button>
+                        </form>
+                        <form action="{{ route('payments.reject', $payment) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('messages.reject_confirm') }}')">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition">
+                                <i class="fas fa-xmark"></i> {{ __('messages.reject') }}
+                            </button>
+                        </form>
+                        @endif
                         @if($trashed)
                         <form action="{{ route('payments.restore', $payment) }}" method="POST">
                             @csrf
@@ -112,7 +134,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="7" class="py-16 text-center text-gray-400">
+            <tr><td colspan="8" class="py-16 text-center text-gray-400">
                 <i class="fas fa-money-bill text-5xl mb-3 block text-gray-200"></i>
                 {{ __('finance.no_payments') }}
             </td></tr>

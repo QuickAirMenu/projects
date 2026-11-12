@@ -20,6 +20,7 @@
                     <th class="px-5 py-4 font-semibold">{{ __('finance.payment_number') }}</th>
                     <th class="px-5 py-3 font-semibold">{{ __('finance.invoice') }}</th>
                     <th class="px-5 py-3 font-semibold">{{ __('finance.amount') }}</th>
+                    <th class="px-5 py-3 font-semibold">{{ __('messages.status') }}</th>
                     <th class="px-5 py-3 font-semibold hidden md:table-cell">{{ __('finance.payment_date') }}</th>
                     <th class="px-5 py-3 font-semibold hidden sm:table-cell">{{ __('finance.payment_method') }}</th>
                     <th class="px-5 py-3 font-semibold hidden lg:table-cell">{{ __('finance.reference') }}</th>
@@ -32,6 +33,13 @@
                         <td class="px-5 py-4 font-medium text-gray-900">{{ $payment->payment_number }}</td>
                         <td class="px-5 py-3 text-gray-600">{{ $payment->invoice?->invoice_number ?? '-' }}</td>
                         <td class="px-5 py-3 font-semibold text-emerald-700">{{ number_format($payment->amount, 2) }} {{ __('messages.currency') }}</td>
+                        <td class="px-5 py-3">
+                            @php
+                                $pColors = ['pending'=>'amber','approved'=>'emerald','rejected'=>'red'];
+                                $pc = $pColors[$payment->status] ?? 'gray';
+                            @endphp
+                            <span class="rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-{{ $pc }}-100 text-{{ $pc }}-700">{{ __('portal.payment_status.'.$payment->status) }}</span>
+                        </td>
                         <td class="px-5 py-3 text-gray-500 hidden md:table-cell">{{ $payment->payment_date?->format('Y-m-d') ?? '-' }}</td>
                         <td class="px-5 py-3 text-gray-600 hidden sm:table-cell">{{ $payment->payment_method_text ?? $payment->payment_method }}</td>
                         <td class="px-5 py-3 text-gray-500 hidden lg:table-cell">{{ $payment->transaction_reference ?? '-' }}</td>

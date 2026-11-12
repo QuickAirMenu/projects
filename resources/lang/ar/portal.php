@@ -72,4 +72,10 @@ return [
     'reject' => 'رفض',
     'quote_approved' => 'تم اعتماد عرض السعر. شكراً لك.',
     'quote_rejected' => 'تم رفض عرض السعر.',
+    'receipt_submitted' => 'تم إرسال الإيصال بنجاح — بانتظار مراجعة الفريق.',
+    'payment_status' => [
+        'pending' => 'بانتظار المراجعة',
+        'approved' => 'معتمدة',
+        'rejected' => 'مرفوضة',
+    ],
 ];

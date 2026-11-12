@@ -72,4 +72,10 @@ return [
     'reject' => 'Reject',
     'quote_approved' => 'Quote approved. Thank you.',
     'quote_rejected' => 'Quote rejected.',
+    'receipt_submitted' => 'Receipt submitted successfully — awaiting team review.',
+    'payment_status' => [
+        'pending' => 'Pending review',
+        'approved' => 'Approved',
+        'rejected' => 'Rejected',
+    ],
 ];

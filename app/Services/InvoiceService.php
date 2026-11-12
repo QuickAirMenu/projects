@@ -111,26 +111,14 @@ class InvoiceService
     {
         return DB::transaction(function () use ($invoice, $data) {
             $data['payment_number'] = $this->generatePaymentNumber();
-            $data['received_by'] = Auth::id();
+            $data['received_by'] = $data['received_by'] ?? Auth::id();
+            $data['status'] = $data['status'] ?? 'approved';
 
             $payment = $invoice->payments()->create($data);
-            $totalPaid = $invoice->payments()->sum('amount');
-            $remaining = max(0, $invoice->total - $totalPaid);
 
-            $status = 'unpaid';
-            if ($totalPaid >= $invoice->total) {
-                $status = 'paid';
-            } elseif ($totalPaid > 0) {
-                $status = 'partially_paid';
-            } elseif ($invoice->due_date && $invoice->due_date < now()) {
-                $status = 'overdue';
+            if ($data['status'] === 'approved') {
+                $this->recalculateInvoiceTotals($invoice);
             }
-
-            $invoice->update([
-                'paid_amount' => $totalPaid,
-                'remaining_amount' => $remaining,
-                'payment_status' => $status,
-            ]);
 
             return $payment;
         });
@@ -143,7 +131,7 @@ class InvoiceService
     {
         $invoice->refresh();
 
-        $totalPaid = (float) $invoice->payments()->sum('amount');
+        $totalPaid = (float) $invoice->payments()->where('status', 'approved')->sum('amount');
         $total = (float) $invoice->total;
         $remaining = max(0, $total - $totalPaid);
 

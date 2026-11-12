@@ -17,4 +17,6 @@ return [
     'mark_read' => 'تعليم كمقروء',
     'view' => 'عرض',
     'no_notifications' => 'لا توجد إشعارات',
+    'payment_submitted' => 'دفعة بانتظار المراجعة',
+    'payment_submitted_msg' => 'تم رفع إيصال تحويل بمبلغ :amount على الفاتورة :invoice — بانتظار المراجعة',
 ];

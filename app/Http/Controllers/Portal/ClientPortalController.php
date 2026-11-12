@@ -13,7 +13,7 @@ use App\Models\ProjectAttachment;
 use App\Models\Quote;
 use App\Models\Setting;
 use App\Models\User;
-use App\Notifications\PaymentReceived;
+use App\Notifications\PaymentSubmitted;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -266,6 +266,7 @@ class ClientPortalController extends Controller
             'payment_method' => 'bank_transfer',
             'transaction_reference' => $data['transaction_reference'] ?? null,
             'notes' => $data['notes'] ?? null,
+            'status' => 'pending',
         ]);
 
         $file = $request->file('receipt');
@@ -278,14 +279,14 @@ class ClientPortalController extends Controller
 
         try {
             User::role(['super-admin', 'admin', 'finance'])->get()->each(
-                fn (User $admin) => $admin->notify(new PaymentReceived($payment))
+                fn (User $admin) => $admin->notify(new PaymentSubmitted($payment))
             );
         } catch (\Throwable $e) {
             report($e);
         }
 
         return redirect()->route('portal.invoices.show', $invoice)
-            ->with('success', __('portal.receipt_uploaded'));
+            ->with('success', __('portal.receipt_submitted'));
     }
 
     public function approveQuote(Request $request, Quote $quote)

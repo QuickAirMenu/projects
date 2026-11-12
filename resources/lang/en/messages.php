@@ -177,4 +177,10 @@ return [
     'top_clients' => 'Top Clients',
     'invoices' => 'Invoices',
     'paid' => 'Paid',
+    'approve' => 'Approve',
+    'reject' => 'Reject',
+    'reject_confirm' => 'Reject this payment?',
+    'payment_approved' => 'Payment approved and invoice updated.',
+    'payment_rejected' => 'Payment rejected.',
+    'payment_already_reviewed' => 'This payment has already been reviewed.',
 ];
