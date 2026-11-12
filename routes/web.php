@@ -418,8 +418,8 @@ Route::get('/manifest.webmanifest', function () {
         'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
         'lang' => app()->getLocale(),
         'icons' => [
-            ['src' => asset('icons/icon-192.png'), 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
-            ['src' => asset('icons/icon-512.png'), 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => asset('icons/icon-192.png'), 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any maskable'],
+            ['src' => asset('icons/icon-512.png'), 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable'],
         ],
     ], 200, ['Content-Type' => 'application/manifest+json']);
 })->name('manifest');
