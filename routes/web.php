@@ -396,6 +396,28 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     });
 });
 
+Route::get('/manifest.webmanifest', function () {
+    $name = Setting::where('key', 'company_name_ar')->value('value')
+        ?: (Setting::where('key', 'company_name')->value('value') ?: config('app.name'));
+
+    return response()->json([
+        'name' => $name,
+        'short_name' => mb_substr($name, 0, 12),
+        'description' => 'iProjects ERP',
+        'start_url' => '/',
+        'scope' => '/',
+        'display' => 'standalone',
+        'orientation' => 'portrait',
+        'background_color' => '#ffffff',
+        'theme_color' => '#4F46E5',
+        'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
+        'lang' => app()->getLocale(),
+        'icons' => [
+            ['src' => asset('icons/icon-192.png'), 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => asset('icons/icon-512.png'), 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+        ],
+    ], 200, ['Content-Type' => 'application/manifest+json']);
+})->name('manifest');
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
