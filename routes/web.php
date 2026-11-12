@@ -99,6 +99,9 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::get('/projects/{project}', [ClientPortalController::class, 'projectShow'])->name('projects.show');
         Route::get('/payments', [ClientPortalController::class, 'payments'])->name('payments');
         Route::get('/payments/{payment}/proof', [ClientPortalController::class, 'downloadPaymentProof'])->name('payments.proof');
+        Route::get('/notifications', [ClientPortalController::class, 'notifications'])->name('notifications');
+        Route::post('/notifications/read-all', [ClientPortalController::class, 'markAllNotificationsRead'])->name('notifications.read-all');
+        Route::post('/notifications/{id}/read', [ClientPortalController::class, 'markNotificationRead'])->name('notifications.read');
         Route::get('/contracts', [ClientPortalController::class, 'contracts'])->name('contracts');
         Route::get('/contracts/{contract}/pdf', [ClientPortalController::class, 'downloadContractPdf'])->name('contracts.pdf');
         Route::get('/profile', [ClientPortalController::class, 'profile'])->name('profile');

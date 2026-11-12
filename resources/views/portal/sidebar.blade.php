@@ -43,6 +43,17 @@
         </a>
         @endif
 
+        @php
+            $portalUnread = \Illuminate\Support\Facades\Auth::guard('client')->user()?->unreadNotifications()->count() ?? 0;
+        @endphp
+        <a href="{{ route('portal.notifications') }}" class="sidebar-link {{ request()->routeIs('portal.notifications') ? 'active' : '' }}">
+            <i class="fas fa-bell w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+            <span class="flex-1">{{ __('portal.notifications') }}</span>
+            @if($portalUnread > 0)
+                <span class="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">{{ $portalUnread }}</span>
+            @endif
+        </a>
+
         <div class="pt-4 mt-4 border-t border-gray-100">
             <p class="px-4 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ __('common.account') }}</p>
             <a href="{{ route('portal.profile') }}" class="sidebar-link {{ request()->routeIs('portal.profile') ? 'active' : '' }}">

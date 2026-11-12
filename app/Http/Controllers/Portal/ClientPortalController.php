@@ -484,6 +484,31 @@ class ClientPortalController extends Controller
         return redirect()->route('portal.login')->with('success', __('messages.updated_successfully'));
     }
 
+    public function notifications()
+    {
+        $account = Auth::guard('client')->user();
+        $notifications = $account->notifications()->paginate(20);
+        $unreadCount = $account->unreadNotifications()->count();
+
+        return view('portal.notifications', compact('notifications', 'unreadCount'));
+    }
+
+    public function markNotificationRead(string $id)
+    {
+        $account = Auth::guard('client')->user();
+        $account->notifications()->findOrFail($id)->markAsRead();
+
+        return back();
+    }
+
+    public function markAllNotificationsRead()
+    {
+        $account = Auth::guard('client')->user();
+        $account->unreadNotifications->markAsRead();
+
+        return back()->with('success', __('portal.notifications_marked_read'));
+    }
+
     public function payments()
     {
         $portalAccount = Auth::guard('client')->user();

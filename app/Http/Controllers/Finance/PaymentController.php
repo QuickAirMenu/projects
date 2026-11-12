@@ -4,13 +4,18 @@ namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StorePaymentRequest;
+use App\Mail\PaymentReviewedMail;
+use App\Models\ClientPortalAccount;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Notifications\PaymentReviewed;
 use App\Services\InvoiceService;
+use App\Services\MailConfigService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
@@ -80,6 +85,7 @@ class PaymentController extends Controller
         ]);
 
         $this->invoiceService->recalculateInvoiceTotals($payment->invoice);
+        $this->notifyClient($payment->fresh(['invoice.client']));
 
         return back()->with('success', __('messages.payment_approved'));
     }
@@ -102,6 +108,8 @@ class PaymentController extends Controller
             'reviewed_at' => now(),
             'rejection_reason' => $data['rejection_reason'] ?? null,
         ]);
+
+        $this->notifyClient($payment->fresh(['invoice.client']));
 
         return back()->with('success', __('messages.payment_rejected'));
     }
@@ -218,6 +226,33 @@ class PaymentController extends Controller
         return response($content)
             ->header('Content-Type', $mime)
             ->header('Content-Disposition', 'inline; filename="'.($payment->proof_file_name ?? basename($payment->proof_file_path)).'"');
+    }
+
+    protected function notifyClient(Payment $payment): void
+    {
+        $client = $payment->invoice?->client;
+
+        if (! $client) {
+            return;
+        }
+
+        try {
+            $account = ClientPortalAccount::where('client_id', $client->id)->first();
+
+            if ($account) {
+                $account->notify(new PaymentReviewed($payment));
+            }
+
+            if ($client->email) {
+                app(MailConfigService::class)->applyDynamicMailConfig();
+
+                if (! blank(config('mail.mailers.smtp.host'))) {
+                    Mail::to($client->email)->send(new PaymentReviewedMail($payment));
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     protected function storeProofOfPayment(UploadedFile $file, string $paymentNumber): string
