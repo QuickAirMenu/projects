@@ -253,7 +253,10 @@ class ClientPortalController extends Controller
         ]);
 
         $remaining = (float) $invoice->remaining_amount;
-        if ($remaining > 0 && (float) $data['amount'] > $remaining) {
+        if ($remaining <= 0) {
+            return back()->with('error', __('portal.invoice_paid'));
+        }
+        if ((float) $data['amount'] > $remaining) {
             $data['amount'] = $remaining;
         }
 
