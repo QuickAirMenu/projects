@@ -78,4 +78,5 @@ return [
         'approved' => 'Approved',
         'rejected' => 'Rejected',
     ],
+    'rejection_reason' => 'Rejection reason',
 ];

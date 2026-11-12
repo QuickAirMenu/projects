@@ -71,13 +71,24 @@
                 </div>
                 <div class="divide-y divide-gray-100">
                     @foreach($invoice->payments as $payment)
-                        <div class="flex items-center justify-between px-5 py-3 text-sm">
-                            <div>
+                        @php
+                            $pvColors = ['pending' => 'amber', 'approved' => 'emerald', 'rejected' => 'red'];
+                            $pv = $pvColors[$payment->status] ?? 'gray';
+                        @endphp
+                        <div class="flex items-start justify-between gap-3 px-5 py-3 text-sm">
+                            <div class="min-w-0">
                                 <p class="font-medium text-gray-800">{{ $payment->payment_number }} — {{ number_format($payment->amount, 2) }} {{ __('messages.currency') }}</p>
-                                <p class="text-xs text-gray-400">{{ $payment->payment_date?->format('Y-m-d') }} · {{ $payment->payment_method }}</p>
+                                <p class="mt-0.5 text-xs text-gray-400">{{ $payment->payment_date?->format('Y-m-d') }} · {{ __('finance.method_'.$payment->payment_method) }}</p>
+                                <span class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-{{ $pv }}-100 px-2.5 py-0.5 text-[11px] font-medium text-{{ $pv }}-700">
+                                    <i class="fas {{ $payment->status === 'pending' ? 'fa-hourglass-half' : ($payment->status === 'approved' ? 'fa-circle-check' : 'fa-circle-xmark') }}"></i>
+                                    {{ __('portal.payment_status.'.$payment->status) }}
+                                </span>
+                                @if($payment->status === 'rejected' && $payment->rejection_reason)
+                                    <p class="mt-1.5 text-xs text-red-600">{{ __('portal.rejection_reason') }}: {{ $payment->rejection_reason }}</p>
+                                @endif
                             </div>
                             @if($payment->proof_file_path)
-                                <a href="{{ route('portal.payments.proof', $payment) }}" target="_blank" class="rounded-lg p-1.5 text-primary-600 hover:bg-primary-50" title="{{ __('finance.download_receipt') }}">
+                                <a href="{{ route('portal.payments.proof', $payment) }}" target="_blank" class="shrink-0 rounded-lg p-1.5 text-primary-600 hover:bg-primary-50" title="{{ __('finance.download_receipt') }}">
                                     <i class="fas fa-paperclip"></i>
                                 </a>
                             @endif

@@ -78,4 +78,5 @@ return [
         'approved' => 'معتمدة',
         'rejected' => 'مرفوضة',
     ],
+    'rejection_reason' => 'سبب الرفض',
 ];

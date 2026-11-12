@@ -131,6 +131,26 @@ class PortalReceiptUploadTest extends TestCase
         $this->assertSame('unpaid', $this->invoice->payment_status);
     }
 
+    public function test_client_sees_review_status_on_invoice_and_payments_pages(): void
+    {
+        $this->actingAs($this->account, 'client');
+
+        $this->post(route('portal.invoices.receipt', $this->invoice), [
+            'amount' => 200,
+            'payment_date' => now()->toDateString(),
+            'receipt' => UploadedFile::fake()->image('receipt.png'),
+        ])->assertRedirect();
+
+        $this->get(route('portal.invoices.show', $this->invoice))
+            ->assertOk()
+            ->assertSee('Pending review')
+            ->assertSee('Bank Transfer');
+
+        $this->get(route('portal.payments'))
+            ->assertOk()
+            ->assertSee('Pending review');
+    }
+
     public function test_amount_is_capped_to_remaining_balance(): void
     {
         $this->actingAs($this->account, 'client');

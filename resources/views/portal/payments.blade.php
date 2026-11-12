@@ -39,9 +39,12 @@
                                 $pc = $pColors[$payment->status] ?? 'gray';
                             @endphp
                             <span class="rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-{{ $pc }}-100 text-{{ $pc }}-700">{{ __('portal.payment_status.'.$payment->status) }}</span>
+                            @if($payment->status === 'rejected' && $payment->rejection_reason)
+                                <p class="mt-1 text-[11px] text-red-600">{{ $payment->rejection_reason }}</p>
+                            @endif
                         </td>
                         <td class="px-5 py-3 text-gray-500 hidden md:table-cell">{{ $payment->payment_date?->format('Y-m-d') ?? '-' }}</td>
-                        <td class="px-5 py-3 text-gray-600 hidden sm:table-cell">{{ $payment->payment_method_text ?? $payment->payment_method }}</td>
+                        <td class="px-5 py-3 text-gray-600 hidden sm:table-cell">{{ __('finance.method_'.$payment->payment_method) }}</td>
                         <td class="px-5 py-3 text-gray-500 hidden lg:table-cell">{{ $payment->transaction_reference ?? '-' }}</td>
                         <td class="px-5 py-3 text-end">
                             @if($payment->proof_file_path)
