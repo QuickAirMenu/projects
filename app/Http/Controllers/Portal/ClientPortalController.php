@@ -489,7 +489,7 @@ class ClientPortalController extends Controller
         $portalAccount = Auth::guard('client')->user();
 
         $payments = Payment::query()
-            ->select(['id', 'invoice_id', 'payment_number', 'amount', 'payment_date', 'payment_method', 'transaction_reference', 'proof_file_path', 'proof_file_name', 'notes'])
+            ->select(['id', 'invoice_id', 'payment_number', 'amount', 'status', 'payment_date', 'payment_method', 'transaction_reference', 'proof_file_path', 'proof_file_name', 'notes'])
             ->whereHas('invoice.project', fn ($q) => $q->where('client_id', $portalAccount->client_id))
             ->with('invoice:id,invoice_number')
             ->latest()
