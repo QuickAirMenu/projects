@@ -12,6 +12,8 @@ use App\Models\Project;
 use App\Models\ProjectAttachment;
 use App\Models\Quote;
 use App\Models\Setting;
+use App\Models\User;
+use App\Notifications\PaymentReceived;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -271,8 +273,48 @@ class ClientPortalController extends Controller
             'proof_file_path' => $path,
         ]);
 
+        try {
+            User::role(['super-admin', 'admin', 'finance'])->get()->each(
+                fn (User $admin) => $admin->notify(new PaymentReceived($payment))
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return redirect()->route('portal.invoices.show', $invoice)
             ->with('success', __('portal.receipt_uploaded'));
+    }
+
+    public function approveQuote(Request $request, Quote $quote)
+    {
+        $portalAccount = Auth::guard('client')->user();
+        abort_unless((int) $quote->client_id === (int) $portalAccount->client_id, 404);
+        abort_unless(in_array($quote->status, ['sent', 'draft'], true), 403);
+
+        $quote->update([
+            'status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => null,
+            'approved_by_ip' => $request->ip(),
+        ]);
+
+        return back()->with('success', __('portal.quote_approved'));
+    }
+
+    public function rejectQuote(Request $request, Quote $quote)
+    {
+        $portalAccount = Auth::guard('client')->user();
+        abort_unless((int) $quote->client_id === (int) $portalAccount->client_id, 404);
+        abort_unless(in_array($quote->status, ['sent', 'draft'], true), 403);
+
+        $quote->update([
+            'status' => 'rejected',
+            'approved_at' => null,
+            'approved_by' => null,
+            'approved_by_ip' => $request->ip(),
+        ]);
+
+        return back()->with('success', __('portal.quote_rejected'));
     }
 
     public function quotes()

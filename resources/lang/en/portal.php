@@ -68,4 +68,8 @@ return [
     'submit_receipt' => 'Submit receipt',
     'receipt_uploaded' => 'Receipt uploaded successfully. Our team will review it.',
     'invoice_paid' => 'This invoice is fully paid.',
+    'approve' => 'Approve',
+    'reject' => 'Reject',
+    'quote_approved' => 'Quote approved. Thank you.',
+    'quote_rejected' => 'Quote rejected.',
 ];

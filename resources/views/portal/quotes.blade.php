@@ -46,6 +46,20 @@
                         </td>
                         <td class="px-5 py-3 text-end">
                             <div class="flex items-center justify-end gap-1">
+                                @if($quote->status === 'sent' && ! $expired)
+                                    <form method="POST" action="{{ route('portal.quotes.approve', $quote) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="{{ __('portal.approve') }}">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ route('portal.quotes.reject', $quote) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg" title="{{ __('portal.reject') }}">
+                                            <i class="fas fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                @endif
                                 @if($quote->status !== 'draft' && $quote->public_token)
                                     <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="p-1.5 text-primary-600 hover:bg-primary-50 rounded-lg" title="{{ __('messages.public_link') }}">
                                         <i class="fas fa-link"></i>
