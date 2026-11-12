@@ -100,7 +100,28 @@ class ClientPortalController extends Controller
             }])
             ->findOrFail($portalAccount->client_id);
 
-        return view('portal.dashboard', compact('client'));
+        $invoices = Invoice::query()
+            ->where('client_id', $client->id)
+            ->orderByDesc('invoice_date')
+            ->get(['id', 'invoice_number', 'invoice_date', 'total', 'paid_amount', 'remaining_amount', 'payment_status']);
+
+        $stats = [
+            'outstanding' => (float) $invoices->sum('remaining_amount'),
+            'paid' => (float) $invoices->sum('paid_amount'),
+            'invoices_count' => $invoices->count(),
+            'pending_quotes' => Quote::where('client_id', $client->id)->where('status', 'sent')->count(),
+            'active_projects' => $client->projects->count(),
+        ];
+
+        $recentInvoices = $invoices->take(5);
+
+        $recentQuotes = Quote::query()
+            ->where('client_id', $client->id)
+            ->orderByDesc('created_at')
+            ->take(5)
+            ->get(['id', 'quote_number', 'subject', 'total', 'status', 'created_at']);
+
+        return view('portal.dashboard', compact('client', 'stats', 'recentInvoices', 'recentQuotes'));
     }
 
     public function projectShow(Project $project)
