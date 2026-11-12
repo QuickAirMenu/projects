@@ -89,6 +89,8 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::get('/dashboard', [ClientPortalController::class, 'dashboard'])->name('dashboard');
         Route::get('/invoices', [ClientPortalController::class, 'invoices'])->name('invoices');
         Route::get('/invoices/{invoice}/pdf', [ClientPortalController::class, 'downloadInvoicePdf'])->name('invoices.pdf');
+        Route::get('/invoices/{invoice}', [ClientPortalController::class, 'invoiceShow'])->name('invoices.show');
+        Route::post('/invoices/{invoice}/receipt', [ClientPortalController::class, 'uploadReceipt'])->name('invoices.receipt');
         Route::get('/quotes', [ClientPortalController::class, 'quotes'])->name('quotes');
         Route::get('/quotes/{quote}/pdf', [ClientPortalController::class, 'downloadQuotePdf'])->name('quotes.pdf');
         Route::get('/attachments/{attachment}/download', [ClientPortalController::class, 'downloadAttachment'])->name('attachments.download');

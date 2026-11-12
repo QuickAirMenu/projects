@@ -43,6 +43,9 @@
                             </span>
                         </td>
                         <td class="px-5 py-3 text-end">
+                            <a href="{{ route('portal.invoices.show', $invoice) }}" class="p-1.5 text-primary-600 hover:bg-primary-50 rounded-lg inline-block" title="{{ __('messages.view') }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
                             <a href="{{ route('portal.invoices.pdf', $invoice) }}" target="_blank" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg inline-block" title="{{ __('messages.download_pdf') }}">
                                 <i class="fas fa-file-pdf"></i>
                             </a>

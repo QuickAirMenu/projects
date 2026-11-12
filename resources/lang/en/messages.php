@@ -176,4 +176,5 @@ return [
     // Skeleton
     'top_clients' => 'Top Clients',
     'invoices' => 'Invoices',
+    'paid' => 'Paid',
 ];

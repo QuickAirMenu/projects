@@ -202,4 +202,6 @@ return [
     'status_active' => 'Active',
     'status_completed' => 'Completed',
     'status_terminated' => 'Terminated',
+    'items' => 'Items',
+    'vat' => 'VAT',
 ];

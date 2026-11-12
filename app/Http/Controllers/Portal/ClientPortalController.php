@@ -12,6 +12,7 @@ use App\Models\Project;
 use App\Models\ProjectAttachment;
 use App\Models\Quote;
 use App\Models\Setting;
+use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -219,6 +220,59 @@ class ClientPortalController extends Controller
 
         return response($mpdf->Output("invoice-{$invoice->invoice_number}.pdf", 'S'), 200)
             ->header('Content-Type', 'application/pdf');
+    }
+
+    public function invoiceShow(Invoice $invoice)
+    {
+        $portalAccount = Auth::guard('client')->user();
+        abort_unless((int) $invoice->client_id === (int) $portalAccount->client_id, 404);
+
+        $invoice->load(['items', 'project', 'payments']);
+
+        $bank = Setting::query()
+            ->whereIn('key', ['bank_account_name', 'bank_iban', 'company_name', 'company_name_ar'])
+            ->pluck('value', 'key')
+            ->toArray();
+
+        return view('portal.invoice', compact('invoice', 'bank'));
+    }
+
+    public function uploadReceipt(Request $request, Invoice $invoice)
+    {
+        $portalAccount = Auth::guard('client')->user();
+        abort_unless((int) $invoice->client_id === (int) $portalAccount->client_id, 404);
+
+        $data = $request->validate([
+            'amount' => ['required', 'numeric', 'min:0.01'],
+            'payment_date' => ['required', 'date'],
+            'transaction_reference' => ['nullable', 'string', 'max:100'],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'receipt' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+        ]);
+
+        $remaining = (float) $invoice->remaining_amount;
+        if ($remaining > 0 && (float) $data['amount'] > $remaining) {
+            $data['amount'] = $remaining;
+        }
+
+        $payment = app(InvoiceService::class)->recordPayment($invoice, [
+            'amount' => $data['amount'],
+            'payment_date' => $data['payment_date'],
+            'payment_method' => 'bank_transfer',
+            'transaction_reference' => $data['transaction_reference'] ?? null,
+            'notes' => $data['notes'] ?? null,
+        ]);
+
+        $file = $request->file('receipt');
+        $path = $file->store('payments/'.$payment->payment_number, 'private');
+
+        $payment->update([
+            'proof_file_name' => $file->getClientOriginalName(),
+            'proof_file_path' => $path,
+        ]);
+
+        return redirect()->route('portal.invoices.show', $invoice)
+            ->with('success', __('portal.receipt_uploaded'));
     }
 
     public function quotes()

@@ -202,4 +202,6 @@ return [
     'status_active' => 'نشط',
     'status_completed' => 'مكتمل',
     'status_terminated' => 'منتهي',
+    'items' => 'البنود',
+    'vat' => 'ضريبة القيمة المضافة',
 ];
