@@ -204,4 +204,9 @@ return [
     'status_terminated' => 'منتهي',
     'items' => 'البنود',
     'vat' => 'ضريبة القيمة المضافة',
+    'payment_review' => [
+        'pending' => 'بانتظار المراجعة',
+        'approved' => 'معتمدة',
+        'rejected' => 'مرفوضة',
+    ],
 ];

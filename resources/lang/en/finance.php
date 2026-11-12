@@ -204,4 +204,9 @@ return [
     'status_terminated' => 'Terminated',
     'items' => 'Items',
     'vat' => 'VAT',
+    'payment_review' => [
+        'pending' => 'Pending review',
+        'approved' => 'Approved',
+        'rejected' => 'Rejected',
+    ],
 ];

@@ -88,7 +88,7 @@
                         $stColors = ['pending'=>'amber','approved'=>'emerald','rejected'=>'red'];
                         $stc = $stColors[$payment->status] ?? 'gray';
                     @endphp
-                    <span class="rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-{{ $stc }}-100 text-{{ $stc }}-700">{{ __('finance.payment_status_label.'.$payment->status) }}</span>
+                    <span class="rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-{{ $stc }}-100 text-{{ $stc }}-700">{{ __('finance.payment_review.'.$payment->status) }}</span>
                 </td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ __('finance.method_'.$payment->payment_method) }}</td>
                 <td class="px-4 py-3 hidden xl:table-cell text-gray-500">{{ $payment->payment_date->format('Y-m-d') }}</td>
