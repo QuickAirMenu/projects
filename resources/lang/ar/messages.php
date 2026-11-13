@@ -188,4 +188,17 @@ return [
     'cookie_accept' => 'قبول الكل',
     'cookie_essential' => 'الضروري فقط',
     'cookie_note' => 'يمكنك تغيير اختيارك في أي وقت من إعدادات المتصفح.',
+    'support_tickets' => 'تذاكر الدعم',
+    'open_tickets' => 'المفتوحة',
+    'reply' => 'الرد',
+    'send_reply' => 'إرسال الرد',
+    'close_ticket' => 'إغلاق التذكرة',
+    'no_tickets' => 'لا توجد تذاكر',
+    'ticket_replied' => 'تم إرسال الرد.',
+    'ticket_closed' => 'تم إغلاق التذكرة.',
+    'ticket_status' => [
+        'open' => 'مفتوحة',
+        'answered' => 'تم الرد',
+        'closed' => 'مغلقة',
+    ],
 ];

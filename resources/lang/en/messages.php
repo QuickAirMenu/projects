@@ -188,4 +188,17 @@ return [
     'cookie_accept' => 'Accept all',
     'cookie_essential' => 'Essential only',
     'cookie_note' => 'You can change your choice anytime in your browser settings.',
+    'support_tickets' => 'Support tickets',
+    'open_tickets' => 'Open',
+    'reply' => 'Reply',
+    'send_reply' => 'Send reply',
+    'close_ticket' => 'Close ticket',
+    'no_tickets' => 'No tickets',
+    'ticket_replied' => 'Reply sent.',
+    'ticket_closed' => 'Ticket closed.',
+    'ticket_status' => [
+        'open' => 'Open',
+        'answered' => 'Answered',
+        'closed' => 'Closed',
+    ],
 ];

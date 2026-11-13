@@ -76,6 +76,7 @@ class RolePermissionSeeder extends Seeder
 
             // Settings
             'manage-settings',
+            'manage-tickets',
         ];
 
         foreach ($permissions as $permission) {
@@ -99,7 +100,7 @@ class RolePermissionSeeder extends Seeder
             'view-invoices', 'create-invoices', 'edit-invoices', 'delete-invoices',
             'view-payments', 'create-payments', 'edit-payments', 'delete-payments',
             'view-change-requests', 'create-change-requests', 'approve-change-requests',
-            'view-reports', 'view-financials',
+            'view-reports', 'view-financials', 'manage-tickets',
         ]);
 
         // Project Manager
@@ -135,7 +136,7 @@ class RolePermissionSeeder extends Seeder
             'view-contracts', 'create-contracts', 'edit-contracts',
             'view-invoices', 'create-invoices', 'edit-invoices',
             'view-payments', 'create-payments', 'edit-payments',
-            'view-reports', 'view-financials',
+            'view-reports', 'view-financials', 'manage-tickets',
         ]);
 
         // Client (for future use)

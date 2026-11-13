@@ -31,6 +31,7 @@ use App\Http\Controllers\Settings\ProjectStatusController;
 use App\Http\Controllers\Settings\ServiceTypeController;
 use App\Http\Controllers\Settings\TaskStatusController;
 use App\Http\Controllers\SetupController;
+use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\Task\KanbanController;
 use App\Http\Controllers\Task\TaskChecklistController;
 use App\Http\Controllers\Task\TaskCommentController;
@@ -98,6 +99,10 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::get('/attachments/{attachment}/download', [ClientPortalController::class, 'downloadAttachment'])->name('attachments.download');
         Route::get('/projects/{project}', [ClientPortalController::class, 'projectShow'])->name('projects.show');
         Route::get('/payments', [ClientPortalController::class, 'payments'])->name('payments');
+        Route::get('/statement', [ClientPortalController::class, 'statement'])->name('statement');
+        Route::get('/statement/pdf', [ClientPortalController::class, 'statementPdf'])->name('statement.pdf');
+        Route::get('/tickets', [ClientPortalController::class, 'tickets'])->name('tickets');
+        Route::post('/tickets', [ClientPortalController::class, 'storeTicket'])->name('tickets.store');
         Route::get('/payments/{payment}/proof', [ClientPortalController::class, 'downloadPaymentProof'])->name('payments.proof');
         Route::get('/notifications', [ClientPortalController::class, 'notifications'])->name('notifications');
         Route::post('/notifications/read-all', [ClientPortalController::class, 'markAllNotificationsRead'])->name('notifications.read-all');
@@ -389,6 +394,12 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('projects', [ImportController::class, 'importProjects'])->name('projects');
     });
 
+    // Support tickets
+    Route::prefix('support-tickets')->name('support-tickets.')->middleware('permission:manage-tickets')->group(function () {
+        Route::get('/', [SupportTicketController::class, 'index'])->name('index');
+        Route::post('{supportTicket}/reply', [SupportTicketController::class, 'reply'])->name('reply');
+        Route::post('{supportTicket}/close', [SupportTicketController::class, 'close'])->name('close');
+    });
     // Exports
     Route::prefix('exports')->name('exports.')->middleware('permission:view-reports')->group(function () {
         Route::get('projects', [ExportController::class, 'projects'])->name('projects');

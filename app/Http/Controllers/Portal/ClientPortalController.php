@@ -12,8 +12,10 @@ use App\Models\Project;
 use App\Models\ProjectAttachment;
 use App\Models\Quote;
 use App\Models\Setting;
+use App\Models\SupportTicket;
 use App\Models\User;
 use App\Notifications\PaymentSubmitted;
+use App\Notifications\SupportTicketCreated;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -509,6 +511,86 @@ class ClientPortalController extends Controller
         return back()->with('success', __('portal.notifications_marked_read'));
     }
 
+    public function tickets()
+    {
+        $account = Auth::guard('client')->user();
+        $tickets = SupportTicket::where('client_id', $account->client_id)->latest()->paginate(10);
+
+        return view('portal.tickets', compact('tickets'));
+    }
+
+    public function storeTicket(Request $request)
+    {
+        $account = Auth::guard('client')->user();
+
+        $data = $request->validate([
+            'subject' => ['required', 'string', 'max:150'],
+            'message' => ['required', 'string', 'max:3000'],
+            'priority' => ['nullable', 'in:low,normal,high'],
+        ]);
+
+        $ticket = SupportTicket::create([
+            'client_id' => $account->client_id,
+            'portal_account_id' => $account->id,
+            'subject' => $data['subject'],
+            'message' => $data['message'],
+            'priority' => $data['priority'] ?? 'normal',
+            'status' => 'open',
+        ]);
+
+        try {
+            User::role(['super-admin', 'admin'])->get()->each(
+                fn (User $admin) => $admin->notify(new SupportTicketCreated($ticket))
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('portal.tickets')->with('success', __('portal.ticket_created'));
+    }
+
+    public function statement(Request $request)
+    {
+        $portalAccount = Auth::guard('client')->user();
+        $client = Client::findOrFail($portalAccount->client_id);
+        [$from, $to] = $this->statementRange($request);
+        $rows = $this->statementRows($client->id, $from, $to);
+        $totals = $this->statementTotals($rows);
+
+        return view('portal.statement', compact('client', 'rows', 'totals', 'from', 'to'));
+    }
+
+    public function statementPdf(Request $request)
+    {
+        $portalAccount = Auth::guard('client')->user();
+        $client = Client::findOrFail($portalAccount->client_id);
+        [$from, $to] = $this->statementRange($request);
+        $rows = $this->statementRows($client->id, $from, $to);
+        $totals = $this->statementTotals($rows);
+
+        $settings = Setting::whereIn('key', [
+            'company_name', 'company_name_ar', 'company_logo',
+            'company_email', 'company_phone', 'company_address', 'currency_symbol',
+        ])->pluck('value', 'key')->toArray();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'default_font' => 'dejavusans',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+        ]);
+
+        $html = view('pdf.statement', compact('client', 'rows', 'totals', 'from', 'to', 'settings'))->render();
+        $mpdf->WriteHTML($html);
+
+        $filename = 'statement-'.$client->id.'-'.$from.'_'.$to.'.pdf';
+
+        return response($mpdf->Output($filename, 'S'), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
+    }
+
     public function payments()
     {
         $portalAccount = Auth::guard('client')->user();
@@ -592,5 +674,83 @@ class ClientPortalController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('portal.login');
+    }
+
+    private function statementRange(Request $request): array
+    {
+        $from = $request->filled('from') ? $request->date('from')->toDateString() : now()->startOfYear()->toDateString();
+        $to = $request->filled('to') ? $request->date('to')->toDateString() : now()->toDateString();
+
+        if ($from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+
+        return [$from, $to];
+    }
+
+    private function statementRows(int $clientId, string $from, string $to): array
+    {
+        $invoices = Invoice::where('client_id', $clientId)
+            ->whereDate('invoice_date', '>=', $from)
+            ->whereDate('invoice_date', '<=', $to)
+            ->get(['invoice_number', 'invoice_date', 'total']);
+
+        $payments = Payment::query()
+            ->where('status', 'approved')
+            ->whereHas('invoice', fn ($q) => $q->where('client_id', $clientId))
+            ->whereDate('payment_date', '>=', $from)
+            ->whereDate('payment_date', '<=', $to)
+            ->with('invoice:id,invoice_number')
+            ->get(['id', 'invoice_id', 'payment_number', 'payment_date', 'amount']);
+
+        $rows = [];
+
+        foreach ($invoices as $invoice) {
+            $rows[] = [
+                'date' => $invoice->invoice_date?->format('Y-m-d') ?? '-',
+                'sort' => $invoice->invoice_date?->timestamp ?? 0,
+                'type' => 'invoice',
+                'label' => $invoice->invoice_number,
+                'debit' => (float) $invoice->total,
+                'credit' => 0.0,
+            ];
+        }
+
+        foreach ($payments as $payment) {
+            $rows[] = [
+                'date' => $payment->payment_date?->format('Y-m-d') ?? '-',
+                'sort' => $payment->payment_date?->timestamp ?? 0,
+                'type' => 'payment',
+                'label' => $payment->payment_number.' · '.($payment->invoice?->invoice_number ?? ''),
+                'debit' => 0.0,
+                'credit' => (float) $payment->amount,
+            ];
+        }
+
+        usort($rows, fn ($a, $b) => $a['sort'] <=> $b['sort']);
+
+        $balance = 0.0;
+        foreach ($rows as &$row) {
+            $balance += $row['debit'] - $row['credit'];
+            $row['balance'] = round($balance, 2);
+        }
+
+        return $rows;
+    }
+
+    private function statementTotals(array $rows): array
+    {
+        $invoiced = 0.0;
+        $paid = 0.0;
+        foreach ($rows as $row) {
+            $invoiced += $row['debit'];
+            $paid += $row['credit'];
+        }
+
+        return [
+            'invoiced' => round($invoiced, 2),
+            'paid' => round($paid, 2),
+            'balance' => round($invoiced - $paid, 2),
+        ];
     }
 }

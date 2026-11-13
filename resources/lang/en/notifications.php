@@ -19,4 +19,6 @@ return [
     'no_notifications' => 'No notifications',
     'payment_submitted' => 'Payment awaiting review',
     'payment_submitted_msg' => 'A transfer receipt of :amount was uploaded for invoice :invoice — awaiting review',
+    'ticket_created' => 'New support ticket',
+    'ticket_created_msg' => 'New ticket from :client: :subject',
 ];

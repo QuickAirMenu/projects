@@ -19,4 +19,6 @@ return [
     'no_notifications' => 'لا توجد إشعارات',
     'payment_submitted' => 'دفعة بانتظار المراجعة',
     'payment_submitted_msg' => 'تم رفع إيصال تحويل بمبلغ :amount على الفاتورة :invoice — بانتظار المراجعة',
+    'ticket_created' => 'تذكرة دعم جديدة',
+    'ticket_created_msg' => 'تذكرة جديدة من :client: :subject',
 ];

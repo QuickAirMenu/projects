@@ -36,6 +36,11 @@
         </a>
         @endif
 
+        <a href="{{ route('portal.statement') }}" class="sidebar-link {{ request()->routeIs('portal.statement') ? 'active' : '' }}">
+            <i class="fas fa-file-invoice-dollar w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+            <span>{{ __('portal.statement') }}</span>
+        </a>
+
         @if(portal_setting('portal_show_quotes') === '1')
         <a href="{{ route('portal.quotes') }}" class="sidebar-link {{ request()->routeIs('portal.quotes') ? 'active' : '' }}">
             <i class="fas fa-file-alt w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
@@ -52,6 +57,11 @@
             @if($portalUnread > 0)
                 <span class="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">{{ $portalUnread }}</span>
             @endif
+        </a>
+
+        <a href="{{ route('portal.tickets') }}" class="sidebar-link {{ request()->routeIs('portal.tickets') ? 'active' : '' }}">
+            <i class="fas fa-life-ring w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+            <span>{{ __('portal.support_tickets') }}</span>
         </a>
 
         <div class="pt-4 mt-4 border-t border-gray-100">
