@@ -10,11 +10,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
     <link rel="manifest" href="{{ url('/manifest.webmanifest') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/icon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/icon-16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/icon-180.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('{{ url('/sw.js?v=3') }}', { scope: '/' }).catch(function () {});
+                navigator.serviceWorker.register('{{ url('/sw.js?v=4') }}', { scope: '/' }).catch(function () {});
             });
         }
     </script>
