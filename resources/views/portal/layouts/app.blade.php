@@ -168,6 +168,5 @@
             </main>
         @endauth
     </div>
-    @include('partials.cookie-consent')
 </body>
 </html>

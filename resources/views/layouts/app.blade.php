@@ -138,6 +138,5 @@
     @endif
 
     @stack('scripts')
-    @include('partials.cookie-consent')
 </body>
 </html>
