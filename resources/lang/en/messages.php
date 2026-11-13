@@ -183,4 +183,9 @@ return [
     'payment_approved' => 'Payment approved and invoice updated.',
     'payment_rejected' => 'Payment rejected.',
     'payment_already_reviewed' => 'This payment has already been reviewed.',
+    'cookie_title' => 'We respect your privacy',
+    'cookie_message' => 'We use cookies to run the system and improve your experience. You can accept all or keep essential only. <a href="#" onclick="return false">Privacy policy</a>',
+    'cookie_accept' => 'Accept all',
+    'cookie_essential' => 'Essential only',
+    'cookie_note' => 'You can change your choice anytime in your browser settings.',
 ];

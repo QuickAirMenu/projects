@@ -117,5 +117,6 @@
 
         </div>
     </div>
+    @include('partials.cookie-consent')
 </body>
 </html>
