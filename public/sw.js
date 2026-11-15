@@ -1,4 +1,4 @@
-const CACHE = 'iprojects-v8';
+const CACHE = 'iprojects-v9';
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {

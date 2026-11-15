@@ -10,31 +10,63 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{
-    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
-    font-family:'Cairo',system-ui,-apple-system,sans-serif;color:#0F172A;background:#F8FAFC;
-  }
-  .box{width:100%;max-width:360px;text-align:center;animation:fade .35s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion: reduce){.box{animation:none}}
-  img{width:56px;height:56px;border-radius:16px;display:block;margin:0 auto 20px;
-      box-shadow:0 10px 24px -14px rgba(79,70,229,.55)}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+       font-family:'Cairo',system-ui,-apple-system,sans-serif;color:#0F172A;background:#F8FAFC}
+  .box{width:100%;max-width:360px;text-align:center}
+  .hero{width:100%;max-width:300px;margin:0 auto 18px;display:block}
   h1{font-size:20px;font-weight:800;margin-bottom:8px}
-  p{font-size:13.5px;color:#64748B;line-height:1.8;margin-bottom:24px}
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
-    padding:12px 18px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;
-    font-size:14px;font-weight:700;color:#fff;background:#4F46E5;transition:background .15s;
-  }
+  p{font-size:13.5px;color:#64748B;line-height:1.8;margin-bottom:22px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+       padding:12px 18px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;
+       font-size:14px;font-weight:700;color:#fff;background:#4F46E5;transition:background .15s}
   .btn:hover{background:#4338CA}
   .btn svg{width:15px;height:15px}
   .status{margin-top:12px;font-size:12px;color:#94A3B8}
-  .brand{margin-top:20px;font-size:11px;font-weight:700;color:#A7B2C2;letter-spacing:.08em;text-transform:uppercase}
+  .brand{margin-top:18px;font-size:11px;font-weight:700;color:#A7B2C2;letter-spacing:.08em;text-transform:uppercase}
 </style>
 </head>
 <body>
   <main class="box">
-    <img src="/icons/ip-512.png" alt="iProjects">
+    <svg class="hero" viewBox="0 0 300 180" role="img" aria-label="لا يوجد اتصال">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4F46E5"/>
+          <stop offset="100%" stop-color="#7C3AED"/>
+        </linearGradient>
+        <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#7C3AED" stop-opacity=".20"/>
+          <stop offset="70%" stop-color="#4F46E5" stop-opacity=".06"/>
+          <stop offset="100%" stop-color="#4F46E5" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="soft" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#EEF2FF"/>
+          <stop offset="100%" stop-color="#F5F3FF"/>
+        </linearGradient>
+      </defs>
+
+      <ellipse cx="150" cy="92" rx="132" ry="76" fill="url(#halo)"/>
+
+      <!-- left: project grid node -->
+      <rect x="34" y="56" width="66" height="66" rx="18" fill="#fff" stroke="#E2E8F0" stroke-width="2"/>
+      <rect x="48" y="70" width="13" height="13" rx="4" fill="url(#g)"/>
+      <rect x="65" y="70" width="13" height="13" rx="4" fill="url(#g)" opacity=".45"/>
+      <rect x="48" y="87" width="13" height="13" rx="4" fill="url(#g)" opacity=".45"/>
+      <rect x="65" y="87" width="13" height="13" rx="4" fill="url(#g)"/>
+
+      <!-- right: cloud node -->
+      <path d="M214 104c-8 0-14-6-14-13.4 0-7.1 5.6-12.9 12.7-13.4 2.2-8.2 9.6-14.2 18.6-14.2 8.6 0 15.8 5.5 18.3 13.1 7.1.7 12.4 6.4 12.4 13.5 0 7.6-6.3 13.8-14.2 13.8H214z"
+            fill="url(#soft)" stroke="#C7D2FE" stroke-width="2"/>
+
+      <!-- broken link (strong, simple) -->
+      <path d="M104 89h34" stroke="url(#g)" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M162 89h34" stroke="url(#g)" stroke-width="3.4" stroke-linecap="round"/>
+      <circle cx="146" cy="89" r="4.6" fill="#fff" stroke="url(#g)" stroke-width="2.6"/>
+      <circle cx="154" cy="89" r="4.6" fill="#fff" stroke="url(#g)" stroke-width="2.6"/>
+
+      <!-- slash through the gap -->
+      <path d="M143 75l14 28" stroke="url(#g)" stroke-width="3.4" stroke-linecap="round"/>
+    </svg>
+
     <h1>لا يوجد اتصال بالإنترنت</h1>
     <p>تحقق من اتصالك وسيتم التحديث تلقائياً عند عودته.</p>
 
