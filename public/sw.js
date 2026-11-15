@@ -1,2 +1,2 @@
-const CACHE = "iprojects-v13";
-const OFFLINE_URL = "/offline.html?v=13";
+const CACHE = "iprojects-v14";
+const OFFLINE_URL = "/offline.html?v=14";

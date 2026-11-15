@@ -16,18 +16,34 @@
        background:radial-gradient(760px 420px at 84% -8%,rgba(124,58,237,.10),transparent 62%),
                   radial-gradient(620px 380px at 6% 108%,rgba(79,70,229,.10),transparent 62%),#F8FAFC}
   .wrap{width:100%;max-width:340px;text-align:center}
-  .hero{width:172px;height:auto;margin:0 auto 26px;display:block;filter:drop-shadow(0 20px 32px rgba(79,70,229,.22))}
 
-  h1{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-bottom:26px}
+  .hero{
+    width:172px;height:auto;margin:0 auto 26px;display:block;cursor:pointer;
+    filter:drop-shadow(0 20px 32px rgba(79,70,229,.22));
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .18s ease;
+  }
+  .hero:active{transform:scale(.97)}
+  .hero:focus-visible{outline:3px solid rgba(79,70,229,.4);outline-offset:6px;border-radius:36px}
+  .hero .slash{transition:opacity .25s ease, transform .25s ease}
+  .hero .left,.hero .right{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+  .hero.connected .slash{opacity:0;transform:rotate(-20deg) scale(.8)}
+  .hero.connected .left{transform:translateX(6px)}
+  .hero.connected .right{transform:translateX(-6px)}
+  .hero.failed{animation:shake .28s ease}
+  @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+
+  h1{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+  .hint{font-size:12px;color:#94A3B8;margin-bottom:24px}
 
   .retry{
     width:58px;height:58px;border-radius:99px;border:0;cursor:pointer;display:inline-flex;
     align-items:center;justify-content:center;color:#fff;
     background:linear-gradient(135deg,var(--brand),var(--brand2));
     box-shadow:0 16px 28px -14px rgba(79,70,229,.7);
-    transition:transform .15s ease, box-shadow .15s ease;
+    transition:transform .15s ease;
   }
-  .retry:hover{transform:translateY(-2px);box-shadow:0 20px 34px -14px rgba(79,70,229,.75)}
+  .retry:hover{transform:translateY(-2px)}
   .retry:active{transform:none}
   .retry[disabled]{opacity:.6;cursor:default;transform:none}
   .retry svg{width:24px;height:24px}
@@ -44,31 +60,39 @@
   @media (prefers-color-scheme: dark){
     body{color:#E2E8F0;background:radial-gradient(760px 420px at 84% -8%,rgba(124,58,237,.16),transparent 62%),
       radial-gradient(620px 380px at 6% 108%,rgba(79,70,229,.16),transparent 62%),#0B1220}
+    .hint{color:#64748B}
     .meta{color:#64748B}.meta b{color:#94A3B8}
     .brand{color:#475569}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero,.hero .slash,.hero .left,.hero .right,.hero.failed{transition:none;animation:none}
   }
 </style>
 </head>
 <body>
   <main class="wrap">
     <div id="offlineView">
-      <svg class="hero" viewBox="0 0 200 200" role="img" aria-label="لا يوجد اتصال">
+      <svg class="hero" id="hero" viewBox="0 0 200 200" role="button" tabindex="0"
+           aria-label="اضغط لإعادة الربط">
         <defs>
           <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#7C3AED"/>
           </linearGradient>
         </defs>
         <rect x="20" y="20" width="160" height="160" rx="46" fill="url(#g)"/>
-        <g stroke="#fff" stroke-width="9" stroke-linecap="round" fill="none">
+        <g class="left" stroke="#fff" stroke-width="9" stroke-linecap="round" fill="none">
           <path d="M74 100h22"/>
+        </g>
+        <circle class="left" cx="103" cy="100" r="7.5" fill="#fff"/>
+        <g class="right" stroke="#fff" stroke-width="9" stroke-linecap="round" fill="none">
           <path d="M112 100h22"/>
         </g>
-        <circle cx="103" cy="100" r="7.5" fill="#fff"/>
-        <circle cx="117" cy="100" r="7.5" fill="#fff"/>
-        <path d="M94 79l20 42" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+        <circle class="right" cx="117" cy="100" r="7.5" fill="#fff"/>
+        <path class="slash" d="M94 79l20 42" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
       </svg>
 
       <h1>لا يوجد اتصال بالإنترنت</h1>
+      <p class="hint">اضغط الرسمة لإعادة الربط</p>
 
       <button class="retry" id="retryBtn" aria-label="إعادة المحاولة" title="إعادة المحاولة">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
@@ -94,6 +118,7 @@
     var busy = false;
     var finished = false;
 
+    var hero = document.getElementById('hero');
     var offlineView = document.getElementById('offlineView');
     var successView = document.getElementById('successView');
     var cd = document.getElementById('cd');
@@ -103,22 +128,32 @@
     function redirect() {
       var path = '/';
       try { path = localStorage.getItem('ip_last_path') || '/'; } catch (e) {}
-      if (path === '/offline.html') path = '/';
+      if (path.indexOf('/offline.html') === 0) path = '/';
       location.replace(path);
     }
 
     function success() {
       finished = true;
+      hero.classList.add('connected');
       offlineView.style.display = 'none';
       successView.classList.add('show');
       if (meta) meta.textContent = 'جارٍ فتح صفحتك…';
-      setTimeout(redirect, 700);
+      setTimeout(redirect, 750);
+    }
+
+    function fail() {
+      hero.classList.remove('connected');
+      hero.classList.add('failed');
+      setTimeout(function () { hero.classList.remove('failed'); }, 320);
+      attempt += 1;
+      countdown = delays[Math.min(attempt, delays.length - 1)];
     }
 
     function probe() {
       if (busy || finished) return;
       busy = true;
       if (btn) btn.disabled = true;
+      hero.classList.add('connected');
 
       var controller = new AbortController();
       var t = setTimeout(function () { controller.abort(); }, 5000);
@@ -131,8 +166,7 @@
         })
         .catch(function () {
           clearTimeout(t);
-          attempt += 1;
-          countdown = delays[Math.min(attempt, delays.length - 1)];
+          fail();
         })
         .then(function () {
           busy = false;
@@ -147,10 +181,13 @@
       if (cd) cd.textContent = String(Math.max(countdown, 0));
     }, 1000);
 
-    if (btn) btn.addEventListener('click', function () {
-      attempt = 0;
-      probe();
+    function trigger() { attempt = 0; probe(); }
+
+    hero.addEventListener('click', trigger);
+    hero.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); trigger(); }
     });
+    if (btn) btn.addEventListener('click', trigger);
 
     window.addEventListener('online', probe);
     probe();
