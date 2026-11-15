@@ -419,20 +419,20 @@ class ClientPortalController extends Controller
             'email' => ['required', 'email'],
         ]);
 
+        // Always return the same response (prevents email enumeration)
         $client = Client::where('email', $data['email'])->first();
-        if (! $client) {
-            return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
+        $account = $client
+            ? ClientPortalAccount::where('client_id', $client->id)->first()
+            : null;
+
+        if (! $client || ! $account) {
+            return back()->with('success', __('messages.sent_successfully'));
         }
 
-        $account = ClientPortalAccount::where('client_id', $client->id)->first();
-        if (! $account) {
-            return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
-        }
-
-        $token = Str::random(40);
+        $token = Str::random(48);
         $account->update([
-            'setup_token' => $token,
-            'setup_token_expires_at' => now()->addHours(2),
+            'reset_token_hash' => hash_hmac('sha256', $token, (string) config('app.key')),
+            'reset_token_expires_at' => now()->addHours(2),
         ]);
 
         try {
@@ -460,8 +460,8 @@ class ClientPortalController extends Controller
     public function showResetPassword(string $token)
     {
         $account = ClientPortalAccount::with('client')
-            ->where('setup_token', $token)
-            ->where('setup_token_expires_at', '>', now())
+            ->where('reset_token_hash', hash_hmac('sha256', $token, (string) config('app.key')))
+            ->where('reset_token_expires_at', '>', now())
             ->firstOrFail();
 
         return view('portal.reset-password', compact('account', 'token'));
@@ -473,14 +473,14 @@ class ClientPortalController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $account = ClientPortalAccount::where('setup_token', $token)
-            ->where('setup_token_expires_at', '>', now())
+        $account = ClientPortalAccount::where('reset_token_hash', hash_hmac('sha256', $token, (string) config('app.key')))
+            ->where('reset_token_expires_at', '>', now())
             ->firstOrFail();
 
         $account->update([
             'password' => $data['password'],
-            'setup_token' => null,
-            'setup_token_expires_at' => null,
+            'reset_token_hash' => null,
+            'reset_token_expires_at' => null,
         ]);
 
         return redirect()->route('portal.login')->with('success', __('messages.updated_successfully'));

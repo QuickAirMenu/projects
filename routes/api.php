@@ -8,6 +8,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [ApiController::class, 'logout']);
+        Route::post('auth/logout-all', [ApiController::class, 'logoutAll']);
         Route::get('me', [ApiController::class, 'me']);
         Route::get('dashboard', [ApiController::class, 'dashboard']);
         Route::get('projects', [ApiController::class, 'projects']);

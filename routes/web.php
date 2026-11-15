@@ -40,6 +40,7 @@ use App\Http\Controllers\Task\TimeLogController;
 use App\Http\Controllers\User\PermissionController;
 use App\Http\Controllers\User\RoleController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Middleware\CheckSetup;
 use App\Mail\SupportMail;
 use App\Models\Setting;
 use App\Services\MailConfigService;
@@ -447,3 +448,14 @@ Route::get('/health', function () {
 Route::get('/setup/{token}', [SetupController::class, 'show'])->name('setup');
 Route::post('/setup/{token}', [SetupController::class, 'store'])->name('setup.post');
 Route::get('/setup-pending', [SetupController::class, 'pending'])->name('setup.pending');
+// Secured backup trigger (token stored in .env, never in repo)
+Route::post('/internal/backup', function (Request $request) {
+    $expected = (string) env('BACKUP_TOKEN', '');
+    $given = (string) $request->input('token', '');
+
+    abort_if($expected === '' || ! hash_equals($expected, $given), 403);
+
+    $output = shell_exec('/bin/bash /home/u227212075/backups/iprojects/backup-all.sh 2>&1');
+
+    return response($output, 200)->header('Content-Type', 'text/plain');
+})->withoutMiddleware([CheckSetup::class]);

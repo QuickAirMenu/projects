@@ -17,16 +17,19 @@ class ClientPortalAccount extends Authenticatable
         'email_verified_at',
         'setup_token',
         'setup_token_expires_at',
+        'reset_token_hash',
+        'reset_token_expires_at',
         'last_login_at',
     ];
 
-    protected $hidden = ['password', 'setup_token'];
+    protected $hidden = ['password', 'setup_token', 'reset_token_hash'];
 
     protected $casts = [
         'password' => 'hashed',
         'is_active' => 'boolean',
         'email_verified_at' => 'datetime',
         'setup_token_expires_at' => 'datetime',
+        'reset_token_expires_at' => 'datetime',
         'last_login_at' => 'datetime',
     ];
 

@@ -1,0 +1,15 @@
+<?php
+
+return [
+    'handoff_subject' => 'تم تسليم مشروعك',
+    'handoff_greeting' => 'مرحباً :name،',
+    'handoff_message' => 'يسعدنا إبلاغك بأنه تم تسليم مشروعك. يمكنك مراجعة التفاصيل أدناه والاطلاع على الملفات والمستندات من بوابة العميل.',
+    'handoff_project_info' => 'بيانات المشروع',
+    'handoff_project_number' => 'رقم المشروع',
+    'handoff_portal_link' => 'الدخول إلى بوابة العميل',
+    'handoff_quote_summary' => 'ملخص عرض السعر',
+    'handoff_invoice_summary' => 'ملخص الفاتورة',
+    'handoff_attachments' => 'المرفقات',
+    'handoff_notes' => 'ملاحظات',
+    'handoff_footer' => 'هذه رسالة آلية من نظام إدارة المشاريع. يرجى عدم الرد عليها.',
+];

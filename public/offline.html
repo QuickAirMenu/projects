@@ -5,62 +5,165 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#4F46E5">
 <title>غير متصل — iProjects</title>
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
-<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/ip-32.png">
+<link rel="apple-touch-icon" href="/icons/ip-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{ --brand:#4F46E5; --violet:#7C3AED; --ink:#0F172A; --muted:#64748B; }
+  :root{ --brand:#4F46E5; --brand-dark:#4338CA; --violet:#7C3AED; --ink:#0F172A; --muted:#64748B; --line:#E2E8F0; }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
     font-family:'Cairo',system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
-    background:#F8FAFC;
+    background:
+      radial-gradient(900px 480px at 82% -10%, rgba(124,58,237,.10), transparent 60%),
+      radial-gradient(700px 420px at 8% 110%, rgba(79,70,229,.10), transparent 60%),
+      #F8FAFC;
   }
-  .wrap{width:100%;max-width:400px;text-align:center}
-  .logo{width:72px;height:72px;border-radius:20px;margin:0 auto 22px;display:block;
-    box-shadow:0 16px 32px -16px rgba(79,70,229,.55)}
-  h1{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
-  p{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:26px}
+  .wrap{width:100%;max-width:420px;text-align:center}
+
+  /* Animated illustration */
+  .scene{position:relative;width:100%;max-width:320px;margin:0 auto 6px;aspect-ratio:320/170}
+  .scene svg{width:100%;height:100%;display:block;overflow:visible}
+  .glow{filter:drop-shadow(0 12px 22px rgba(79,70,229,.18))}
+
+  .node-fill{fill:#fff;stroke:var(--line);stroke-width:1.5}
+  .node-brand{fill:url(#brandGrad)}
+  .path-dash{
+    fill:none;stroke:url(#brandGrad);stroke-width:2.5;stroke-linecap:round;
+    stroke-dasharray:6 8;
+    animation:dash 1.6s linear infinite;
+  }
+  .path-base{fill:none;stroke:#E9EDF5;stroke-width:2.5;stroke-linecap:round}
+  @keyframes dash{to{stroke-dashoffset:-28}}
+
+  .pulse-ring{fill:none;stroke:var(--brand);stroke-width:1.5;opacity:.35;transform-origin:center;animation:pulse 2.4s ease-out infinite}
+  .pulse-ring.r2{animation-delay:.8s}
+  .pulse-ring.r3{animation-delay:1.6s}
+  @keyframes pulse{
+    0%{transform:scale(.55);opacity:.45}
+    70%{transform:scale(1.25);opacity:0}
+    100%{opacity:0}
+  }
+
+  .orbit{fill:var(--violet);opacity:.85}
+  .orbit-dot{animation:orbitFade 2.4s ease-in-out infinite}
+  @keyframes orbitFade{0%,100%{opacity:.25;r:2}50%{opacity:.95;r:3}}
+
+  .logo-wrap{position:relative;width:64px;height:64px;margin:4px auto 18px}
+  .logo-ring{
+    position:absolute;inset:-8px;border-radius:22px;
+    background:conic-gradient(from 0deg, rgba(79,70,229,0), rgba(79,70,229,.55), rgba(124,58,237,.55), rgba(79,70,229,0));
+    animation:spin 6s linear infinite;
+    filter:blur(6px);opacity:.7;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .logo-wrap img{position:relative;width:64px;height:64px;border-radius:18px;display:block;box-shadow:0 12px 26px -14px rgba(79,70,229,.6)}
+
+  h1{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+  p.lead{font-size:13.5px;color:var(--muted);line-height:1.8;margin-bottom:22px}
+
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    width:100%;max-width:260px;padding:13px 20px;border:0;border-radius:14px;cursor:pointer;
-    font-family:inherit;font-size:14px;font-weight:700;color:#fff;
-    background:var(--brand);transition:background .15s ease;
+    width:100%;max-width:250px;padding:12px 20px;border:0;border-radius:13px;cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:700;color:#fff;background:var(--brand);
+    transition:background .15s ease, transform .15s ease;
   }
-  .btn:hover{background:#4338CA}
-  .btn svg{width:16px;height:16px}
-  .brand{margin-top:28px;font-size:11.5px;font-weight:700;color:#94A3B8;letter-spacing:.06em;text-transform:uppercase}
+  .btn:hover{background:var(--brand-dark)}
+  .btn:active{transform:translateY(1px)}
+  .btn svg{width:15px;height:15px}
+  .btn.loading{opacity:.8;pointer-events:none}
+  .btn.loading svg{animation:spin .8s linear infinite}
+
+  .status{margin-top:14px;font-size:12px;color:#94A3B8}
+  .brand{margin-top:22px;font-size:11px;font-weight:700;color:#A7B2C2;letter-spacing:.08em;text-transform:uppercase}
+
+  @media (prefers-reduced-motion: reduce){
+    .path-dash,.pulse-ring,.orbit-dot,.logo-ring,.btn.loading svg{animation:none !important}
+  }
 </style>
 </head>
 <body>
   <main class="wrap">
-    <img src="/icons/icon-512.png" alt="iProjects" class="logo">
+    <div class="scene glow" aria-hidden="true">
+      <svg viewBox="0 0 320 170" role="img">
+        <defs>
+          <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4F46E5"/>
+            <stop offset="100%" stop-color="#7C3AED"/>
+          </linearGradient>
+          <linearGradient id="softBrand" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#EEF2FF"/>
+            <stop offset="100%" stop-color="#F5F3FF"/>
+          </linearGradient>
+        </defs>
+
+        <!-- connection path -->
+        <path class="path-base" d="M88 92 C 128 52, 192 52, 232 92"/>
+        <path class="path-dash" d="M88 92 C 128 52, 192 52, 232 92"/>
+
+        <!-- traveling packet -->
+        <circle r="4" fill="url(#brandGrad)">
+          <animateMotion dur="2.4s" repeatCount="indefinite" rotate="auto"
+            path="M88 92 C 128 52, 192 52, 232 92"/>
+          <animate attributeName="opacity" values="0;1;1;0" dur="2.4s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- left node: project grid -->
+        <g>
+          <rect x="44" y="66" width="52" height="52" rx="14" class="node-fill"/>
+          <rect x="56" y="78" width="12" height="12" rx="3" class="node-brand" opacity=".9"/>
+          <rect x="72" y="78" width="12" height="12" rx="3" class="node-brand" opacity=".55"/>
+          <rect x="56" y="94" width="12" height="12" rx="3" class="node-brand" opacity=".55"/>
+          <rect x="72" y="94" width="12" height="12" rx="3" class="node-brand" opacity=".9"/>
+        </g>
+
+        <!-- right node: cloud with pulses -->
+        <g>
+          <circle cx="232" cy="92" r="30" class="pulse-ring"/>
+          <circle cx="232" cy="92" r="30" class="pulse-ring r2"/>
+          <circle cx="232" cy="92" r="30" class="pulse-ring r3"/>
+          <path d="M214 100c-6 0-10-4.4-10-9.8 0-5.2 4-9.4 9.2-9.8 1.6-6 7-10.4 13.6-10.4 6.3 0 11.6 4 13.4 9.6 5.2.5 9.1 4.7 9.1 9.9 0 5.6-4.6 10.1-10.4 10.1h-24.9z"
+                fill="url(#softBrand)" stroke="#C7D2FE" stroke-width="1.2"/>
+          <circle cx="232" cy="89" r="2.2" fill="#4F46E5" class="orbit orbit-dot"/>
+          <circle cx="243" cy="96" r="2" fill="#7C3AED" class="orbit orbit-dot" style="animation-delay:.6s"/>
+          <circle cx="221" cy="96" r="2" fill="#4F46E5" class="orbit orbit-dot" style="animation-delay:1.2s"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="logo-wrap">
+      <span class="logo-ring"></span>
+      <img src="/icons/ip-512.png" alt="iProjects">
+    </div>
+
     <h1>لا يوجد اتصال بالإنترنت</h1>
-    <p>تحقق من اتصالك ثم أعد المحاولة.</p>
-    <button class="btn" onclick="location.reload()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+    <p class="lead">جارٍ محاولة إعادة الربط تلقائياً. تحقق من شبكتك أو أعد المحاولة يدوياً.</p>
+
+    <button class="btn" id="retryBtn" onclick="retry()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
       إعادة المحاولة
     </button>
-    <p id="status" style="margin-top:14px;font-size:12px;color:#94A3B8">سيتم التحديث تلقائياً عند عودة الاتصال…</p>
+
+    <p class="status" id="status">إعادة المحاولة التلقائية كل 5 ثوانٍ…</p>
     <div class="brand">iProjects</div>
   </main>
 
 <script>
   (function () {
     var reloading = false;
+    var statusEl = document.getElementById('status');
+    var btn = document.getElementById('retryBtn');
 
     function refresh() {
       if (reloading) return;
       reloading = true;
-      var st = document.getElementById('status');
-      if (st) st.textContent = 'تم استعادة الاتصال، جارٍ التحديث…';
+      if (btn) btn.classList.add('loading');
+      if (statusEl) statusEl.textContent = 'تم استعادة الاتصال، جارٍ التحديث…';
       location.reload();
     }
 
-    // 1) Browser online event (fast, but not always reliable)
     window.addEventListener('online', refresh);
 
-    // 2) Active probe: ping /health every 5s (no cache)
     var timer = setInterval(function () {
       if (navigator.onLine === false) return;
       fetch('/health', { method: 'GET', cache: 'no-store' })
@@ -68,7 +171,6 @@
         .catch(function () {});
     }, 5000);
 
-    // 3) Try immediately in case connection already returned
     if (navigator.onLine) {
       fetch('/health', { method: 'GET', cache: 'no-store' })
         .then(function (r) { if (r.ok) refresh(); })

@@ -52,3 +52,7 @@ bootstrap/cache/*.php
 !bootstrap/cache/.gitkeep
 
 /storage/framework/testing/*
+
+/error_log
+
+public/backup-trigger.php

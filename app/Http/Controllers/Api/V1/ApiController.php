@@ -32,7 +32,11 @@ class ApiController extends Controller
             ]);
         }
 
-        $token = $user->createToken($data['device_name'] ?? 'mobile')->plainTextToken;
+        $token = $user->createToken(
+            $data['device_name'] ?? 'mobile',
+            ['*'],
+            now()->addDays(30)
+        )->plainTextToken;
 
         return response()->json([
             'token' => $token,
@@ -45,6 +49,13 @@ class ApiController extends Controller
         $request->user()->currentAccessToken()?->delete();
 
         return response()->json(['message' => 'Logged out']);
+    }
+
+    public function logoutAll(Request $request): JsonResponse
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json(['message' => 'All tokens revoked']);
     }
 
     public function me(Request $request): JsonResponse

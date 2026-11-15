@@ -108,4 +108,5 @@ return [
     'collected' => 'المحصّل',
     'collections_last_6_months' => 'المفوتر مقابل المحصّل (آخر 6 أشهر)',
     'projects_by_status' => 'المشاريع حسب الحالة',
+    'download_pdf' => 'تحميل PDF',
 ];

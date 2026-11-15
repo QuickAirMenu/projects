@@ -108,4 +108,5 @@ return [
     'collected' => 'Collected',
     'collections_last_6_months' => 'Invoiced vs Collected (Last 6 Months)',
     'projects_by_status' => 'Projects by Status',
+    'download_pdf' => 'Download PDF',
 ];
