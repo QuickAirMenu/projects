@@ -16,7 +16,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('{{ url('/sw.js?v=10') }}', { scope: '/' }).catch(function () {});
+                navigator.serviceWorker.register('{{ url('/sw.js?v=11') }}', { scope: '/' }).catch(function () {});
             });
         }
     </script>

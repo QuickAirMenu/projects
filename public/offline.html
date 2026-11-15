@@ -9,60 +9,74 @@
 <link rel="apple-touch-icon" href="/icons/ip-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--brand:#4F46E5;--brand-2:#7C3AED;--ink:#0F172A;--muted:#64748B;--line:#E2E8F0;--card:#FFFFFF}
+  :root{--brand:#4F46E5;--brand2:#7C3AED;--ink:#0F172A;--muted:#64748B;--line:#E2E8F0;--ok:#059669}
   *{margin:0;padding:0;box-sizing:border-box}
-  body{
-    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 20px;
-    font-family:'Cairo',system-ui,-apple-system,sans-serif;color:var(--ink);
-    background:
-      radial-gradient(760px 420px at 84% -8%, rgba(124,58,237,.10), transparent 62%),
-      radial-gradient(620px 380px at 6% 108%, rgba(79,70,229,.10), transparent 62%),
-      #F8FAFC;
-  }
-  .wrap{width:100%;max-width:380px;text-align:center}
-  .hero{width:100%;max-width:300px;margin:0 auto 20px;display:block;filter:drop-shadow(0 18px 30px rgba(79,70,229,.14))}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:26px 20px;
+       font-family:'Cairo',system-ui,-apple-system,sans-serif;color:var(--ink);
+       background:radial-gradient(760px 420px at 84% -8%,rgba(124,58,237,.10),transparent 62%),
+                  radial-gradient(620px 380px at 6% 108%,rgba(79,70,229,.10),transparent 62%),#F8FAFC}
+  .wrap{width:100%;max-width:400px;text-align:center}
+  .hero{width:100%;max-width:290px;margin:0 auto 18px;display:block;filter:drop-shadow(0 18px 30px rgba(79,70,229,.14))}
 
-  .chip{
-    display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
-    padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#475569;margin-bottom:14px;
-    box-shadow:0 4px 10px -6px rgba(15,23,42,.12)
-  }
-  .dot{width:7px;height:7px;border-radius:99px;background:var(--brand);animation:blink 1.6s ease-in-out infinite}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+        padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#475569;margin-bottom:14px}
+  .dot{width:7px;height:7px;border-radius:99px;background:#F59E0B}
+  .dot.probing{background:var(--brand);animation:blink 1.3s ease-in-out infinite}
+  .dot.ok{background:var(--ok);animation:none}
   @keyframes blink{0%,100%{opacity:.35}50%{opacity:1}}
 
   h1{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
-  p{font-size:13.5px;color:var(--muted);line-height:1.85;margin-bottom:22px}
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
-    padding:13px 18px;border:0;border-radius:13px;cursor:pointer;font-family:inherit;
-    font-size:14px;font-weight:700;color:#fff;
-    background:linear-gradient(135deg,var(--brand),var(--brand-2));
-    box-shadow:0 14px 26px -14px rgba(79,70,229,.65);
-    transition:transform .15s ease,box-shadow .15s ease
-  }
-  .btn:hover{transform:translateY(-1px);box-shadow:0 18px 30px -14px rgba(79,70,229,.7)}
+  p.lead{font-size:13.5px;color:var(--muted);line-height:1.85;margin-bottom:18px}
+
+  .resume{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+          display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;text-align:start}
+  .resume .t{font-size:12px;color:var(--muted)}
+  .resume .p{font-size:13px;font-weight:700;color:var(--ink);word-break:break-all}
+  .resume a{font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;white-space:nowrap}
+  .resume a:hover{text-decoration:underline}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+       padding:13px 18px;border:0;border-radius:13px;cursor:pointer;font-family:inherit;font-size:14px;
+       font-weight:700;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));
+       box-shadow:0 14px 26px -14px rgba(79,70,229,.65);transition:transform .15s ease}
+  .btn:hover{transform:translateY(-1px)}
   .btn:active{transform:none}
+  .btn[disabled]{opacity:.6;cursor:default;transform:none}
   .btn svg{width:15px;height:15px}
+
   .meta{margin-top:12px;font-size:12px;color:#94A3B8}
   .meta b{color:#64748B;font-weight:700}
-  .brand{margin-top:20px;font-size:11px;font-weight:700;color:#A7B2C2;letter-spacing:.08em;text-transform:uppercase}
+
+  details{margin-top:16px;text-align:start;background:#fff;border:1px solid var(--line);border-radius:14px}
+  summary{cursor:pointer;padding:11px 14px;font-size:12.5px;font-weight:700;color:#475569;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary:before{content:"▸";margin-inline-end:8px;color:#94A3B8}
+  details[open] summary:before{content:"▾"}
+  .diag{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:0 14px 14px;font-size:12px;color:#64748B}
+  .diag b{color:#334155;font-weight:700}
+
+  .brand{margin-top:18px;font-size:11px;font-weight:700;color:#A7B2C2;letter-spacing:.08em;text-transform:uppercase}
+  .success{display:none}
+  .success.show{display:block}
+  .success .ico{width:54px;height:54px;border-radius:99px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+  .success .ico svg{width:26px;height:26px;color:var(--ok)}
 
   @media (prefers-color-scheme: dark){
-    body{color:#E2E8F0;background:
-      radial-gradient(760px 420px at 84% -8%, rgba(124,58,237,.16), transparent 62%),
-      radial-gradient(620px 380px at 6% 108%, rgba(79,70,229,.16), transparent 62%),
-      #0B1220}
-    .chip{background:#0F172A;border-color:#1E293B;color:#CBD5E1}
-    p{color:#94A3B8}
-    .meta{color:#64748B}
-    .meta b{color:#94A3B8}
+    body{color:#E2E8F0;background:radial-gradient(760px 420px at 84% -8%,rgba(124,58,237,.16),transparent 62%),
+      radial-gradient(620px 380px at 6% 108%,rgba(79,70,229,.16),transparent 62%),#0B1220}
+    .chip,.resume,details{background:#0F172A;border-color:#1E293B;color:#CBD5E1}
+    .resume .p{color:#E2E8F0}
+    p.lead,.diag{color:#94A3B8}
+    .diag b{color:#CBD5E1}
+    .meta{color:#64748B}.meta b{color:#94A3B8}
     .brand{color:#475569}
+    summary{color:#CBD5E1}
   }
-  @media (prefers-reduced-motion: reduce){.dot{animation:none;opacity:1}}
+  @media (prefers-reduced-motion: reduce){.dot.probing{animation:none;opacity:1}}
 </style>
 </head>
 <body>
-  <main class="wrap">
+  <main class="wrap" id="main">
     <svg class="hero" viewBox="0 0 300 180" role="img" aria-label="لا يوجد اتصال">
       <defs>
         <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -77,21 +91,14 @@
           <stop offset="0%" stop-color="#EEF2FF"/><stop offset="100%" stop-color="#F5F3FF"/>
         </linearGradient>
       </defs>
-
       <ellipse cx="150" cy="92" rx="134" ry="78" fill="url(#halo)"/>
-
-      <!-- project node -->
       <rect x="32" y="54" width="68" height="68" rx="19" fill="#fff" stroke="#E2E8F0" stroke-width="2"/>
       <rect x="47" y="69" width="13" height="13" rx="4" fill="url(#g)"/>
       <rect x="64" y="69" width="13" height="13" rx="4" fill="url(#g)" opacity=".4"/>
       <rect x="47" y="86" width="13" height="13" rx="4" fill="url(#g)" opacity=".4"/>
       <rect x="64" y="86" width="13" height="13" rx="4" fill="url(#g)"/>
-
-      <!-- cloud node -->
       <path d="M212 105c-8.3 0-15-6.4-15-14.2 0-7.4 6-13.6 13.5-14.1 2.3-8.6 10.1-14.9 19.6-14.9 9 0 16.6 5.8 19.2 13.8 7.5.8 13.1 6.8 13.1 14.2 0 8-6.7 14.5-15 14.5H212z"
             fill="url(#soft)" stroke="#C7D2FE" stroke-width="2"/>
-
-      <!-- broken link -->
       <path d="M104 88h32" stroke="url(#g)" stroke-width="3.6" stroke-linecap="round"/>
       <path d="M164 88h32" stroke="url(#g)" stroke-width="3.6" stroke-linecap="round"/>
       <circle cx="146" cy="88" r="4.8" fill="#fff" stroke="url(#g)" stroke-width="2.8"/>
@@ -99,53 +106,176 @@
       <path d="M143 74l14 28" stroke="url(#g)" stroke-width="3.6" stroke-linecap="round"/>
     </svg>
 
-    <div class="chip"><span class="dot"></span> غير متصل</div>
+    <div class="chip" aria-live="polite"><span class="dot probing" id="dot"></span><span id="chipText">جارٍ التحقق من الاتصال…</span></div>
 
-    <h1>لا يوجد اتصال بالإنترنت</h1>
-    <p>بياناتك محفوظة بأمان. سنعيد الربط تلقائياً بمجرد عودة الشبكة.</p>
+    <div id="offlineView">
+      <h1>لا يوجد اتصال بالإنترنت</h1>
+      <p class="lead">بياناتك محفوظة بأمان. سنعيد الربط تلقائياً بمجرد عودة الشبكة.</p>
 
-    <button class="btn" onclick="location.reload()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
-      إعادة المحاولة
-    </button>
+      <div class="resume" id="resumeCard" hidden>
+        <div class="min-w-0">
+          <div class="t">آخر صفحة كنت فيها · <span id="lastAgo">—</span></div>
+          <div class="p" id="lastPath">—</div>
+        </div>
+        <a href="#" id="resumeLink">متابعة</a>
+      </div>
 
-    <p class="meta" id="meta">إعادة المحاولة التلقائية خلال <b id="cd">5</b> ث</p>
-    <div class="brand">iProjects</div>
+      <button class="btn" id="retryBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        إعادة المحاولة الآن
+      </button>
+
+      <p class="meta" id="meta">المحاولة التلقائية خلال <b id="cd">3</b> ث · <span id="attempts">0</span> محاولة</p>
+
+      <details>
+        <summary>معلومات التشخيص</summary>
+        <div class="diag">
+          <span>حالة المتصفح</span><b id="dOnline">—</b>
+          <span>نوع الشبكة</span><b id="dType">—</b>
+          <span>سرعة تقريبية</span><b id="dSpeed">—</b>
+          <span>زمن الاستجابة</span><b id="dRtt">—</b>
+          <span>Service Worker</span><b id="dSw">—</b>
+          <span>آخر صفحة</span><b id="dLast">—</b>
+        </div>
+      </details>
+
+      <div class="brand">iProjects</div>
+    </div>
+
+    <div id="successView" class="success" aria-live="polite">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h1>تم استعادة الاتصال</h1>
+      <p class="lead">جارٍ فتح صفحتك…</p>
+    </div>
+
+    <noscript>
+      <p class="lead" style="margin-top:12px">أعد تحميل الصفحة يدوياً بعد استعادة الاتصال.</p>
+    </noscript>
   </main>
 
 <script>
   (function () {
-    var done = false;
-    var cd = document.getElementById('cd');
-    var meta = document.getElementById('meta');
-    var left = 5;
+    var delays = [3, 5, 8, 12, 15];
+    var attempt = 0;
+    var countdown = delays[0];
+    var busy = false;
+    var finished = false;
 
-    function refresh() {
-      if (done) return;
-      done = true;
-      if (meta) meta.textContent = 'تم استعادة الاتصال…';
-      location.reload();
+    var el = function (id) { return document.getElementById(id); };
+    var dot = el('dot'), chipText = el('chipText'), cd = el('cd'),
+        attempts = el('attempts'), meta = el('meta'), retryBtn = el('retryBtn'),
+        offlineView = el('offlineView'), successView = el('successView');
+
+    function lastPage() {
+      try {
+        return {
+          path: localStorage.getItem('ip_last_path') || '/',
+          at: parseInt(localStorage.getItem('ip_last_at') || '0', 10) || 0
+        };
+      } catch (e) { return { path: '/', at: 0 }; }
     }
 
-    window.addEventListener('online', refresh);
-
-    var timer = setInterval(function () {
-      if (navigator.onLine === false) return;
-      fetch('/health', { cache: 'no-store' })
-        .then(function (r) { if (r.ok) refresh(); })
-        .catch(function () {});
-      left -= 1;
-      if (left <= 0) left = 5;
-      if (cd) cd.textContent = String(left);
-    }, 5000);
-
-    if (navigator.onLine) {
-      fetch('/health', { cache: 'no-store' })
-        .then(function (r) { if (r.ok) refresh(); })
-        .catch(function () {});
+    function ago(ts) {
+      if (!ts) return '—';
+      var s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+      if (s < 60) return s + ' ثانية';
+      if (s < 3600) return Math.floor(s / 60) + ' دقيقة';
+      if (s < 86400) return Math.floor(s / 3600) + ' ساعة';
+      return Math.floor(s / 86400) + ' يوم';
     }
 
-    window.addEventListener('pagehide', function () { clearInterval(timer); });
+    function paintResume() {
+      var l = lastPage();
+      if (l.at > 0 && l.path && l.path !== '/offline.html') {
+        el('resumeCard').hidden = false;
+        el('lastPath').textContent = l.path;
+        el('lastAgo').textContent = ago(l.at);
+        el('resumeLink').setAttribute('href', l.path);
+        el('dLast').textContent = l.path + ' · ' + ago(l.at);
+      } else {
+        el('dLast').textContent = '—';
+      }
+    }
+
+    function paintDiagnostics() {
+      el('dOnline').textContent = navigator.onLine ? 'متصل' : 'غير متصل';
+      var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      el('dType').textContent = (c && c.effectiveType) ? c.effectiveType.toUpperCase() : '—';
+      el('dSpeed').textContent = (c && typeof c.downlink === 'number') ? (c.downlink + ' Mbps') : '—';
+      el('dRtt').textContent = (c && typeof c.rtt === 'number') ? (c.rtt + ' ms') : '—';
+      el('dSw').textContent = ('serviceWorker' in navigator)
+        ? (navigator.serviceWorker.controller ? 'نشط' : 'غير مفعّل')
+        : 'غير مدعوم';
+    }
+
+    function setChip(state) {
+      dot.className = 'dot ' + state;
+      if (state === 'probing') chipText.textContent = 'جارٍ التحقق من الاتصال…';
+      else if (state === 'ok') chipText.textContent = 'تم استعادة الاتصال';
+      else chipText.textContent = navigator.onLine ? 'جارٍ إعادة المحاولة…' : 'لا يوجد اتصال';
+    }
+
+    function probe() {
+      if (busy || finished) return;
+      busy = true;
+      setChip('probing');
+
+      var controller = new AbortController();
+      var t = setTimeout(function () { controller.abort(); }, 5000);
+
+      fetch('/health', { cache: 'no-store', signal: controller.signal })
+        .then(function (r) {
+          clearTimeout(t);
+          if (r.ok) { success(); return; }
+          throw new Error('bad');
+        })
+        .catch(function () {
+          clearTimeout(t);
+          attempt += 1;
+          attempts.textContent = String(attempt);
+          countdown = delays[Math.min(attempt, delays.length - 1)];
+          setChip(navigator.onLine ? 'wait' : 'off');
+        })
+        .then(function () { busy = false; });
+    }
+
+    function success() {
+      finished = true;
+      setChip('ok');
+      offlineView.style.display = 'none';
+      successView.classList.add('show');
+      var l = lastPage();
+      setTimeout(function () {
+        location.replace(l.at > 0 && l.path && l.path !== '/offline.html' ? l.path : '/');
+      }, 700);
+    }
+
+    // countdown tick
+    setInterval(function () {
+      if (finished || busy) return;
+      countdown -= 1;
+      if (countdown <= 0) { probe(); countdown = delays[0]; }
+      if (cd) cd.textContent = String(Math.max(countdown, 0));
+    }, 1000);
+
+    retryBtn.addEventListener('click', function () {
+      retryBtn.disabled = true;
+      attempt = 0; attempts.textContent = '0';
+      probe();
+      setTimeout(function () { retryBtn.disabled = false; }, 1200);
+    });
+
+    window.addEventListener('online', function () { probe(); });
+    window.addEventListener('offline', function () { setChip('off'); paintDiagnostics(); });
+    window.addEventListener('pagehide', function () {});
+
+    paintResume();
+    paintDiagnostics();
+    setChip(navigator.onLine ? 'wait' : 'off');
+    probe();
+    setInterval(paintDiagnostics, 4000);
   })();
 </script>
 </body>

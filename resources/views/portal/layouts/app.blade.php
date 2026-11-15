@@ -17,7 +17,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('{{ url('/sw.js?v=10') }}', { scope: '/' }).catch(function () {});
+                navigator.serviceWorker.register('{{ url('/sw.js?v=11') }}', { scope: '/' }).catch(function () {});
             });
         }
     </script>
@@ -168,5 +168,16 @@
             </main>
         @endauth
     </div>
+    <script>
+        // Remember last visited page for the offline screen
+        (function () {
+            try {
+                if (navigator.onLine) {
+                    localStorage.setItem('ip_last_path', location.pathname + location.search);
+                    localStorage.setItem('ip_last_at', String(Date.now()));
+                }
+            } catch (e) {}
+        })();
+    </script>
 </body>
 </html>
