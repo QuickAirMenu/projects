@@ -56,3 +56,8 @@ bootstrap/cache/*.php
 /error_log
 
 public/backup-trigger.php
+
+/storage/app/private/*
+!/storage/app/private/.gitkeep
+/storage/app/public/avatars/*
+!/storage/app/public/avatars/.gitkeep
