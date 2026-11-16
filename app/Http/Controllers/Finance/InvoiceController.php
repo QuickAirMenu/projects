@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StoreInvoiceRequest;
+use App\Mail\InvoiceReminderMail;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\Quote;
 use App\Models\Setting;
 use App\Services\InvoiceService;
+use App\Services\MailConfigService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Mpdf\Mpdf;
 
 class InvoiceController extends Controller
@@ -118,6 +121,39 @@ class InvoiceController extends Controller
         $invoice->load(['client', 'project', 'items', 'payments', 'contract']);
 
         return view('finance.invoices.show', compact('invoice'));
+    }
+
+    public function remind(Invoice $invoice)
+    {
+        $this->authorize('update', $invoice);
+
+        $invoice->load('client');
+
+        if (! $invoice->client?->email) {
+            return back()->with('error', __('messages.client_no_email'));
+        }
+
+        if ((float) $invoice->remaining_amount <= 0) {
+            return back()->with('error', __('messages.invoice_already_paid'));
+        }
+
+        try {
+            app(MailConfigService::class)->applyDynamicMailConfig();
+
+            if (blank(config('mail.mailers.smtp.host'))) {
+                return back()->with('error', __('messages.mail_not_configured'));
+            }
+
+            Mail::to($invoice->client->email)->send(new InvoiceReminderMail($invoice));
+
+            activity()->causedBy(auth()->user())->performedOn($invoice)->log('invoice reminder sent');
+
+            return back()->with('success', __('messages.invoice_reminder_sent'));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', __('messages.invoice_reminder_failed'));
+        }
     }
 
     public function pdf(Invoice $invoice)

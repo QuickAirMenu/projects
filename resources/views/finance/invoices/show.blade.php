@@ -16,6 +16,14 @@
     </div>
     <div class="flex gap-2">
         <a href="{{ route('invoices.pdf', $invoice) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
+        @if((float) $invoice->remaining_amount > 0)
+        <form action="{{ route('invoices.remind', $invoice) }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="bg-amber-50 text-amber-700 hover:bg-amber-100 px-4 py-2 rounded-xl text-sm transition">
+                <i class="fas fa-bell me-2"></i>{{ __('messages.send_reminder') }}
+            </button>
+        </form>
+        @endif
         <a href="{{ route('invoices.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
     </div>
 </div>

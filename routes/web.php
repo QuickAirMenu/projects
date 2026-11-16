@@ -298,6 +298,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::put('{invoice}', [InvoiceController::class, 'update'])->name('update');
         Route::post('{invoice}/restore', [InvoiceController::class, 'restore'])->withTrashed()->name('restore');
         Route::delete('{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
+        Route::post('{invoice}/remind', [InvoiceController::class, 'remind'])->name('remind');
         Route::post('{invoice}/convert-to-contract', [InvoiceController::class, 'convertToContract'])->name('convert-to-contract');
     });
 
