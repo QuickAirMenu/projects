@@ -61,3 +61,5 @@ public/backup-trigger.php
 !/storage/app/private/.gitkeep
 /storage/app/public/avatars/*
 !/storage/app/public/avatars/.gitkeep
+
+/storage/framework/cache/laravel-excel/*
