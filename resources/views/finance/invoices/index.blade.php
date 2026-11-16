@@ -14,12 +14,7 @@
             <i class="fas fa-file-excel"></i>
             <span class="hidden sm:inline">{{ __('common.export') }}</span>
         </a>
-        <form action="{{ route('invoices.remind-overdue') }}" method="POST" class="inline">
-            @csrf
-            <button type="submit" class="bg-amber-50 text-amber-700 hover:bg-amber-100 px-4 py-2.5 rounded-xl text-sm transition font-medium">
-                <i class="fas fa-bell me-2"></i>{{ __('messages.remind_overdue') }}
-            </button>
-        </form>
+
         <a href="{{ route('invoices.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm transition font-medium">
             <i class="fas fa-plus me-2"></i>{{ __('finance.add_invoice') }}
         </a>
@@ -32,7 +27,12 @@
             <span class="hidden sm:inline">{{ __('common.export') }}</span>
         </a>
         @endif
-    </div>
+        <form action="{{ route('invoices.remind-overdue') }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="bg-amber-50 text-amber-700 hover:bg-amber-100 px-4 py-2.5 rounded-xl text-sm transition font-medium">
+                <i class="fas fa-bell me-2"></i>{{ __('messages.remind_overdue') }}
+            </button>
+        </form>    </div>
 </div>
 
 <div class="flex gap-2 mb-4">
@@ -174,7 +174,12 @@
         @if($invoices->hasPages())
         <div class="px-5 py-4 border-t">{{ $invoices->links() }}</div>
         @endif
-    </div>
+        <form action="{{ route('invoices.remind-overdue') }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="bg-amber-50 text-amber-700 hover:bg-amber-100 px-4 py-2.5 rounded-xl text-sm transition font-medium">
+                <i class="fas fa-bell me-2"></i>{{ __('messages.remind_overdue') }}
+            </button>
+        </form>    </div>
 </div>
 @endsection
 
