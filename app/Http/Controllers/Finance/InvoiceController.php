@@ -156,6 +156,49 @@ class InvoiceController extends Controller
         }
     }
 
+    public function remindOverdue(Request $request)
+    {
+        $this->authorize('viewAny', Invoice::class);
+
+        try {
+            app(MailConfigService::class)->applyDynamicMailConfig();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (blank(config('mail.mailers.smtp.host'))) {
+            return back()->with('error', __('messages.mail_not_configured'));
+        }
+
+        $invoices = Invoice::with('client')
+            ->where('remaining_amount', '>', 0)
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '<', now())
+            ->whereIn('payment_status', ['unpaid', 'partially_paid', 'overdue'])
+            ->get();
+
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($invoices as $invoice) {
+            if (! $invoice->client?->email) {
+                continue;
+            }
+
+            try {
+                Mail::to($invoice->client->email)->send(new InvoiceReminderMail($invoice));
+                $sent++;
+            } catch (\Throwable $e) {
+                report($e);
+                $failed++;
+            }
+        }
+
+        $message = __('messages.reminders_sent_summary', ['sent' => $sent, 'failed' => $failed]);
+
+        return back()->with($sent > 0 ? 'success' : 'error', $message);
+    }
+
     public function pdf(Invoice $invoice)
     {
         $this->authorize('view', $invoice);

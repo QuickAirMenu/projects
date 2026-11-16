@@ -18,6 +18,12 @@
                class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm text-white transition hover:bg-red-700">
                 <i class="fas fa-file-pdf"></i> {{ __('messages.download_pdf') }}
             </a>
+            <form action="{{ route('portal.statement.email', request()->only(['from', 'to'])) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm text-white transition hover:bg-indigo-700">
+                    <i class="fas fa-envelope"></i> {{ __('messages.send_statement') }}
+                </button>
+            </form>
         </div>
     </div>
 

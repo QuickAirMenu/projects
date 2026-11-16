@@ -227,4 +227,13 @@ return [
     'invoice_reminder_amount_due' => 'Amount due: :amount :currency',
     'invoice_reminder_pay_link' => 'View invoice & pay',
     'invoice_reminder_footer' => 'This is an automated message, please do not reply.',
+    'remind_overdue' => 'Remind overdue',
+    'reminders_sent_summary' => 'Sent :sent reminders, :failed failed.',
+    'send_statement' => 'Email statement',
+    'statement_email_sent' => 'Statement sent to your email.',
+    'statement_email_failed' => 'Could not send the statement.',
+    'statement_email_subject' => 'Statement from :from to :to',
+    'statement_email_greeting' => 'Hello :name,',
+    'statement_email_body' => 'Attached is your statement for :from to :to.',
+    'statement_email_attached' => 'Please review the attached PDF for details.',
 ];

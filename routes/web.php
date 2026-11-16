@@ -103,6 +103,7 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::get('/payments', [ClientPortalController::class, 'payments'])->name('payments');
         Route::get('/statement', [ClientPortalController::class, 'statement'])->name('statement');
         Route::get('/statement/pdf', [ClientPortalController::class, 'statementPdf'])->name('statement.pdf');
+        Route::post('/statement/email', [ClientPortalController::class, 'emailStatement'])->name('statement.email');
         Route::get('/tickets', [ClientPortalController::class, 'tickets'])->name('tickets');
         Route::post('/tickets', [ClientPortalController::class, 'storeTicket'])->name('tickets.store');
         Route::get('/payments/{payment}/proof', [ClientPortalController::class, 'downloadPaymentProof'])->name('payments.proof');
@@ -291,6 +292,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::prefix('invoices')->name('invoices.')->middleware('permission:view-invoices')->group(function () {
         Route::get('/', [InvoiceController::class, 'index'])->name('index');
         Route::get('create', [InvoiceController::class, 'create'])->name('create');
+        Route::post('remind-overdue', [InvoiceController::class, 'remindOverdue'])->name('remind-overdue');
         Route::post('/', [InvoiceController::class, 'store'])->name('store');
         Route::get('{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('pdf');
         Route::get('{invoice}', [InvoiceController::class, 'show'])->name('show');

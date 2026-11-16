@@ -227,4 +227,13 @@ return [
     'invoice_reminder_amount_due' => 'المبلغ المستحق: :amount :currency',
     'invoice_reminder_pay_link' => 'عرض الفاتورة والسداد',
     'invoice_reminder_footer' => 'هذه رسالة آلية، يرجى عدم الرد عليها.',
+    'remind_overdue' => 'تذكير المتأخرة',
+    'reminders_sent_summary' => 'تم إرسال :sent تذكيراً، وفشل :failed.',
+    'send_statement' => 'إرسال الكشف بالبريد',
+    'statement_email_sent' => 'تم إرسال كشف الحساب إلى بريدك.',
+    'statement_email_failed' => 'تعذر إرسال كشف الحساب.',
+    'statement_email_subject' => 'كشف حساب من :from إلى :to',
+    'statement_email_greeting' => 'مرحباً :name،',
+    'statement_email_body' => 'مرفق كشف حسابك للفترة من :from إلى :to.',
+    'statement_email_attached' => 'يمكنك مراجعة التفاصيل في الملف المرفق.',
 ];

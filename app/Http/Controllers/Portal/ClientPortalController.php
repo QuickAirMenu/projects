@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Mail\StatementMail;
 use App\Models\Client;
 use App\Models\ClientPortalAccount;
 use App\Models\Contract;
@@ -17,6 +18,7 @@ use App\Models\User;
 use App\Notifications\PaymentSubmitted;
 use App\Notifications\SupportTicketCreated;
 use App\Services\InvoiceService;
+use App\Services\MailConfigService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -674,6 +676,51 @@ class ClientPortalController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('portal.login');
+    }
+
+    public function emailStatement(Request $request)
+    {
+        $portalAccount = Auth::guard('client')->user();
+        $client = Client::findOrFail($portalAccount->client_id);
+
+        if (! $client->email) {
+            return back()->with('error', __('messages.client_no_email'));
+        }
+
+        [$from, $to] = $this->statementRange($request);
+        $rows = $this->statementRows($client->id, $from, $to);
+        $totals = $this->statementTotals($rows);
+
+        $settings = Setting::whereIn('key', [
+            'company_name', 'company_name_ar', 'company_logo',
+            'company_email', 'company_phone', 'company_address', 'currency_symbol',
+        ])->pluck('value', 'key')->toArray();
+
+        try {
+            app(MailConfigService::class)->applyDynamicMailConfig();
+
+            if (blank(config('mail.mailers.smtp.host'))) {
+                return back()->with('error', __('messages.mail_not_configured'));
+            }
+
+            $mpdf = new Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'default_font' => 'dejavusans',
+                'autoScriptToLang' => true,
+                'autoLangToFont' => true,
+            ]);
+            $mpdf->WriteHTML(view('pdf.statement', compact('client', 'rows', 'totals', 'from', 'to', 'settings'))->render());
+            $pdf = $mpdf->Output('statement.pdf', 'S');
+
+            Mail::to($client->email)->send(new StatementMail($client, $from, $to, $pdf));
+
+            return back()->with('success', __('messages.statement_email_sent'));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', __('messages.statement_email_failed'));
+        }
     }
 
     private function statementRange(Request $request): array
