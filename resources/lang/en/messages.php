@@ -212,4 +212,8 @@ return [
     'import_note_format' => 'Supported formats: xlsx, xls, csv.',
     'import_note_template' => 'Use the template to ensure correct column headers.',
     'import_note_duplicates' => 'Duplicate rows may be rejected by validation.',
+    'quote_duplicated' => 'Quote duplicated successfully.',
+    'copy_items_from_previous' => 'Copy items from a previous quote:',
+    'copy_items_failed' => 'Could not load quote items.',
+    'duplicate' => 'Duplicate',
 ];

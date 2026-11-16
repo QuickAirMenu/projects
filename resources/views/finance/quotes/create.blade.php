@@ -107,6 +107,18 @@
 
 {{-- Items --}}
 <h3 class="font-semibold text-gray-700 mb-3">{{ __('finance.quote_items') }}</h3>
+
+@if(isset($sourceQuotes) && $sourceQuotes->count())
+<div class="mb-3 flex flex-wrap items-center gap-2">
+    <label class="text-sm text-gray-500">{{ __('messages.copy_items_from_previous') }}</label>
+    <select id="copy-source" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="">—</option>
+        @foreach($sourceQuotes as $source)
+            <option value="{{ route('quotes.items', $source) }}">{{ $source->quote_number }} — {{ $source->subject }}</option>
+        @endforeach
+    </select>
+</div>
+@endif
 <div id="items-container">
     <div class="grid grid-cols-12 gap-2 mb-2 text-xs text-gray-500 px-1">
         <div class="col-span-4">{{ __('messages.description') }}</div>
@@ -234,6 +246,30 @@ document.getElementById('add-item').addEventListener('click', () => {
     idx++;
     calcTotals();
 });
+
+const copySource = document.getElementById('copy-source');
+if (copySource) {
+    copySource.addEventListener('change', async () => {
+        if (! copySource.value) return;
+
+        try {
+            const res = await fetch(copySource.value, {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (! res.ok) throw new Error('failed');
+
+            const items = await res.json();
+            if (Array.isArray(items) && items.length) {
+                loadDefaults(items);
+            }
+        } catch (e) {
+            alert('{{ __('messages.copy_items_failed') }}');
+        } finally {
+            copySource.value = '';
+        }
+    });
+}
 
 document.addEventListener('click', e => {
     if (e.target.closest('.remove-row')) {

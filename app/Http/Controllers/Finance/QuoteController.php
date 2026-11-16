@@ -66,7 +66,13 @@ class QuoteController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('finance.quotes.create', compact('clients', 'serviceTypes'));
+        $sourceQuotes = Quote::query()
+            ->select(['id', 'quote_number', 'subject'])
+            ->latest()
+            ->take(25)
+            ->get();
+
+        return view('finance.quotes.create', compact('clients', 'serviceTypes', 'sourceQuotes'));
     }
 
     public function store(StoreQuoteRequest $request)
@@ -131,6 +137,50 @@ class QuoteController extends Controller
         return response($mpdf->Output($filename, 'S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
+    }
+
+    public function duplicate(Quote $quote)
+    {
+        $this->authorize('create', Quote::class);
+        $this->authorize('view', $quote);
+
+        $quote->load('items');
+
+        $copy = $this->quoteService->createQuote([
+            'client_id' => $quote->client_id,
+            'subject' => trim($quote->subject.' (نسخة)'),
+            'description' => $quote->description,
+            'tax_percentage' => $quote->tax_percentage,
+            'discount_type' => $quote->discount_type ?? 'percentage',
+            'discount_percentage' => $quote->discount_value ?? $quote->discount_percentage ?? 0,
+            'notes' => $quote->notes,
+            'terms_and_conditions' => $quote->terms_and_conditions,
+            'valid_until' => $quote->valid_until?->toDateString(),
+            'status' => 'draft',
+            'items' => $quote->items->map(fn ($item) => [
+                'description' => $item->description,
+                'quantity' => $item->quantity,
+                'unit_price' => $item->unit_price,
+                'service_type_id' => $item->service_type_id,
+            ])->values()->all(),
+        ]);
+
+        return redirect()->route('quotes.edit', $copy)
+            ->with('success', __('messages.quote_duplicated'));
+    }
+
+    public function itemsJson(Quote $quote)
+    {
+        $this->authorize('view', $quote);
+
+        return response()->json(
+            $quote->items->map(fn ($item) => [
+                'description' => $item->description,
+                'quantity' => (float) $item->quantity,
+                'unit_price' => (float) $item->unit_price,
+                'service_type_id' => $item->service_type_id,
+            ])->values()
+        );
     }
 
     public function edit(Quote $quote)

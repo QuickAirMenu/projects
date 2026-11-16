@@ -20,6 +20,7 @@ use App\Http\Controllers\Portal\ClientPortalController;
 use App\Http\Controllers\Project\ProjectAttachmentController;
 use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ProjectWorkflowController;
+use App\Http\Controllers\Report\AdvancedReportController;
 use App\Http\Controllers\Report\FinanceReportController;
 use App\Http\Controllers\Report\PerformanceReportController;
 use App\Http\Controllers\Report\ProjectReportController;
@@ -258,6 +259,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('/', [QuoteController::class, 'store'])->name('store');
         Route::get('{quote}/pdf', [QuoteController::class, 'pdf'])->name('pdf');
         Route::get('{quote}', [QuoteController::class, 'show'])->name('show');
+        Route::get('{quote}/items', [QuoteController::class, 'itemsJson'])->name('items');
+        Route::post('{quote}/duplicate', [QuoteController::class, 'duplicate'])->name('duplicate');
         Route::get('{quote}/edit', [QuoteController::class, 'edit'])->name('edit');
         Route::put('{quote}', [QuoteController::class, 'update'])->name('update');
         Route::post('{quote}/restore', [QuoteController::class, 'restore'])->withTrashed()->name('restore');
@@ -330,6 +333,9 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('tasks', [TaskReportController::class, 'index'])->name('tasks');
         Route::get('finance', [FinanceReportController::class, 'index'])->name('finance');
         Route::get('finance/export', [FinanceReportController::class, 'export'])->name('finance.export');
+        Route::get('aging', [AdvancedReportController::class, 'aging'])->name('aging');
+        Route::get('aging/export', [AdvancedReportController::class, 'agingExport'])->name('aging.export');
+        Route::get('profitability', [AdvancedReportController::class, 'profitability'])->name('profitability');
         Route::get('performance', [PerformanceReportController::class, 'index'])->name('performance');
     });
 

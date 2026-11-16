@@ -150,7 +150,7 @@ class Invoice extends Model
             $invoice->discount_amount = $discountAmount;
             $invoice->tax_amount = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
             $invoice->total = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
-            $invoice->remaining_amount = $invoice->total;
+            $invoice->remaining_amount = max(0, $invoice->total - ($invoice->paid_amount ?? 0));
         });
 
         static::updating(function (Invoice $invoice) {

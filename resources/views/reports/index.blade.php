@@ -27,11 +27,13 @@
 </div>
 
 {{-- Report Links --}}
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     @foreach([
         ['route' => 'reports.projects',    'label' => __('messages.projects_report'),   'desc' => __('messages.by_status_priority'), 'icon' => 'fa-folder-open', 'color' => 'blue'],
         ['route' => 'reports.tasks',       'label' => __('messages.tasks_report'),     'desc' => __('messages.by_employee_status'),   'icon' => 'fa-clipboard-list', 'color' => 'purple'],
         ['route' => 'reports.finance',     'label' => __('messages.finance_report'),   'desc' => __('messages.invoices_payments'),   'icon' => 'fa-chart-line', 'color' => 'green'],
+        ['route' => 'reports.aging',        'label' => __('reports.aging_title'),       'desc' => __('reports.aging_hint'), 'icon' => 'fa-hourglass-half', 'color' => 'red'],
+        ['route' => 'reports.profitability','label' => __('reports.profitability_title'), 'desc' => __('reports.profitability_hint'), 'icon' => 'fa-chart-pie', 'color' => 'teal'],
         ['route' => 'reports.performance', 'label' => __('messages.performance_report'),     'desc' => __('messages.team_performance'),'icon' => 'fa-tachometer-alt', 'color' => 'orange'],
     ] as $r)
     <a href="{{ route($r['route']) }}" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-{{ $r['color'] }}-200 transition group">

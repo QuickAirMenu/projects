@@ -1,0 +1,20 @@
+<?php
+
+return [
+    'aging_title' => 'أعمار الديون (AR Aging)',
+    'aging_hint' => 'الفواتير غير المسددة موزّعة حسب تأخر السداد.',
+    'aging_current' => 'غير مستحق',
+    'aging_1_30' => '1–30 يوم',
+    'aging_31_60' => '31–60 يوم',
+    'aging_61_90' => '61–90 يوم',
+    'aging_90_plus' => 'أكثر من 90',
+    'days_overdue' => 'أيام التأخر',
+    'bucket' => 'الفئة',
+    'total_outstanding' => 'إجمالي المستحق',
+    'profitability_title' => 'ملخص فوترة المشاريع',
+    'profitability_hint' => 'المفوتر مقابل المحصّل لكل مشروع ونسبة التحصيل.',
+    'invoiced' => 'المفوتر',
+    'collected' => 'المحصّل',
+    'outstanding' => 'المتبقي',
+    'collection_rate' => 'نسبة التحصيل',
+];

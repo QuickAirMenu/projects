@@ -1,0 +1,20 @@
+<?php
+
+return [
+    'aging_title' => 'AR Aging',
+    'aging_hint' => 'Unpaid invoices grouped by how overdue they are.',
+    'aging_current' => 'Current',
+    'aging_1_30' => '1–30 days',
+    'aging_31_60' => '31–60 days',
+    'aging_61_90' => '61–90 days',
+    'aging_90_plus' => '90+ days',
+    'days_overdue' => 'Days overdue',
+    'bucket' => 'Bucket',
+    'total_outstanding' => 'Total outstanding',
+    'profitability_title' => 'Project billing summary',
+    'profitability_hint' => 'Invoiced vs collected per project with collection rate.',
+    'invoiced' => 'Invoiced',
+    'collected' => 'Collected',
+    'outstanding' => 'Outstanding',
+    'collection_rate' => 'Collection rate',
+];

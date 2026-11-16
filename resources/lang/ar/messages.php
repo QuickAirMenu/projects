@@ -212,4 +212,8 @@ return [
     'import_note_format' => 'الصيغ المدعومة: xlsx، xls، csv.',
     'import_note_template' => 'استخدم القالب لضمان أسماء الأعمدة الصحيحة.',
     'import_note_duplicates' => 'السجلات المكررة قد تُرفض حسب التحقق.',
+    'quote_duplicated' => 'تم إنشاء نسخة من عرض السعر.',
+    'copy_items_from_previous' => 'نسخ بنود من عرض سابق:',
+    'copy_items_failed' => 'تعذر جلب بنود العرض.',
+    'duplicate' => 'نسخ',
 ];

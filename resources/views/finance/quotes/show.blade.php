@@ -18,6 +18,12 @@
         <a href="{{ route('quotes.pdf', $quote) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
         <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-link me-2"></i>{{ __('messages.public_link') }}</a>
         <a href="{{ route('quotes.edit', $quote) }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-edit me-2"></i>{{ __('messages.edit') }}</a>
+        <form action="{{ route('quotes.duplicate', $quote) }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl text-sm transition hover:bg-indigo-100">
+                <i class="fas fa-copy me-2"></i>{{ __('messages.duplicate') }}
+            </button>
+        </form>
         @if($quote->status === 'draft')
         <form action="{{ route('quotes.send', $quote) }}" method="POST">
             @csrf
