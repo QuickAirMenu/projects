@@ -155,6 +155,12 @@
                 <i class="fas fa-circle-question w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
                 <span>{{ __('help.title') }}</span>
             </a>
+            @can('manage-tickets')
+            <a href="{{ route('support-tickets.index') }}" class="sidebar-link {{ request()->routeIs('support-tickets.*') ? 'active' : '' }}">
+                <i class="fas fa-life-ring w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                <span>{{ __('messages.support_tickets') }}</span>
+            </a>
+            @endcan
             <a href="{{ route('support') }}" class="sidebar-link {{ request()->routeIs('support') ? 'active' : '' }}">
                 <i class="fas fa-headset w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
                 <span>{{ __('support.title') }}</span>
