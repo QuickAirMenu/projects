@@ -488,7 +488,7 @@ Route::post('/setup/{token}', [SetupController::class, 'store'])->name('setup.po
 Route::get('/setup-pending', [SetupController::class, 'pending'])->name('setup.pending');
 // Secured backup trigger (token stored in .env, never in repo)
 Route::post('/internal/backup', function (Request $request) {
-    $expected = (string) env('BACKUP_TOKEN', '');
+    $expected = (string) config('internal.token', '');
     $given = (string) $request->input('token', '');
 
     abort_if($expected === '' || ! hash_equals($expected, $given), 403);
@@ -504,7 +504,7 @@ Route::get('api/docs', [ApiDocsController::class, 'ui'])->name('api.docs');
 Route::get('api/v1/openapi.json', [ApiDocsController::class, 'spec'])->name('api.openapi');
 
 Route::post('/internal/recurring', function (Request $request) {
-    $expected = (string) env('BACKUP_TOKEN', '');
+    $expected = (string) config('internal.token', '');
     $given = (string) $request->input('token', '');
 
     abort_if($expected === '' || ! hash_equals($expected, $given), 403);
