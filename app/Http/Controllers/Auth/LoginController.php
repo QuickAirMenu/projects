@@ -28,6 +28,25 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            if (! Auth::user()->is_active) {
+                Auth::logout();
+
+                throw ValidationException::withMessages(['email' => __('auth.failed')]);
+            }
+
+            if (Auth::user()->hasTwoFactorEnabled()) {
+                $user = Auth::user();
+                Auth::logout();
+                $request->session()->regenerate();
+                $request->session()->put([
+                    '2fa_user_id' => $user->id,
+                    '2fa_remember' => $request->boolean('remember'),
+                    '2fa_started_at' => time(),
+                ]);
+
+                return redirect()->route('two-factor.login');
+            }
+
             $request->session()->regenerate();
 
             // Update last login

@@ -19,7 +19,7 @@ class SecurityHeaders
             'Permissions-Policy' => 'geolocation=(), microphone=(), camera=()',
             'Cross-Origin-Opener-Policy' => 'same-origin',
             'X-Permitted-Cross-Domain-Policies' => 'none',
-            'Content-Security-Policy-Report-Only' => "default-src 'self'; img-src 'self' data: https://flagcdn.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
+            'Content-Security-Policy-Report-Only' => "default-src 'self'; img-src 'self' data: https://flagcdn.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; report-uri /csp-report",
         ];
 
         foreach ($headers as $name => $value) {

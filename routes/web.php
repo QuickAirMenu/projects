@@ -5,6 +5,8 @@ use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\UserInvitationController;
 use App\Http\Controllers\BulkActionController;
 use App\Http\Controllers\ChangeRequest\ChangeRequestController;
@@ -52,6 +54,7 @@ use App\Models\Setting;
 use App\Services\MailConfigService;
 use App\Services\RecurringInvoiceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\Process\Process;
@@ -60,6 +63,8 @@ use Symfony\Component\Process\Process;
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+    Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'show'])->name('two-factor.login');
+    Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store'])->middleware('throttle:5,1')->name('two-factor.login.store');
 });
 
 // Route::get('/welcome', fn() => view('welcome'))->name('welcome'); // Disabled on subdomains
@@ -186,6 +191,12 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     })->name('support.send');
 
     // Profile
+    Route::get('two-factor', [TwoFactorController::class, 'index'])->name('two-factor.index');
+    Route::post('two-factor/enable', [TwoFactorController::class, 'enable'])->name('two-factor.enable');
+    Route::post('two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+    Route::delete('two-factor', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+    Route::post('two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('two-factor.recovery');
+
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('edit');
         Route::put('/', [ProfileController::class, 'update'])->name('update');
@@ -513,3 +524,16 @@ Route::post('/internal/recurring', function (Request $request) {
 
     return response("generated={$generated} failed={$failed}", 200)->header('Content-Type', 'text/plain');
 })->middleware('throttle:5,1');
+
+Route::post('/csp-report', function (Request $request) {
+    $report = $request->json('csp-report', $request->all());
+
+    Log::warning('csp-report', [
+        'document' => $report['document-uri'] ?? null,
+        'directive' => $report['effective-directive'] ?? ($report['violated-directive'] ?? null),
+        'blocked' => $report['blocked-uri'] ?? null,
+        'ip' => $request->ip(),
+    ]);
+
+    return response()->noContent();
+})->withoutMiddleware([CheckSetup::class])->middleware('throttle:60,1');

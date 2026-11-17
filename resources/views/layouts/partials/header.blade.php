@@ -82,6 +82,10 @@
                         <i class="fas fa-key {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                         {{ __('settings.api_tokens') }}
                     </a>
+                    <a href="{{ route('two-factor.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-shield-halved {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                        {{ __('messages.2fa_security') }}
+                    </a>
                     <a href="{{ route('settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-cog {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                         {{ __('common.settings') }}

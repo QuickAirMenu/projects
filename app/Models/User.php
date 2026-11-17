@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use PragmaRX\Google2FA\Google2FA;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
@@ -70,6 +72,9 @@ class User extends Authenticatable
         'last_login_at' => 'datetime',
         'is_active' => 'boolean',
         'password' => 'hashed',
+        'two_factor_secret' => 'encrypted',
+        'two_factor_recovery_codes' => 'encrypted:array',
+        'two_factor_confirmed_at' => 'datetime',
     ];
 
     /**
@@ -166,5 +171,72 @@ class User extends Authenticatable
     public function getFullNameAttribute()
     {
         return $this->name;
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return filled($this->two_factor_secret) && $this->two_factor_confirmed_at !== null;
+    }
+
+    public function twoFactorSecret(): string
+    {
+        return (string) $this->two_factor_secret;
+    }
+
+    public function twoFactorOtpauthUrl(): string
+    {
+        return (new Google2FA)->getQRCodeUrl(
+            config('app.name'),
+            (string) $this->email,
+            $this->twoFactorSecret()
+        );
+    }
+
+    public function verifyTwoFactorCode(string $code): bool
+    {
+        if (blank($this->two_factor_secret)) {
+            return false;
+        }
+
+        $code = preg_replace('/\s+/', '', $code) ?? '';
+
+        if (preg_match('/^\d{6}$/', $code) !== 1) {
+            return false;
+        }
+
+        return (new Google2FA)->verifyKey($this->twoFactorSecret(), $code);
+    }
+
+    public function recoveryCodes(): array
+    {
+        return $this->two_factor_recovery_codes ?? [];
+    }
+
+    public function useRecoveryCode(string $code): bool
+    {
+        $code = strtoupper(trim($code));
+        $codes = $this->recoveryCodes();
+
+        $index = array_search($code, $codes, true);
+
+        if ($index === false) {
+            return false;
+        }
+
+        unset($codes[$index]);
+        $this->forceFill(['two_factor_recovery_codes' => array_values($codes)])->save();
+
+        return true;
+    }
+
+    public function replaceRecoveryCodes(): array
+    {
+        $codes = collect(range(1, 8))->map(function () {
+            return strtoupper(Str::random(5).'-'.Str::random(5));
+        })->all();
+
+        $this->forceFill(['two_factor_recovery_codes' => $codes])->save();
+
+        return $codes;
     }
 }

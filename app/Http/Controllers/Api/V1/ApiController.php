@@ -22,6 +22,7 @@ class ApiController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
             'device_name' => ['nullable', 'string', 'max:60'],
+            'code' => ['nullable', 'string', 'max:32'],
         ]);
 
         $user = User::where('email', $data['email'])->first();
@@ -30,6 +31,20 @@ class ApiController extends Controller
             throw ValidationException::withMessages([
                 'email' => [__('auth.failed')],
             ]);
+        }
+
+        if ($user->hasTwoFactorEnabled()) {
+            $code = preg_replace('/\s+/', '', (string) ($data['code'] ?? '')) ?? '';
+
+            $valid = preg_match('/^\d{6}$/', $code) === 1
+                ? $user->verifyTwoFactorCode($code)
+                : $user->useRecoveryCode($code);
+
+            if (! $valid) {
+                throw ValidationException::withMessages([
+                    'code' => [__('messages.2fa_invalid_code')],
+                ]);
+            }
         }
 
         $token = $user->createToken(

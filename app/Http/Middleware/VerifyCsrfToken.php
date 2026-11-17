@@ -9,5 +9,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'internal/backup',
         'internal/recurring',
+        'csp-report',
     ];
 }
