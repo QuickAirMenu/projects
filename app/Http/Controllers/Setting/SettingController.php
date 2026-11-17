@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -19,7 +20,7 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'company_logo' => 'nullable|file|mimes:jpg,jpeg,png,webp,svg|max:2048',
+            'company_logo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $groupMap = [
@@ -49,7 +50,12 @@ class SettingController extends Controller
         ];
 
         if ($request->hasFile('company_logo')) {
+            $oldLogo = Setting::where('key', 'company_logo')->value('value');
             $path = $request->file('company_logo')->store('settings', 'public');
+
+            if ($oldLogo && $oldLogo !== $path && Storage::disk('public')->exists($oldLogo)) {
+                Storage::disk('public')->delete($oldLogo);
+            }
             Setting::updateOrCreate(
                 ['key' => 'company_logo'],
                 ['value' => $path, 'group' => 'general']

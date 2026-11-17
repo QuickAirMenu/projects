@@ -9,6 +9,10 @@ class SendPushNotification
 {
     public function handle(NotificationSent $event): void
     {
+        if (($event->channel ?? null) !== 'database') {
+            return;
+        }
+
         $notifiable = $event->notifiable;
 
         if (! is_object($notifiable) || ! method_exists($notifiable, 'pushSubscriptions')) {

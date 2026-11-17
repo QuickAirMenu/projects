@@ -19,6 +19,10 @@ class ApiTokenController extends Controller
             'name' => ['required', 'string', 'max:60'],
         ]);
 
+        if ($request->user()->tokens()->count() >= 10) {
+            return back()->with('error', __('messages.api_token_limit'));
+        }
+
         $token = $request->user()->createToken($data['name'], ['*'], now()->addDays(30));
 
         return redirect()->route('api-tokens.index')

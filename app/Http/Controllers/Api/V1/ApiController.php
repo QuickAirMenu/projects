@@ -54,6 +54,7 @@ class ApiController extends Controller
     public function logoutAll(Request $request): JsonResponse
     {
         $request->user()->tokens()->delete();
+        $request->user()->pushSubscriptions()->delete();
 
         return response()->json(['message' => 'All tokens revoked']);
     }

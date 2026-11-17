@@ -695,6 +695,8 @@ class ClientPortalController extends Controller
 
     public function logout(Request $request)
     {
+        Auth::guard('client')->user()?->pushSubscriptions()->delete();
+
         Auth::guard('client')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

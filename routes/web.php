@@ -498,7 +498,7 @@ Route::post('/internal/backup', function (Request $request) {
     $process->run();
 
     return response($process->getOutput().$process->getErrorOutput(), 200)->header('Content-Type', 'text/plain');
-})->withoutMiddleware([CheckSetup::class]);
+})->withoutMiddleware([CheckSetup::class])->middleware('throttle:5,1');
 
 Route::get('api/docs', [ApiDocsController::class, 'ui'])->name('api.docs');
 Route::get('api/v1/openapi.json', [ApiDocsController::class, 'spec'])->name('api.openapi');
@@ -512,4 +512,4 @@ Route::post('/internal/recurring', function (Request $request) {
     [$generated, $failed] = app(RecurringInvoiceService::class)->processDue();
 
     return response("generated={$generated} failed={$failed}", 200)->header('Content-Type', 'text/plain');
-});
+})->middleware('throttle:5,1');

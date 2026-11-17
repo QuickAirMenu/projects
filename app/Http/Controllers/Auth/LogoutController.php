@@ -14,6 +14,8 @@ class LogoutController extends Controller
             ->causedBy(Auth::user())
             ->log('تسجيل خروج');
 
+        Auth::user()?->pushSubscriptions()->delete();
+
         Auth::logout();
 
         $request->session()->invalidate();

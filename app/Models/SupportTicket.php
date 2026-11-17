@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class SupportTicket extends Model
 {
@@ -40,5 +41,13 @@ class SupportTicket extends Model
     public function replier()
     {
         return $this->belongsTo(User::class, 'replied_by');
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (SupportTicket $ticket) {
+            $ticket->attachments()->get()->each->delete();
+            Storage::disk('private')->deleteDirectory('tickets/'.$ticket->getKey());
+        });
     }
 }

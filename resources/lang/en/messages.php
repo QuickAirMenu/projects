@@ -238,6 +238,7 @@ return [
     'recurring_generated' => 'Invoice :number generated.',
     'recurring_run_failed' => 'Could not generate the invoice. Make sure the project exists.',
     'api_token_created' => 'Token created. Copy it now — it will not be shown again.',
+    'api_token_limit' => 'Token limit reached (10). Revoke an old token first.',
     'api_token_once' => 'This token is shown only once:',
     'api_tokens_hint' => 'Create tokens for mobile apps and integrations. Each token is valid for 30 days.',
     'api_docs' => 'API Docs',
