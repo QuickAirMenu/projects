@@ -15,7 +15,7 @@ class InvoiceService
     public function createInvoice(array $data): Invoice
     {
         return DB::transaction(function () use ($data) {
-            $data['created_by'] = Auth::id();
+            $data['created_by'] = $data['created_by'] ?? Auth::id();
             $data['invoice_number'] = $this->generateInvoiceNumber();
             $data['tax_percentage'] = $data['tax_percentage'] ?? 0;
             $data['discount_type'] = $data['discount_type'] ?? 'fixed';

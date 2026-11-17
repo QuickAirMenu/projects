@@ -14,6 +14,7 @@ use App\Models\ProjectAttachment;
 use App\Models\Quote;
 use App\Models\Setting;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketAttachment;
 use App\Models\User;
 use App\Notifications\PaymentSubmitted;
 use App\Notifications\SupportTicketCreated;
@@ -529,6 +530,8 @@ class ClientPortalController extends Controller
             'subject' => ['required', 'string', 'max:150'],
             'message' => ['required', 'string', 'max:3000'],
             'priority' => ['nullable', 'in:low,normal,high'],
+            'attachments' => ['nullable', 'array', 'max:5'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx', 'max:5120'],
         ]);
 
         $ticket = SupportTicket::create([
@@ -540,6 +543,17 @@ class ClientPortalController extends Controller
             'status' => 'open',
         ]);
 
+        foreach ($request->file('attachments', []) as $file) {
+            $path = $file->store('tickets/'.$ticket->id, 'private');
+
+            $ticket->attachments()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+            ]);
+        }
+
         try {
             User::role(['super-admin', 'admin'])->get()->each(
                 fn (User $admin) => $admin->notify(new SupportTicketCreated($ticket))
@@ -549,6 +563,16 @@ class ClientPortalController extends Controller
         }
 
         return redirect()->route('portal.tickets')->with('success', __('portal.ticket_created'));
+    }
+
+    public function downloadTicketAttachment(SupportTicketAttachment $attachment)
+    {
+        $account = Auth::guard('client')->user();
+        abort_unless((int) $attachment->ticket?->client_id === (int) $account->client_id, 404);
+
+        abort_unless(Storage::disk('private')->exists($attachment->file_path), 404);
+
+        return Storage::disk('private')->download($attachment->file_path, $attachment->file_name);
     }
 
     public function statement(Request $request)

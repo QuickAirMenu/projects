@@ -22,6 +22,11 @@ class SupportTicket extends Model
         'replied_at' => 'datetime',
     ];
 
+    public function attachments()
+    {
+        return $this->hasMany(SupportTicketAttachment::class);
+    }
+
     public function client()
     {
         return $this->belongsTo(Client::class);

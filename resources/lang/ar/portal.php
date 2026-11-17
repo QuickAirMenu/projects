@@ -25,6 +25,7 @@ return [
     'payments' => 'المدفوعات',
     'contracts' => 'العقود',
     'attachments' => 'المرفقات',
+    'attachments_hint' => 'حتى 5 ملفات، كل ملف بحد أقصى 5 ميجابايت (صور/PDF/Office).',
     'profile' => 'الملف الشخصي',
     'profile_subtitle' => 'إدارة بياناتك الشخصية وكلمة المرور',
     'my_account' => 'حسابي',

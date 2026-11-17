@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\ApiDocsController;
+use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
@@ -14,12 +16,14 @@ use App\Http\Controllers\Finance\ContractController;
 use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
 use App\Http\Controllers\Finance\QuoteController;
+use App\Http\Controllers\Finance\RecurringInvoiceController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Portal\ClientPortalController;
 use App\Http\Controllers\Project\ProjectAttachmentController;
 use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ProjectWorkflowController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\Report\AdvancedReportController;
 use App\Http\Controllers\Report\FinanceReportController;
 use App\Http\Controllers\Report\PerformanceReportController;
@@ -28,6 +32,7 @@ use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Report\TaskReportController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Setting\SettingController;
+use App\Http\Controllers\Settings\BackupController;
 use App\Http\Controllers\Settings\ProjectStatusController;
 use App\Http\Controllers\Settings\ServiceTypeController;
 use App\Http\Controllers\Settings\TaskStatusController;
@@ -45,9 +50,11 @@ use App\Http\Middleware\CheckSetup;
 use App\Mail\SupportMail;
 use App\Models\Setting;
 use App\Services\MailConfigService;
+use App\Services\RecurringInvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\Process\Process;
 
 // Guest
 Route::middleware('guest')->group(function () {
@@ -106,6 +113,7 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::post('/statement/email', [ClientPortalController::class, 'emailStatement'])->name('statement.email');
         Route::get('/tickets', [ClientPortalController::class, 'tickets'])->name('tickets');
         Route::post('/tickets', [ClientPortalController::class, 'storeTicket'])->name('tickets.store');
+        Route::get('/tickets/attachments/{attachment}', [ClientPortalController::class, 'downloadTicketAttachment'])->name('tickets.attachment');
         Route::get('/payments/{payment}/proof', [ClientPortalController::class, 'downloadPaymentProof'])->name('payments.proof');
         Route::get('/notifications', [ClientPortalController::class, 'notifications'])->name('notifications');
         Route::post('/notifications/read-all', [ClientPortalController::class, 'markAllNotificationsRead'])->name('notifications.read-all');
@@ -125,6 +133,16 @@ Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSe
 
 // Authenticated
 Route::middleware(['auth', 'set.locale'])->group(function () {
+    Route::get('push/key', [PushSubscriptionController::class, 'key'])->name('push.key');
+    Route::post('push/subscribe', [PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
+    Route::delete('push/unsubscribe', [PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
+
+    Route::prefix('settings/api-tokens')->name('api-tokens.')->group(function () {
+        Route::get('/', [ApiTokenController::class, 'index'])->name('index');
+        Route::post('/', [ApiTokenController::class, 'store'])->name('store');
+        Route::delete('/{token}', [ApiTokenController::class, 'destroy'])->name('destroy');
+    });
+
     Route::post('logout', [LogoutController::class, 'logout'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/support', fn () => view('support'))->name('support');
@@ -344,6 +362,9 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
 
     // Settings
     Route::prefix('settings')->name('settings.')->middleware('permission:manage-settings')->group(function () {
+        Route::get('backups', [BackupController::class, 'index'])->name('backups');
+        Route::post('backups/run', [BackupController::class, 'run'])->name('backups.run');
+        Route::get('backups/{file}', [BackupController::class, 'download'])->where('file', '[A-Za-z0-9_.-]+')->name('backups.download');
         Route::get('/', [SettingController::class, 'index'])->name('index');
         Route::put('/', [SettingController::class, 'update'])->name('update');
         Route::prefix('service-types')->name('service-types.')->group(function () {
@@ -404,11 +425,19 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('projects', [ImportController::class, 'importProjects'])->name('projects');
     });
 
+    // Recurring invoices
+    Route::resource('recurring-invoices', RecurringInvoiceController::class)
+        ->except(['show'])
+        ->parameters(['recurring-invoices' => 'recurringInvoice']);
+    Route::post('recurring-invoices/{recurringInvoice}/run', [RecurringInvoiceController::class, 'runNow'])
+        ->name('recurring-invoices.run');
+
     // Support tickets
     Route::prefix('support-tickets')->name('support-tickets.')->middleware('permission:manage-tickets')->group(function () {
         Route::get('/', [SupportTicketController::class, 'index'])->name('index');
         Route::post('{supportTicket}/reply', [SupportTicketController::class, 'reply'])->name('reply');
         Route::post('{supportTicket}/close', [SupportTicketController::class, 'close'])->name('close');
+        Route::get('attachments/{attachment}', [SupportTicketController::class, 'downloadAttachment'])->name('attachment');
     });
     // Exports
     Route::prefix('exports')->name('exports.')->middleware('permission:view-reports')->group(function () {
@@ -464,7 +493,23 @@ Route::post('/internal/backup', function (Request $request) {
 
     abort_if($expected === '' || ! hash_equals($expected, $given), 403);
 
-    $output = shell_exec('/bin/bash /home/u227212075/backups/iprojects/backup-all.sh 2>&1');
+    $process = new Process(['bash', '/home/u227212075/backups/iprojects/backup-all.sh']);
+    $process->setTimeout(280);
+    $process->run();
 
-    return response($output, 200)->header('Content-Type', 'text/plain');
+    return response($process->getOutput().$process->getErrorOutput(), 200)->header('Content-Type', 'text/plain');
 })->withoutMiddleware([CheckSetup::class]);
+
+Route::get('api/docs', [ApiDocsController::class, 'ui'])->name('api.docs');
+Route::get('api/v1/openapi.json', [ApiDocsController::class, 'spec'])->name('api.openapi');
+
+Route::post('/internal/recurring', function (Request $request) {
+    $expected = (string) env('BACKUP_TOKEN', '');
+    $given = (string) $request->input('token', '');
+
+    abort_if($expected === '' || ! hash_equals($expected, $given), 403);
+
+    [$generated, $failed] = app(RecurringInvoiceService::class)->processDue();
+
+    return response("generated={$generated} failed={$failed}", 200)->header('Content-Type', 'text/plain');
+});

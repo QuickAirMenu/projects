@@ -23,6 +23,12 @@
         <a href="{{ route('settings.task-statuses.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm transition">
             <i class="fas fa-tags w-4"></i> {{ __('settings.task_statuses') }}
         </a>
+        <a href="{{ route('settings.backups') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm transition">
+            <i class="fas fa-database w-4"></i> {{ __('settings.backups') }}
+        </a>
+        <a href="{{ route('api-tokens.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm transition">
+            <i class="fas fa-key w-4"></i> {{ __('settings.api_tokens') }}
+        </a>
         <a href="{{ route('roles.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm transition">
             <i class="fas fa-shield-alt w-4"></i> {{ __('settings.roles_permissions') }}
         </a>

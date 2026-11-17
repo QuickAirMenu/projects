@@ -93,6 +93,12 @@
                     <span>{{ __('common.quotes') }}</span>
                 </a>
                 @endcan
+                @can('create-invoices')
+                <a href="{{ route('recurring-invoices.index') }}" class="sidebar-link {{ request()->routeIs('recurring-invoices.*') ? 'active' : '' }}">
+                    <i class="fas fa-rotate w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                    <span>{{ __('finance.recurring_invoices') }}</span>
+                </a>
+                @endcan
                 @can('view-invoices')
                 <a href="{{ route('invoices.index') }}" class="sidebar-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
                     <i class="fas fa-receipt w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\SupportTicket;
+use App\Models\SupportTicketAttachment;
 use App\Notifications\SupportTicketReplied;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SupportTicketController extends Controller
 {
@@ -53,5 +55,12 @@ class SupportTicketController extends Controller
         $supportTicket->update(['status' => 'closed']);
 
         return back()->with('success', __('messages.ticket_closed'));
+    }
+
+    public function downloadAttachment(SupportTicketAttachment $attachment)
+    {
+        abort_unless(Storage::disk('private')->exists($attachment->file_path), 404);
+
+        return Storage::disk('private')->download($attachment->file_path, $attachment->file_name);
     }
 }

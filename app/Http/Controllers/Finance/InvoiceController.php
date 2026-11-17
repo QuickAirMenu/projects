@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StoreInvoiceRequest;
+use App\Mail\InvoiceIssuedMail;
 use App\Mail\InvoiceReminderMail;
 use App\Models\Client;
 use App\Models\Invoice;
@@ -109,6 +110,18 @@ class InvoiceController extends Controller
         $this->authorize('create', Invoice::class);
 
         $invoice = $this->invoiceService->createInvoice($request->validated());
+
+        if ($invoice->client?->email) {
+            try {
+                app(MailConfigService::class)->applyDynamicMailConfig();
+
+                if (filled(config('mail.mailers.smtp.host'))) {
+                    Mail::to($invoice->client->email)->send(new InvoiceIssuedMail($invoice));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', __('messages.created_successfully'));

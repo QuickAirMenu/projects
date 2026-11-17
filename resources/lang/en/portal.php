@@ -25,6 +25,7 @@ return [
     'payments' => 'Payments',
     'contracts' => 'Contracts',
     'attachments' => 'Attachments',
+    'attachments_hint' => 'Up to 5 files, max 5 MB each (images/PDF/Office).',
     'profile' => 'Profile',
     'profile_subtitle' => 'Manage your personal details and password',
     'my_account' => 'My account',

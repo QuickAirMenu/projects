@@ -78,10 +78,19 @@
                         <i class="fas fa-user {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                         {{ __('common.profile') }}
                     </a>
+                    <a href="{{ route('api-tokens.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-key {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                        {{ __('settings.api_tokens') }}
+                    </a>
                     <a href="{{ route('settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-cog {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                         {{ __('common.settings') }}
                     </a>
+                    <button type="button" id="enablePushBtn" class="w-full text-{{ is_rtl() ? 'right' : 'left' }} px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-bell {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                        {{ __('messages.push_enable') }}
+                    </button>
+                    <p id="pushStatus" class="px-4 pb-1 text-xs text-gray-400"></p>
                     <div class="border-t border-gray-200 my-2"></div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

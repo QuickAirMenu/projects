@@ -37,6 +37,15 @@
                 </div>
 
                 <p class="mt-3 whitespace-pre-line text-sm text-gray-700">{{ $ticket->message }}</p>
+                @if($ticket->attachments->isNotEmpty())
+                <div class="mt-3 flex flex-wrap gap-2">
+                    @foreach($ticket->attachments as $att)
+                    <a href="{{ route('support-tickets.attachment', $att) }}" class="inline-flex items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-1 text-xs text-gray-600 hover:bg-gray-200">
+                        <i class="fas fa-paperclip"></i>{{ \Illuminate\Support\Str::limit($att->file_name, 28) }}
+                    </a>
+                    @endforeach
+                </div>
+                @endif
 
                 @if($ticket->admin_reply)
                     <div class="mt-4 rounded-xl bg-emerald-50 p-4">

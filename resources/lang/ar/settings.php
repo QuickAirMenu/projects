@@ -21,6 +21,8 @@ return [
     'service_types' => 'أنواع الخدمات',
     'project_statuses' => 'حالات المشاريع',
     'task_statuses' => 'حالات المهام',
+    'backups' => 'النسخ الاحتياطي',
+    'api_tokens' => 'توكنات API',
     'roles_permissions' => 'الأدوار والصلاحيات',
     'leave_blank_to_keep' => 'اتركه فارغاً للإبقاء على القيمة الحالية',
     'add_new_status' => 'إضافة حالة جديدة',

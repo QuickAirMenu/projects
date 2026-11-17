@@ -21,6 +21,8 @@ return [
     'service_types' => 'Service Types',
     'project_statuses' => 'Project Statuses',
     'task_statuses' => 'Task Statuses',
+    'backups' => 'Backups',
+    'api_tokens' => 'API Tokens',
     'roles_permissions' => 'Roles & Permissions',
     'leave_blank_to_keep' => 'Leave blank to keep current value',
     'add_new_status' => 'Add New Status',
