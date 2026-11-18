@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var placeholder = (options[0] && options[0].value === '') ? options[0].text : (select.dataset.searchPlaceholder || '');
         var selectedText = (selectedOption && selectedOption.value !== '') ? selectedOption.text.trim() : '';
 
+        var baseClass = select.className.replace(/\bhidden\b/g, '').replace(/\s+/g, ' ').trim();
+
         select.classList.add('hidden');
         select.setAttribute('tabindex', '-1');
 
@@ -22,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var input = document.createElement('input');
         input.type = 'text';
         input.autocomplete = 'off';
-        input.className = select.className;
+        input.className = baseClass;
         input.placeholder = placeholder;
         input.value = selectedText;
         input.setAttribute('role', 'combobox');
