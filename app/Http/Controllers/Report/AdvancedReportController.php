@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Project;
+use App\Models\TimeEntry;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -65,6 +66,57 @@ class AdvancedReportController extends Controller
             ->orderByDesc('invoiced_total')
             ->paginate(20);
 
+        [$collectedByProject, $laborByProject] = $this->profitabilityMaps();
+
+        return view('reports.profitability', compact('projects', 'collectedByProject', 'laborByProject'));
+    }
+
+    public function profitabilityExport(): StreamedResponse
+    {
+        $projects = Project::with(['client:id,name'])
+            ->withSum('invoices as invoiced_total', 'total')
+            ->withSum(['expenses as expenses_total' => fn ($q) => $q->where('status', 'approved')], 'total')
+            ->orderByDesc('invoiced_total')
+            ->get();
+
+        [$collectedByProject, $laborByProject] = $this->profitabilityMaps();
+
+        $filename = 'profitability-'.now()->format('Ymd').'.csv';
+
+        return response()->streamDownload(function () use ($projects, $collectedByProject, $laborByProject) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['Project', 'Client', 'Invoiced', 'Collected', 'Outstanding', 'Expenses', 'Labor', 'Cost', 'Net', 'Margin %']);
+
+            foreach ($projects as $project) {
+                $invoiced = (float) ($project->invoiced_total ?? 0);
+                $collected = (float) ($collectedByProject[$project->id] ?? 0);
+                $expenses = (float) ($project->expenses_total ?? 0);
+                $labor = (float) ($laborByProject[$project->id] ?? 0);
+                $cost = $expenses + $labor;
+                $net = $invoiced - $cost;
+                $margin = $invoiced > 0 ? round($net / $invoiced * 100, 1) : 0;
+
+                fputcsv($out, [
+                    $project->name,
+                    $project->client?->name ?? '-',
+                    number_format($invoiced, 2, '.', ''),
+                    number_format($collected, 2, '.', ''),
+                    number_format(max(0, $invoiced - $collected), 2, '.', ''),
+                    number_format($expenses, 2, '.', ''),
+                    number_format($labor, 2, '.', ''),
+                    number_format($cost, 2, '.', ''),
+                    number_format($net, 2, '.', ''),
+                    $margin,
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    protected function profitabilityMaps(): array
+    {
         $collectedByProject = Payment::query()
             ->where('status', 'approved')
             ->whereHas('invoice')
@@ -73,7 +125,12 @@ class AdvancedReportController extends Controller
             ->selectRaw('invoices.project_id as project_id, SUM(payments.amount) as collected')
             ->pluck('collected', 'project_id');
 
-        return view('reports.profitability', compact('projects', 'collectedByProject'));
+        $laborByProject = TimeEntry::query()
+            ->selectRaw('project_id, SUM(hours * hourly_rate) as labor')
+            ->groupBy('project_id')
+            ->pluck('labor', 'project_id');
+
+        return [$collectedByProject, $laborByProject];
     }
 
     private function agingRows(): array

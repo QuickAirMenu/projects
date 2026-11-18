@@ -18,6 +18,8 @@ return [
     'view' => 'عرض',
     'no_notifications' => 'لا توجد إشعارات',
     'payment_submitted' => 'دفعة بانتظار المراجعة',
+    'project_budget_alert' => 'تنبيه ميزانية مشروع',
+    'project_budget_alert_msg' => 'مشروع :project استهلك :percentage% من الميزانية (التكلفة :cost من :budget).',
     'payment_submitted_msg' => 'تم رفع إيصال تحويل بمبلغ :amount على الفاتورة :invoice — بانتظار المراجعة',
     'ticket_created' => 'تذكرة دعم جديدة',
     'ticket_created_msg' => 'تذكرة جديدة من :client: :subject',

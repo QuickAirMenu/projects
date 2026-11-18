@@ -15,9 +15,14 @@
             <h1 class="text-2xl font-bold text-gray-800">{{ __('reports.profitability_title') }}</h1>
             <p class="mt-1 text-sm text-gray-500">{{ __('reports.profitability_hint') }}</p>
         </div>
-        <a href="{{ route('reports.index') }}" class="rounded-xl bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">
-            <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
-        </a>
+        <div class="flex gap-2">
+            <a href="{{ route('reports.profitability.export') }}" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700">
+                <i class="fas fa-file-csv me-2"></i>{{ __('reports.export_csv') }}
+            </a>
+            <a href="{{ route('reports.index') }}" class="rounded-xl bg-gray-100 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">
+                <i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}
+            </a>
+        </div>
     </div>
 
     <div class="card overflow-hidden rounded-2xl">
@@ -30,7 +35,10 @@
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.collected') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.outstanding') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('expenses.title') }}</th>
+                    <th class="px-5 py-3 text-end font-semibold">{{ __('reports.labor') }}</th>
+                    <th class="px-5 py-3 text-end font-semibold">{{ __('reports.cost') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.net') }}</th>
+                    <th class="px-5 py-3 text-end font-semibold">{{ __('reports.margin') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.collection_rate') }}</th>
                 </tr>
             </thead>
@@ -41,7 +49,10 @@
                         $collected = (float) ($collectedByProject[$project->id] ?? 0);
                         $outstanding = max(0, $invoiced - $collected);
                         $expenses = (float) ($project->expenses_total ?? 0);
-                        $net = $invoiced - $expenses;
+                        $labor = (float) ($laborByProject[$project->id] ?? 0);
+                        $cost = $expenses + $labor;
+                        $net = $invoiced - $cost;
+                        $margin = $invoiced > 0 ? round($net / $invoiced * 100, 1) : 0;
                         $rate = $invoiced > 0 ? round($collected / $invoiced * 100) : 0;
                     @endphp
                     <tr class="hover:bg-gray-50">
@@ -51,7 +62,10 @@
                         <td class="px-5 py-3 text-end text-emerald-600">{{ number_format($collected, 2) }}</td>
                         <td class="px-5 py-3 text-end {{ $outstanding > 0 ? 'text-red-600' : 'text-gray-400' }}">{{ number_format($outstanding, 2) }}</td>
                         <td class="px-5 py-3 text-end text-red-500">{{ number_format($expenses, 2) }}</td>
+                        <td class="px-5 py-3 text-end text-amber-600">{{ number_format($labor, 2) }}</td>
+                        <td class="px-5 py-3 text-end text-red-600">{{ number_format($cost, 2) }}</td>
                         <td class="px-5 py-3 text-end font-medium {{ $net >= 0 ? 'text-emerald-600' : 'text-red-600' }}">{{ number_format($net, 2) }}</td>
+                        <td class="px-5 py-3 text-end {{ $margin >= 0 ? 'text-emerald-600' : 'text-red-600' }}">{{ $margin }}%</td>
                         <td class="px-5 py-3 text-end">
                             <span class="inline-flex items-center gap-2">
                                 <span class="h-1.5 w-16 overflow-hidden rounded-full bg-gray-200"><span class="block h-1.5 rounded-full bg-emerald-500" style="width: {{ $rate }}%"></span></span>
@@ -60,7 +74,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="px-5 py-16 text-center text-gray-400">{{ __('messages.no_data') }}</td></tr>
+                    <tr><td colspan="11" class="px-5 py-16 text-center text-gray-400">{{ __('messages.no_data') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

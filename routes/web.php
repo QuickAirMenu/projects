@@ -60,6 +60,7 @@ use App\Services\InvoiceReminderService;
 use App\Services\MailConfigService;
 use App\Services\RecurringInvoiceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -382,6 +383,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('finance/export', [FinanceReportController::class, 'export'])->name('finance.export');
         Route::get('aging', [AdvancedReportController::class, 'aging'])->name('aging');
         Route::get('aging/export', [AdvancedReportController::class, 'agingExport'])->name('aging.export');
+        Route::get('profitability/export', [AdvancedReportController::class, 'profitabilityExport'])->name('profitability.export');
         Route::get('profitability', [AdvancedReportController::class, 'profitability'])->name('profitability');
         Route::get('performance', [PerformanceReportController::class, 'index'])->name('performance');
     });
@@ -595,4 +597,15 @@ Route::post('/internal/reminders', function (Request $request) {
     }
 
     return response("sent={$sent} skipped={$skipped} failed={$failed}", 200)->header('Content-Type', 'text/plain');
+})->middleware('throttle:5,1');
+
+Route::post('/internal/budget-alerts', function (Request $request) {
+    $expected = (string) config('internal.token', '');
+    $given = (string) $request->input('token', '');
+
+    abort_if($expected === '' || ! hash_equals($expected, $given), 403);
+
+    Artisan::call('projects:budget-alerts');
+
+    return response(trim(Artisan::output()), 200)->header('Content-Type', 'text/plain');
 })->middleware('throttle:5,1');

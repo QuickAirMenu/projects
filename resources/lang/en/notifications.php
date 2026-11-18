@@ -18,6 +18,8 @@ return [
     'view' => 'View',
     'no_notifications' => 'No notifications',
     'payment_submitted' => 'Payment awaiting review',
+    'project_budget_alert' => 'Project budget alert',
+    'project_budget_alert_msg' => 'Project :project has used :percentage% of its budget (cost :cost of :budget).',
     'payment_submitted_msg' => 'A transfer receipt of :amount was uploaded for invoice :invoice — awaiting review',
     'ticket_created' => 'New support ticket',
     'ticket_created_msg' => 'New ticket from :client: :subject',
