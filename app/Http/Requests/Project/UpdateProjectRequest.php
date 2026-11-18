@@ -25,6 +25,7 @@ class UpdateProjectRequest extends FormRequest
             'status_id' => 'required|exists:project_statuses,id',
             'manager_id' => 'required|exists:users,id',
             'budget' => 'nullable|numeric|min:0',
+            'contract_value' => 'nullable|numeric|min:0',
             'progress_percentage' => 'nullable|integer|min:0|max:100',
             'internal_notes' => 'nullable|string',
             'client_notes' => 'nullable|string',

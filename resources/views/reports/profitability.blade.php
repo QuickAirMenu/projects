@@ -31,6 +31,8 @@
                 <tr class="bg-gray-50 text-left text-gray-500">
                     <th class="px-5 py-3 font-semibold">{{ __('project.project') }}</th>
                     <th class="px-5 py-3 font-semibold">{{ __('client.client') }}</th>
+                    <th class="px-5 py-3 text-end font-semibold">{{ __('reports.contract_value') }}</th>
+                    <th class="px-5 py-3 text-end font-semibold">{{ __('reports.to_invoice') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.invoiced') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.collected') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.outstanding') }}</th>
@@ -45,6 +47,8 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse($projects as $project)
                     @php
+                        $contract = $project->contract_value !== null ? (float) $project->contract_value : null;
+                        $toInvoice = $contract !== null ? max(0, $contract - (float) ($project->invoiced_total ?? 0)) : null;
                         $invoiced = (float) ($project->invoiced_total ?? 0);
                         $collected = (float) ($collectedByProject[$project->id] ?? 0);
                         $outstanding = max(0, $invoiced - $collected);
@@ -58,6 +62,8 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-5 py-3"><a href="{{ route('projects.show', $project) }}" class="font-medium text-gray-800 hover:text-primary-600">{{ $project->name }}</a></td>
                         <td class="px-5 py-3 text-gray-600">{{ $project->client?->name ?? '-' }}</td>
+                        <td class="px-5 py-3 text-end text-gray-800">{{ $contract !== null ? number_format($contract, 2) : '-' }}</td>
+                        <td class="px-5 py-3 text-end {{ $toInvoice !== null && $toInvoice > 0 ? 'text-amber-600' : 'text-gray-400' }}">{{ $toInvoice !== null ? number_format($toInvoice, 2) : '-' }}</td>
                         <td class="px-5 py-3 text-end text-gray-800">{{ number_format($invoiced, 2) }}</td>
                         <td class="px-5 py-3 text-end text-emerald-600">{{ number_format($collected, 2) }}</td>
                         <td class="px-5 py-3 text-end {{ $outstanding > 0 ? 'text-red-600' : 'text-gray-400' }}">{{ number_format($outstanding, 2) }}</td>
@@ -74,7 +80,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="11" class="px-5 py-16 text-center text-gray-400">{{ __('messages.no_data') }}</td></tr>
+                    <tr><td colspan="13" class="px-5 py-16 text-center text-gray-400">{{ __('messages.no_data') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

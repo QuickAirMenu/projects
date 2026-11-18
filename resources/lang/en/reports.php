@@ -12,6 +12,8 @@ return [
     'bucket' => 'Bucket',
     'total_outstanding' => 'Total outstanding',
     'net' => 'Net billed',
+    'contract_value' => 'Contract value',
+    'to_invoice' => 'To invoice',
     'labor' => 'Labor',
     'cost' => 'Total cost',
     'margin' => 'Margin',

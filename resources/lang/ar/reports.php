@@ -12,6 +12,8 @@ return [
     'bucket' => 'الفئة',
     'total_outstanding' => 'إجمالي المستحق',
     'net' => 'صافي الفوترة',
+    'contract_value' => 'قيمة العقد',
+    'to_invoice' => 'المتبقي للفوترة',
     'labor' => 'تكلفة العمل',
     'cost' => 'إجمالي التكلفة',
     'margin' => 'الهامش',

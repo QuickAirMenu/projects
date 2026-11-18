@@ -86,7 +86,7 @@ class AdvancedReportController extends Controller
         return response()->streamDownload(function () use ($projects, $collectedByProject, $laborByProject) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Project', 'Client', 'Invoiced', 'Collected', 'Outstanding', 'Expenses', 'Labor', 'Cost', 'Net', 'Margin %']);
+            fputcsv($out, ['Project', 'Client', 'Contract', 'To invoice', 'Invoiced', 'Collected', 'Outstanding', 'Expenses', 'Labor', 'Cost', 'Net', 'Margin %']);
 
             foreach ($projects as $project) {
                 $invoiced = (float) ($project->invoiced_total ?? 0);
@@ -97,9 +97,13 @@ class AdvancedReportController extends Controller
                 $net = $invoiced - $cost;
                 $margin = $invoiced > 0 ? round($net / $invoiced * 100, 1) : 0;
 
+                $contract = $project->contract_value !== null ? (float) $project->contract_value : null;
+
                 fputcsv($out, [
                     $project->name,
                     $project->client?->name ?? '-',
+                    $contract !== null ? number_format($contract, 2, '.', '') : '',
+                    $contract !== null ? number_format(max(0, $contract - $invoiced), 2, '.', '') : '',
                     number_format($invoiced, 2, '.', ''),
                     number_format($collected, 2, '.', ''),
                     number_format(max(0, $invoiced - $collected), 2, '.', ''),

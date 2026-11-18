@@ -155,7 +155,8 @@
                     {{ $project->deadline?->format('Y-m-d') ?? '-' }}
                 </span>
             </div>
-            <div class="flex justify-between"><span class="text-gray-500">{{ __('project.budget') }}</span><span class="font-medium">{{ number_format($project->budget, 2) }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('project.contract_value') }}</span><span class="font-medium">{{ $project->contract_value !== null ? number_format((float) $project->contract_value, 2) : '-' }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">{{ __('project.cost_budget') }}</span><span class="font-medium">{{ number_format($project->budget, 2) }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.payment_status') }}</span>
                 <span class="px-2 py-0.5 rounded-full text-xs font-medium
                     {{ $project->payment_status === 'paid' ? 'bg-green-100 text-green-700' :

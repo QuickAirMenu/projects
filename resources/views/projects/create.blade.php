@@ -90,7 +90,17 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ __('project.budget') }}
+                    {{ __('project.contract_value') }}
+                    <i class="fas fa-circle-question text-gray-400 cursor-help" title="{{ __('project.contract_value_help') }}"></i>
+                </label>
+                <input type="number" name="contract_value" value="{{ old('contract_value') }}" step="0.01" min="0"
+                       class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('contract_value')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ __('project.cost_budget') }}
                     <i class="fas fa-circle-question text-gray-400 cursor-help" title="{{ __('project.budget_help') }}"></i>
                 </label>
                 <input type="number" name="budget" value="{{ old('budget') }}" step="0.01" min="0"
