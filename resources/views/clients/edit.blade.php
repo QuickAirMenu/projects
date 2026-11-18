@@ -18,16 +18,16 @@
         @csrf @method('PUT')
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.name') }} *</label>
-                <input type="text" name="name" value="{{ old('name', $client->name) }}" required
-                       class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.company_name') }}</label>
                 <input type="text" name="company_name" value="{{ old('company_name', $client->company_name) }}"
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('company_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.contact_person') }} *</label>
+                <input type="text" name="name" value="{{ old('name', $client->name) }}" required
+                       class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.email') }}</label>

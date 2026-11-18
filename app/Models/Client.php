@@ -73,6 +73,23 @@ class Client extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function getDisplayNameAttribute(): string
+    {
+        $company = trim((string) $this->company_name);
+        $person = trim((string) $this->name);
+
+        if ($company !== '' && $person !== '' && $company !== $person) {
+            return $company.' — '.$person;
+        }
+
+        return $company !== '' ? $company : $person;
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(ClientDocument::class);
+    }
+
     public function projects()
     {
         return $this->hasMany(Project::class);

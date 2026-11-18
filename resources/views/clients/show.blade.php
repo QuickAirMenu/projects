@@ -124,6 +124,113 @@
             @endforelse
         </div>
 
+        {{-- Quotes --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fas fa-file-signature text-indigo-500"></i> {{ __('client.quotes_title') }}</h3>
+                @can('create', App\Models\Quote::class)
+                <a href="{{ route('quotes.create') }}?client_id={{ $client->id }}" class="text-sm text-blue-600 hover:underline">+ {{ __('finance.new_quote') }}</a>
+                @endcan
+            </div>
+            @forelse($quotes as $quote)
+            <div class="flex items-center justify-between py-2.5 border-b last:border-0 text-sm">
+                <div>
+                    <a href="{{ route('quotes.show', $quote) }}" class="font-medium text-gray-800 hover:text-blue-600">{{ $quote->quote_number }}</a>
+                    <p class="text-xs text-gray-400">{{ $quote->valid_until?->format('Y-m-d') }}</p>
+                </div>
+                <div class="text-end">
+                    <p class="font-medium text-gray-700">{{ number_format((float) $quote->total, 2) }}</p>
+                    <span class="text-xs text-gray-500">{{ __('finance.quote_status.'.$quote->status) }}</span>
+                </div>
+            </div>
+            @empty
+            <p class="text-gray-400 text-sm text-center py-4">{{ __('client.no_quotes') }}</p>
+            @endforelse
+        </div>
+
+        {{-- Invoices --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fas fa-receipt text-emerald-500"></i> {{ __('client.invoices_title') }}</h3>
+                @can('create', App\Models\Invoice::class)
+                <a href="{{ route('invoices.create') }}?client_id={{ $client->id }}" class="text-sm text-blue-600 hover:underline">+ {{ __('finance.add_invoice') }}</a>
+                @endcan
+            </div>
+            <div class="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="rounded-xl bg-gray-50 p-2"><p class="text-gray-500">{{ __('client.invoiced') }}</p><p class="mt-1 font-bold text-gray-800 privacy-mask">{{ number_format($totals['invoiced'], 2) }}</p></div>
+                <div class="rounded-xl bg-emerald-50 p-2"><p class="text-emerald-600">{{ __('client.paid') }}</p><p class="mt-1 font-bold text-emerald-700 privacy-mask">{{ number_format($totals['paid'], 2) }}</p></div>
+                <div class="rounded-xl bg-red-50 p-2"><p class="text-red-500">{{ __('client.outstanding') }}</p><p class="mt-1 font-bold text-red-600 privacy-mask">{{ number_format($totals['outstanding'], 2) }}</p></div>
+            </div>
+            @forelse($invoices as $invoice)
+            <div class="flex items-center justify-between py-2.5 border-b last:border-0 text-sm">
+                <div>
+                    <a href="{{ route('invoices.show', $invoice) }}" class="font-medium text-gray-800 hover:text-blue-600">{{ $invoice->invoice_number }}</a>
+                    <p class="text-xs text-gray-400">{{ $invoice->invoice_date?->format('Y-m-d') }}</p>
+                </div>
+                <div class="text-end">
+                    <p class="font-medium text-gray-700">{{ number_format((float) $invoice->total, 2) }}</p>
+                    <span class="text-xs text-gray-500">{{ __('finance.payment_status.'.$invoice->payment_status) }}</span>
+                </div>
+            </div>
+            @empty
+            <p class="text-gray-400 text-sm text-center py-4">{{ __('client.no_invoices') }}</p>
+            @endforelse
+        </div>
+
+        {{-- Documents --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fas fa-folder-open text-amber-500"></i> {{ __('client.documents') }}</h3>
+                @can('update', $client)
+                <button type="button" onclick="document.getElementById('docForm').classList.toggle('hidden')" class="text-sm text-blue-600 hover:underline"><i class="fas fa-plus me-1"></i>{{ __('client.add_document') }}</button>
+                @endcan
+            </div>
+
+            @can('update', $client)
+            <form id="docForm" action="{{ route('clients.documents.store', $client) }}" method="POST" enctype="multipart/form-data" class="hidden mb-4 rounded-xl bg-gray-50 p-4 space-y-3">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <select name="type" required class="rounded-xl border border-gray-300 px-3 py-2 text-sm">
+                        @foreach(['commercial_registration','tax_certificate','national_id','contract','other'] as $type)
+                        <option value="{{ $type }}">{{ __('client.doc_'.$type) }}</option>
+                        @endforeach
+                    </select>
+                    <input name="title" required maxlength="150" placeholder="{{ __('client.document_title') }}" class="rounded-xl border border-gray-300 px-3 py-2 text-sm md:col-span-2">
+                    <input name="number" maxlength="100" placeholder="{{ __('client.document_number') }}" class="rounded-xl border border-gray-300 px-3 py-2 text-sm">
+                    <input type="date" name="issue_date" class="rounded-xl border border-gray-300 px-3 py-2 text-sm" title="{{ __('client.document_issue_date') }}">
+                    <input type="date" name="expiry_date" class="rounded-xl border border-gray-300 px-3 py-2 text-sm" title="{{ __('client.document_expiry_date') }}">
+                    <input type="file" name="file" required accept=".jpg,.jpeg,.png,.webp,.pdf" class="rounded-xl border border-gray-300 px-3 py-2 text-sm md:col-span-2">
+                    <button class="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">{{ __('client.document_upload') }}</button>
+                </div>
+                @error('file')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+            </form>
+            @endcan
+
+            @forelse($client->documents as $document)
+            <div class="flex items-start justify-between py-2.5 border-b last:border-0 text-sm gap-3">
+                <div class="min-w-0">
+                    <p class="font-medium text-gray-800 truncate">{{ $document->title }} <span class="text-xs text-gray-400">· {{ __('client.doc_'.$document->type) }}</span></p>
+                    <p class="text-xs text-gray-400">
+                        @if($document->number){{ $document->number }} · @endif
+                        @if($document->expiry_date){{ __('client.document_expiry_date') }}: {{ $document->expiry_date->format('Y-m-d') }}@endif
+                        @if($document->isExpired()) <span class="text-red-500">({{ __('client.expired') }})</span>@endif
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <a href="{{ route('clients.documents.download', [$client, $document]) }}" class="text-blue-600 text-xs"><i class="fas fa-download"></i></a>
+                    @can('update', $client)
+                    <form action="{{ route('clients.documents.destroy', [$client, $document]) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                        @csrf @method('DELETE')
+                        <button class="text-red-500 text-xs"><i class="fas fa-trash"></i></button>
+                    </form>
+                    @endcan
+                </div>
+            </div>
+            @empty
+            <p class="text-gray-400 text-sm text-center py-4">{{ __('client.no_documents') }}</p>
+            @endforelse
+        </div>
+
         {{-- Communication Log --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <div class="flex items-center justify-between mb-4">

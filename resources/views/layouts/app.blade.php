@@ -243,5 +243,6 @@
             refresh();
         })();
     </script>
+    <script src="{{ asset('js/searchable-select.js') }}" defer></script>
 </body>
 </html>

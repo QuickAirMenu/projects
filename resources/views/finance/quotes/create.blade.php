@@ -58,10 +58,10 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.client') }} *</label>
-        <select name="client_id" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select name="client_id" required data-searchable data-search-placeholder="{{ __('messages.search_client') }}" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">-- {{ __('messages.select') }} --</option>
             @foreach($clients as $c)
-                <option value="{{ $c->id }}" {{ old('client_id', $quoteModel?->client_id) == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                <option value="{{ $c->id }}" {{ old('client_id', $quoteModel?->client_id) == $c->id ? 'selected' : '' }}>{{ $c->display_name }}</option>
             @endforeach
         </select>
         @error('client_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror

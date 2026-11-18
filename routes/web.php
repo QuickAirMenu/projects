@@ -12,6 +12,7 @@ use App\Http\Controllers\BulkActionController;
 use App\Http\Controllers\ChangeRequest\ChangeRequestController;
 use App\Http\Controllers\Client\ClientCommunicationController;
 use App\Http\Controllers\Client\ClientController;
+use App\Http\Controllers\Client\ClientDocumentController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\Finance\ContractController;
@@ -232,6 +233,9 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::put('{client}', [ClientController::class, 'update'])->name('update');
         Route::delete('{client}', [ClientController::class, 'destroy'])->name('destroy');
         Route::post('{client}/portal-invite', [ClientController::class, 'resendPortalInvite'])->name('portal-invite');
+        Route::post('{client}/documents', [ClientDocumentController::class, 'store'])->name('documents.store');
+        Route::get('{client}/documents/{document}/download', [ClientDocumentController::class, 'download'])->name('documents.download');
+        Route::delete('{client}/documents/{document}', [ClientDocumentController::class, 'destroy'])->name('documents.destroy');
         Route::post('{client}/communications', [ClientCommunicationController::class, 'store'])->name('communications.store');
         Route::delete('communications/{communication}', [ClientCommunicationController::class, 'destroy'])->name('communications.destroy');
     });

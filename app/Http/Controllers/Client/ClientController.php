@@ -77,9 +77,18 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
-        $client->load(['projects.status', 'communications.user', 'assignedUser', 'portalAccount']);
+        $client->load(['projects.status', 'communications.user', 'assignedUser', 'portalAccount', 'documents.creator']);
 
-        return view('clients.show', compact('client'));
+        $quotes = $client->quotes()->latest()->limit(8)->get();
+        $invoices = $client->invoices()->latest('invoice_date')->limit(8)->get();
+
+        $totals = [
+            'invoiced' => (float) $client->invoices()->sum('total'),
+            'paid' => (float) $client->invoices()->sum('paid_amount'),
+            'outstanding' => (float) $client->invoices()->sum('remaining_amount'),
+        ];
+
+        return view('clients.show', compact('client', 'quotes', 'invoices', 'totals'));
     }
 
     public function resendPortalInvite(Client $client)

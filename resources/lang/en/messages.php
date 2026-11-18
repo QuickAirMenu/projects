@@ -48,6 +48,7 @@ return [
     'all' => 'All',
     'none' => 'None',
     'select' => 'Select',
+    'search_client' => 'Search by company or person...',
     'loading' => 'Loading...',
     'total' => 'Total',
     'of' => 'of',
