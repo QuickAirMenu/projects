@@ -68,6 +68,16 @@
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('industry')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.source') }}</label>
+                <select name="source" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">-- {{ __('messages.select') }} --</option>
+                    @foreach(\App\Models\Client::SOURCES as $sourceOption)
+                    <option value="{{ $sourceOption }}" @selected(old('source', $client->source) === $sourceOption)>{{ __('client.source_'.$sourceOption) }}</option>
+                    @endforeach
+                </select>
+                @error('source')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.notes') }}</label>
                 <textarea name="notes" rows="3"

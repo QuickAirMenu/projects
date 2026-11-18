@@ -70,6 +70,9 @@
                 @if($client->industry)
                 <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-industry w-4 text-gray-400"></i> {{ $client->industry }}</div>
                 @endif
+                @if($client->sourceLabel())
+                <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-bullseye w-4 text-indigo-400"></i> {{ $client->sourceLabel() }}</div>
+                @endif
             </div>
         </div>
 

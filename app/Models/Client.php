@@ -12,6 +12,10 @@ class Client extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
+    public const SOURCES = [
+        'referral', 'website', 'social_media', 'email_campaign', 'exhibition', 'cold_call', 'other',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -71,6 +75,18 @@ class Client extends Model
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function sourceLabel(): ?string
+    {
+        if (blank($this->source)) {
+            return null;
+        }
+
+        $key = 'client.source_'.$this->source;
+        $label = __($key);
+
+        return $label === $key ? $this->source : $label;
     }
 
     public function getDisplayNameAttribute(): string

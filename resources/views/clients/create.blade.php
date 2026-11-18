@@ -70,12 +70,9 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.source') }}</label>
                 <select name="source" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">-- {{ __('messages.select') }} --</option>
-                    <option value="referral">Referral</option>
-                    <option value="website">Website</option>
-                    <option value="social_media">Social Media</option>
-                    <option value="exhibition">Exhibition</option>
-                    <option value="cold_call">Cold Call</option>
-                    <option value="other">Other</option>
+                    @foreach(\App\Models\Client::SOURCES as $sourceOption)
+                    <option value="{{ $sourceOption }}" @selected(old('source') === $sourceOption)>{{ __('client.source_'.$sourceOption) }}</option>
+                    @endforeach
                 </select>
             </div>
             <div>
