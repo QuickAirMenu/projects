@@ -141,7 +141,7 @@
                 </span>
                 @endif
             </div>
-            <form action="{{ route('settings.update') }}" method="POST">
+            <form id="mailSettingsForm" action="{{ route('settings.update') }}" method="POST">
                 @csrf @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @foreach([
@@ -172,17 +172,15 @@
                     </div>
                     @endforeach
                 </div>
-                <div class="mt-5 flex flex-wrap items-center gap-2">
-                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2.5 rounded-xl transition text-sm">
-                        <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
-                    </button>
-                </div>
             </form>
-            <div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-gray-50 px-3 py-2.5">
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+                <button type="submit" form="mailSettingsForm" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2.5 rounded-xl transition text-sm">
+                    <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
+                </button>
                 <span class="text-xs text-gray-500">{{ __('messages.mail_test_compact_hint') }}</span>
                 <form action="{{ route('settings.mail-test') }}" method="POST">
                     @csrf
-                    <button type="submit" class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700">
+                    <button type="submit" class="border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 font-medium px-4 py-2.5 rounded-xl transition text-sm">
                         <i class="fas fa-paper-plane me-2"></i>{{ __('messages.mail_test_button') }}
                     </button>
                 </form>
