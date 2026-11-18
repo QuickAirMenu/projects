@@ -25,6 +25,14 @@ class QuoteController extends Controller
         $this->authorize('viewAny', Quote::class);
 
         $query = Quote::with(['client', 'creator'])->latest();
+        if ($request->filled('q')) {
+            $q = '%'.$request->string('q').'%';
+            $query->where(function ($w) use ($q) {
+                $w->where('quote_number', 'like', $q)
+                    ->orWhere('subject', 'like', $q)
+                    ->orWhereHas('client', fn ($c) => $c->where('name', 'like', $q)->orWhere('company_name', 'like', $q));
+            });
+        }
         if ($request->status) {
             $query->where('status', $request->status);
         }

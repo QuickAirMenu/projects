@@ -40,6 +40,29 @@
     </a>
 </div>
 
+{{-- Filters --}}
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
+    <form method="GET" class="flex flex-wrap gap-3">
+        <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ __('messages.search_quote') }}" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-56">
+        <select name="client_id" data-searchable data-search-placeholder="{{ __('messages.search_client') }}" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">{{ __('client.client') }}</option>
+            @foreach($clients as $c)
+                <option value="{{ $c->id }}" {{ (string) request('client_id') === (string) $c->id ? 'selected' : '' }}>{{ $c->display_name }}</option>
+            @endforeach
+        </select>
+        <select name="status" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">{{ __('finance.quote_status_label') }}</option>
+            @foreach(['draft','sent','approved','rejected'] as $st)
+                <option value="{{ $st }}" {{ request('status') === $st ? 'selected' : '' }}>{{ __('finance.quote_status.'.$st) }}</option>
+            @endforeach
+        </select>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm transition">
+            <i class="fas fa-search me-1"></i>{{ __('messages.filter') }}
+        </button>
+        <a href="{{ route('quotes.index') }}" class="bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-sm transition">{{ __('messages.reset') }}</a>
+    </form>
+</div>
+
 {{-- KPIs --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
     @foreach([

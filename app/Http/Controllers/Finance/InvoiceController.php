@@ -26,6 +26,14 @@ class InvoiceController extends Controller
         $this->authorize('viewAny', Invoice::class);
 
         $query = Invoice::with(['client', 'project'])->latest();
+        if ($request->filled('q')) {
+            $q = '%'.$request->string('q').'%';
+            $query->where(function ($w) use ($q) {
+                $w->where('invoice_number', 'like', $q)
+                    ->orWhereHas('client', fn ($c) => $c->where('name', 'like', $q)->orWhere('company_name', 'like', $q))
+                    ->orWhereHas('project', fn ($p) => $p->where('name', 'like', $q));
+            });
+        }
         if ($request->payment_status) {
             $query->where('payment_status', $request->payment_status);
         }

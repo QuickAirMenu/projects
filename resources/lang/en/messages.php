@@ -49,6 +49,8 @@ return [
     'none' => 'None',
     'select' => 'Select',
     'search_client' => 'Search by company or person...',
+    'search_invoice' => 'Search invoice # / client / project...',
+    'search_quote' => 'Search quote # / subject / client...',
     'loading' => 'Loading...',
     'total' => 'Total',
     'of' => 'of',

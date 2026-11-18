@@ -69,6 +69,13 @@
 {{-- Filters --}}
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
     <form method="GET" class="flex flex-wrap gap-3">
+        <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ __('messages.search_invoice') }}" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-56">
+        <select name="client_id" data-searchable data-search-placeholder="{{ __('messages.search_client') }}" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">{{ __('client.client') }}</option>
+            @foreach($clients as $c)
+                <option value="{{ $c->id }}" {{ (string) request('client_id') === (string) $c->id ? 'selected' : '' }}>{{ $c->display_name }}</option>
+            @endforeach
+        </select>
         <select name="payment_status" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">{{ __('finance.status_unpaid') }}</option>
             @foreach(['unpaid','partially_paid','paid','overdue'] as $s)
