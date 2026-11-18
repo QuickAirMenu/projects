@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var baseClass = select.className.replace(/\bhidden\b/g, '').replace(/\s+/g, ' ').trim();
 
-        select.classList.add('hidden');
+        select.style.display = 'none';
         select.setAttribute('tabindex', '-1');
 
         var wrapper = document.createElement('div');
