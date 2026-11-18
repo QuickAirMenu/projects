@@ -82,6 +82,11 @@
                                         <i class="fas fa-user w-4 text-center text-gray-400"></i>
                                         <span>{{ __('portal.my_account') }}</span>
                                     </a>
+                                    <button type="button" id="portalEnablePush" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition text-start">
+                                        <i class="fas fa-bell w-4 text-center text-gray-400"></i>
+                                        <span>{{ __('messages.push_enable') }}</span>
+                                    </button>
+                                    <p id="portalPushStatus" class="px-4 pb-1 text-xs text-gray-400"></p>
                                     <div class="border-t border-gray-100 my-1.5"></div>
                                     <form method="POST" action="{{ route('portal.logout') }}">
                                         @csrf
@@ -177,6 +182,72 @@
                     localStorage.setItem('ip_last_at', String(Date.now()));
                 }
             } catch (e) {}
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('portalEnablePush');
+            if (!btn) return;
+            if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+                btn.style.display = 'none';
+                return;
+            }
+            const status = document.getElementById('portalPushStatus');
+            const keyUrl = @json(route('portal.push.key'));
+            const subUrl = @json(route('portal.push.subscribe'));
+            const unsubUrl = @json(route('portal.push.unsubscribe'));
+            const csrf = @json(csrf_token());
+            const say = (t) => { if (status) status.textContent = t; };
+            const b64 = (s) => {
+                const pad = '='.repeat((4 - s.length % 4) % 4);
+                const raw = atob((s + pad).replace(/-/g, '+').replace(/_/g, '/'));
+                return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+            };
+            const ready = () => navigator.serviceWorker.ready;
+            async function subscription() {
+                const reg = await ready();
+                return reg.pushManager.getSubscription();
+            }
+            async function refresh() {
+                const sub = await subscription();
+                say(sub ? @json(__('messages.push_enabled')) : '');
+            }
+            btn.addEventListener('click', async function () {
+                try {
+                    btn.disabled = true;
+                    const current = await subscription();
+                    if (current) {
+                        await fetch(unsubUrl, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                            body: JSON.stringify({ endpoint: current.endpoint })
+                        });
+                        await current.unsubscribe();
+                        say(@json(__('messages.push_disabled')));
+                        btn.disabled = false;
+                        return;
+                    }
+                    const perm = await Notification.requestPermission();
+                    if (perm !== 'granted') { say(@json(__('messages.push_denied'))); btn.disabled = false; return; }
+                    const res = await fetch(keyUrl, { headers: { 'Accept': 'application/json' } });
+                    if (!res.ok) { say(@json(__('messages.push_unconfigured'))); btn.disabled = false; return; }
+                    const { publicKey } = await res.json();
+                    const reg = await ready();
+                    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(publicKey) });
+                    await fetch(subUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                        body: JSON.stringify(sub)
+                    });
+                    say(@json(__('messages.push_enabled')));
+                } catch (e) {
+                    say(@json(__('messages.push_unavailable')));
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+            refresh();
         })();
     </script>
 </body>

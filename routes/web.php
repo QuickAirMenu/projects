@@ -25,6 +25,7 @@ use App\Http\Controllers\Finance\TimeEntryController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Portal\ClientPortalController;
+use App\Http\Controllers\Portal\PortalPushController;
 use App\Http\Controllers\Project\ProjectAttachmentController;
 use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ProjectWorkflowController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Report\TaskReportController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Setting\SettingController;
+use App\Http\Controllers\Settings\ActivityLogController;
 use App\Http\Controllers\Settings\BackupController;
 use App\Http\Controllers\Settings\ProjectStatusController;
 use App\Http\Controllers\Settings\ServiceTypeController;
@@ -123,6 +125,12 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::post('/tickets', [ClientPortalController::class, 'storeTicket'])->name('tickets.store');
         Route::get('/tickets/attachments/{attachment}', [ClientPortalController::class, 'downloadTicketAttachment'])->name('tickets.attachment');
         Route::get('/payments/{payment}/proof', [ClientPortalController::class, 'downloadPaymentProof'])->name('payments.proof');
+        Route::get('/push/key', [PortalPushController::class, 'key'])->name('push.key');
+        Route::post('/push/subscribe', [PortalPushController::class, 'subscribe'])->name('push.subscribe');
+        Route::delete('/push/unsubscribe', [PortalPushController::class, 'unsubscribe'])->name('push.unsubscribe');
+        Route::get('/push/key', [PortalPushController::class, 'key'])->name('push.key');
+        Route::post('/push/subscribe', [PortalPushController::class, 'subscribe'])->name('push.subscribe');
+        Route::delete('/push/unsubscribe', [PortalPushController::class, 'unsubscribe'])->name('push.unsubscribe');
         Route::get('/notifications', [ClientPortalController::class, 'notifications'])->name('notifications');
         Route::post('/notifications/read-all', [ClientPortalController::class, 'markAllNotificationsRead'])->name('notifications.read-all');
         Route::post('/notifications/{id}/read', [ClientPortalController::class, 'markNotificationRead'])->name('notifications.read');
@@ -380,6 +388,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     // Settings
     Route::prefix('settings')->name('settings.')->middleware('permission:manage-settings')->group(function () {
         Route::get('backups', [BackupController::class, 'index'])->name('backups');
+        Route::get('audit-log', [ActivityLogController::class, 'index'])->name('audit-log');
         Route::post('backups/run', [BackupController::class, 'run'])->name('backups.run');
         Route::get('backups/{file}', [BackupController::class, 'download'])->where('file', '[A-Za-z0-9_.-]+')->name('backups.download');
         Route::get('/', [SettingController::class, 'index'])->name('index');

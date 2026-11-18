@@ -29,6 +29,9 @@
         <a href="{{ route('api-tokens.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm transition">
             <i class="fas fa-key w-4"></i> {{ __('settings.api_tokens') }}
         </a>
+        <a href="{{ route('settings.audit-log') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm transition">
+            <i class="fas fa-clipboard-list w-4"></i> {{ __('messages.audit_log') }}
+        </a>
         <a href="{{ route('roles.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm transition">
             <i class="fas fa-shield-alt w-4"></i> {{ __('settings.roles_permissions') }}
         </a>
