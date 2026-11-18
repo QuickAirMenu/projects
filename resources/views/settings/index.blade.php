@@ -102,6 +102,7 @@
                         ['key' => 'currency_symbol',  'label' => __('settings.currency_symbol'), 'type' => 'text'],
                         ['key' => 'bank_account_name','label' => __('settings.bank_account_name'), 'type' => 'text'],
                         ['key' => 'bank_iban',        'label' => __('settings.bank_iban'), 'type' => 'text'],
+                        ['key' => 'reminder_interval_days', 'label' => __('settings.reminder_interval_days'), 'type' => 'number'],
                     ] as $field)
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ $field['label'] }}</label>

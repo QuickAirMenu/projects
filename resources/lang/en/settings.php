@@ -17,6 +17,7 @@ return [
     'finance_settings' => 'Finance Settings',
     'bank_account_name' => 'Bank Account Name',
     'bank_iban' => 'IBAN Number',
+    'reminder_interval_days' => 'Days between payment reminders',
     'general_settings' => 'General Settings',
     'service_types' => 'Service Types',
     'project_statuses' => 'Project Statuses',

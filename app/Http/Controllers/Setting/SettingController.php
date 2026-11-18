@@ -32,6 +32,7 @@ class SettingController extends Controller
             'company_address' => 'general',
             'company_logo' => 'general',
             'default_tax_rate' => 'finance',
+            'reminder_interval_days' => 'finance',
             'currency' => 'finance',
             'currency_symbol' => 'finance',
             'bank_account_name' => 'finance',

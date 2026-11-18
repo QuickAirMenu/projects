@@ -89,6 +89,11 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
+    public function reminders()
+    {
+        return $this->hasMany(InvoiceReminder::class);
+    }
+
     public function payments()
     {
         return $this->hasMany(Payment::class);

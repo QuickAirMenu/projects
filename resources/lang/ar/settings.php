@@ -17,6 +17,7 @@ return [
     'finance_settings' => 'الإعدادات المالية',
     'bank_account_name' => 'اسم الحساب البنكي',
     'bank_iban' => 'رقم الآيبان',
+    'reminder_interval_days' => 'الفاصل بين تذكيرات السداد (أيام)',
     'general_settings' => 'إعدادات عامة',
     'service_types' => 'أنواع الخدمات',
     'project_statuses' => 'حالات المشاريع',

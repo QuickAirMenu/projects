@@ -14,7 +14,7 @@ class Expense extends Model
     protected $fillable = [
         'expense_number', 'vendor_name', 'category', 'expense_date', 'amount', 'tax_amount', 'total',
         'status', 'paid_at', 'payment_method', 'reference', 'notes', 'project_id', 'client_id',
-        'billable', 'receipt_path', 'receipt_name', 'created_by', 'approved_by', 'approved_at',
+        'billable', 'receipt_path', 'receipt_name', 'created_by', 'approved_by', 'approved_at', 'invoiced_invoice_id',
         'rejection_reason',
     ];
 
@@ -46,6 +46,21 @@ class Expense extends Model
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoiced_invoice_id');
+    }
+
+    public function isInvoiced(): bool
+    {
+        return $this->invoiced_invoice_id !== null;
+    }
+
+    public function scopeBillable($query)
+    {
+        return $query->where('status', 'approved')->where('billable', true)->whereNull('invoiced_invoice_id');
     }
 
     public function scopeApproved($query)

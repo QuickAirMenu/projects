@@ -56,6 +56,7 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Middleware\CheckSetup;
 use App\Mail\SupportMail;
 use App\Models\Setting;
+use App\Services\InvoiceReminderService;
 use App\Services\MailConfigService;
 use App\Services\RecurringInvoiceService;
 use Illuminate\Http\Request;
@@ -475,6 +476,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [ExpenseController::class, 'index'])->name('index');
         Route::get('create', [ExpenseController::class, 'create'])->name('create');
         Route::post('/', [ExpenseController::class, 'store'])->name('store');
+        Route::get('bill', [ExpenseController::class, 'billPreview'])->name('bill.preview');
+        Route::post('bill', [ExpenseController::class, 'bill'])->name('bill.store');
         Route::get('{expense}/edit', [ExpenseController::class, 'edit'])->name('edit');
         Route::put('{expense}', [ExpenseController::class, 'update'])->name('update');
         Route::delete('{expense}', [ExpenseController::class, 'destroy'])->name('destroy');
@@ -577,3 +580,18 @@ Route::post('/csp-report', function (Request $request) {
 
     return response()->noContent();
 })->withoutMiddleware([CheckSetup::class])->middleware('throttle:60,1');
+
+Route::post('/internal/reminders', function (Request $request) {
+    $expected = (string) config('internal.token', '');
+    $given = (string) $request->input('token', '');
+
+    abort_if($expected === '' || ! hash_equals($expected, $given), 403);
+
+    try {
+        [$sent, $skipped, $failed] = app(InvoiceReminderService::class)->sendDue();
+    } catch (Throwable $e) {
+        return response($e->getMessage(), 422)->header('Content-Type', 'text/plain');
+    }
+
+    return response("sent={$sent} skipped={$skipped} failed={$failed}", 200)->header('Content-Type', 'text/plain');
+})->middleware('throttle:5,1');

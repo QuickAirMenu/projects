@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Expense;
 use App\Models\Project;
+use App\Services\ExpenseBillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -169,6 +170,67 @@ class ExpenseController extends Controller
         abort_unless($expense->receipt_path && Storage::disk('private')->exists($expense->receipt_path), 404);
 
         return Storage::disk('private')->download($expense->receipt_path, $expense->receipt_name ?: 'receipt');
+    }
+
+    public function billPreview(Request $request)
+    {
+        $data = $request->validate([
+            'project_id' => ['nullable', 'exists:projects,id'],
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date'],
+        ]);
+
+        $from = $data['from'] ?? now()->startOfMonth()->toDateString();
+        $to = $data['to'] ?? now()->toDateString();
+
+        $expenses = Expense::with(['project:id,name'])
+            ->where('status', 'approved')
+            ->where('billable', true)
+            ->whereNull('invoiced_invoice_id')
+            ->when($data['project_id'] ?? null, fn ($q, $id) => $q->where('project_id', $id))
+            ->whereDate('expense_date', '>=', $from)
+            ->whereDate('expense_date', '<=', $to)
+            ->orderBy('project_id')
+            ->orderBy('expense_date')
+            ->get();
+
+        $total = round((float) $expenses->sum('amount'), 2);
+        $tax = round($total * 0.15, 2);
+
+        return view('finance.expenses.bill', [
+            'expenses' => $expenses,
+            'from' => $from,
+            'to' => $to,
+            'projectId' => $data['project_id'] ?? null,
+            'projects' => Project::orderBy('name')->get(['id', 'name']),
+            'total' => $total,
+            'tax' => $tax,
+        ]);
+    }
+
+    public function bill(Request $request, ExpenseBillingService $service)
+    {
+        abort_unless(Auth::user()->can('create-invoices'), 403);
+
+        $data = $request->validate([
+            'project_id' => ['required', 'exists:projects,id'],
+            'from' => ['required', 'date'],
+            'to' => ['required', 'date', 'after_or_equal:from'],
+            'tax_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'due_date' => ['nullable', 'date', 'after_or_equal:today'],
+        ]);
+
+        $invoice = $service->bill(
+            (int) $data['project_id'],
+            $data['from'],
+            $data['to'],
+            (int) ($data['tax_percentage'] ?? 15),
+            Auth::id(),
+            $data['due_date'] ?? null
+        );
+
+        return redirect()->route('invoices.show', $invoice)
+            ->with('success', __('expenses.invoice_created', ['number' => $invoice->invoice_number]));
     }
 
     protected function validated(Request $request): array

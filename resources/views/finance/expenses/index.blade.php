@@ -7,9 +7,14 @@
         <h1 class="text-2xl font-bold text-gray-800">{{ __('expenses.title') }}</h1>
         <p class="mt-1 text-sm text-gray-500">{{ __('expenses.hint') }}</p>
     </div>
+    <div class="flex gap-2">
+    <a href="{{ route('expenses.bill.preview') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium">
+        <i class="fas fa-file-invoice-dollar me-2"></i>{{ __('expenses.bill_invoice') }}
+    </a>
     <a href="{{ route('expenses.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium">
         <i class="fas fa-plus me-2"></i>{{ __('expenses.new') }}
     </a>
+    </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -82,6 +87,9 @@
                 <td class="px-4 py-3">
                     @php $c = ['pending' => 'amber', 'approved' => 'emerald', 'rejected' => 'red'][$expense->status] ?? 'gray'; @endphp
                     <span class="rounded-full bg-{{ $c }}-100 px-2.5 py-1 text-xs text-{{ $c }}-700">{{ __('expenses.status_'.$expense->status) }}</span>
+                    @if($expense->isInvoiced())
+                    <a href="{{ route('invoices.show', $expense->invoiced_invoice_id) }}" class="mt-1 inline-block rounded-full bg-blue-100 px-2.5 py-1 text-xs text-blue-700">{{ __('expenses.invoiced') }}</a>
+                    @endif
                     @if($expense->status === 'rejected' && $expense->rejection_reason)
                     <p class="mt-1 text-[11px] text-red-500">{{ $expense->rejection_reason }}</p>
                     @endif
