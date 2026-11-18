@@ -12,7 +12,7 @@
     <form action="{{ route('projects.update', $project) }}" method="POST">
         @csrf @method('PUT')
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div class="md:col-span-2">
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.name') }} *</label>
                 <input type="text" name="name" value="{{ old('name', $project->name) }}" required
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
