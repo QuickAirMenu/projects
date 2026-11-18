@@ -238,6 +238,11 @@ class Project extends Model
         return $this->tasks()->count();
     }
 
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
+
     /**
      * Boot method
      */

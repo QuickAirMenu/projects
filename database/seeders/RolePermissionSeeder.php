@@ -65,6 +65,12 @@ class RolePermissionSeeder extends Seeder
             'edit-payments',
             'delete-payments',
 
+            'view-expenses',
+            'create-expenses',
+            'edit-expenses',
+            'delete-expenses',
+            'approve-expenses',
+
             // Change Requests
             'view-change-requests',
             'create-change-requests',
@@ -99,6 +105,7 @@ class RolePermissionSeeder extends Seeder
             'view-contracts', 'create-contracts', 'edit-contracts', 'delete-contracts',
             'view-invoices', 'create-invoices', 'edit-invoices', 'delete-invoices',
             'view-payments', 'create-payments', 'edit-payments', 'delete-payments',
+            'view-expenses', 'create-expenses', 'edit-expenses', 'delete-expenses', 'approve-expenses',
             'view-change-requests', 'create-change-requests', 'approve-change-requests',
             'view-reports', 'view-financials', 'manage-tickets',
         ]);
@@ -113,6 +120,7 @@ class RolePermissionSeeder extends Seeder
             'view-contracts',
             'view-invoices',
             'view-payments',
+            'view-expenses', 'create-expenses',
             'view-change-requests', 'create-change-requests',
             'view-reports',
         ]);
@@ -136,6 +144,7 @@ class RolePermissionSeeder extends Seeder
             'view-contracts', 'create-contracts', 'edit-contracts',
             'view-invoices', 'create-invoices', 'edit-invoices',
             'view-payments', 'create-payments', 'edit-payments',
+            'view-expenses', 'create-expenses', 'edit-expenses', 'approve-expenses',
             'view-reports', 'view-financials', 'manage-tickets',
         ]);
 

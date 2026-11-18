@@ -11,6 +11,7 @@ return [
     'days_overdue' => 'أيام التأخر',
     'bucket' => 'الفئة',
     'total_outstanding' => 'إجمالي المستحق',
+    'net' => 'صافي الفوترة',
     'profitability_title' => 'ملخص فوترة المشاريع',
     'profitability_hint' => 'المفوتر مقابل المحصّل لكل مشروع ونسبة التحصيل.',
     'invoiced' => 'المفوتر',

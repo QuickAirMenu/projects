@@ -29,6 +29,8 @@
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.invoiced') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.collected') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.outstanding') }}</th>
+                    <th class="px-5 py-3 text-end font-semibold">{{ __('expenses.title') }}</th>
+                    <th class="px-5 py-3 text-end font-semibold">{{ __('reports.net') }}</th>
                     <th class="px-5 py-3 text-end font-semibold">{{ __('reports.collection_rate') }}</th>
                 </tr>
             </thead>
@@ -38,6 +40,8 @@
                         $invoiced = (float) ($project->invoiced_total ?? 0);
                         $collected = (float) ($collectedByProject[$project->id] ?? 0);
                         $outstanding = max(0, $invoiced - $collected);
+                        $expenses = (float) ($project->expenses_total ?? 0);
+                        $net = $invoiced - $expenses;
                         $rate = $invoiced > 0 ? round($collected / $invoiced * 100) : 0;
                     @endphp
                     <tr class="hover:bg-gray-50">
@@ -46,6 +50,8 @@
                         <td class="px-5 py-3 text-end text-gray-800">{{ number_format($invoiced, 2) }}</td>
                         <td class="px-5 py-3 text-end text-emerald-600">{{ number_format($collected, 2) }}</td>
                         <td class="px-5 py-3 text-end {{ $outstanding > 0 ? 'text-red-600' : 'text-gray-400' }}">{{ number_format($outstanding, 2) }}</td>
+                        <td class="px-5 py-3 text-end text-red-500">{{ number_format($expenses, 2) }}</td>
+                        <td class="px-5 py-3 text-end font-medium {{ $net >= 0 ? 'text-emerald-600' : 'text-red-600' }}">{{ number_format($net, 2) }}</td>
                         <td class="px-5 py-3 text-end">
                             <span class="inline-flex items-center gap-2">
                                 <span class="h-1.5 w-16 overflow-hidden rounded-full bg-gray-200"><span class="block h-1.5 rounded-full bg-emerald-500" style="width: {{ $rate }}%"></span></span>
@@ -54,7 +60,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="px-5 py-16 text-center text-gray-400">{{ __('messages.no_data') }}</td></tr>
+                    <tr><td colspan="8" class="px-5 py-16 text-center text-gray-400">{{ __('messages.no_data') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

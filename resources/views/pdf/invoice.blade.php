@@ -1,3 +1,4 @@
+@inject('zatca', 'App\Services\ZatcaQrService')
 @php
     $isRtl = app()->getLocale() === 'ar' || preg_match('/[\p{Arabic}]/u', trim((string) ($invoice->client?->name ?? '') . ' ' . (string) ($invoice->client?->company_name ?? '')));
     $companyName = $settings['company_name_ar'] ?? $settings['company_name'] ?? config('app.name');
@@ -73,6 +74,18 @@
         <tr><td>{{ __('finance.paid_amount') }}</td><td style="text-align:end">{{ number_format($invoice->paid_amount, 2) }} {{ $currency }}</td></tr>
         <tr><td>{{ __('finance.remaining_amount') }}</td><td style="text-align:end">{{ number_format($invoice->remaining_amount, 2) }} {{ $currency }}</td></tr>
     </table>
+
+    <div class="box" style="display:table;width:100%">
+        <div style="display:table-cell;width:120px;vertical-align:middle">
+            <barcode code="{{ $zatca->payload($invoice) }}" type="QR" size="1.05" error="M" />
+        </div>
+        <div style="display:table-cell;vertical-align:middle;padding-{{ $isRtl ? 'right' : 'left' }}:12px">
+            <p class="section-title" style="margin-bottom:4px">{{ __('finance.zatca_qr') }}</p>
+            <p class="muted" style="margin:0">{{ __('finance.vat_number') }}: {{ $zatca->vatNumber() ?: '-' }}</p>
+            <p class="muted" style="margin:0">{{ __('finance.invoice_uuid') }}: {{ $invoice->uuid }}</p>
+            <p class="muted" style="margin:0">{{ __('finance.zatca_invoice_type') }}: {{ __('finance.zatca_type_'.$invoice->zatca_invoice_type) }}</p>
+        </div>
+    </div>
 
     @if($invoice->notes || $invoice->terms)
     <div class="box">

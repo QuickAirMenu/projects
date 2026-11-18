@@ -22,6 +22,8 @@ return [
     'project_statuses' => 'حالات المشاريع',
     'task_statuses' => 'حالات المهام',
     'backups' => 'النسخ الاحتياطي',
+    'vat_number' => 'الرقم الضريبي',
+    'commercial_registration' => 'السجل التجاري',
     'api_tokens' => 'توكنات API',
     'roles_permissions' => 'الأدوار والصلاحيات',
     'leave_blank_to_keep' => 'اتركه فارغاً للإبقاء على القيمة الحالية',

@@ -22,6 +22,8 @@ return [
     'project_statuses' => 'Project Statuses',
     'task_statuses' => 'Task Statuses',
     'backups' => 'Backups',
+    'vat_number' => 'VAT Number',
+    'commercial_registration' => 'Commercial Registration',
     'api_tokens' => 'API Tokens',
     'roles_permissions' => 'Roles & Permissions',
     'leave_blank_to_keep' => 'Leave blank to keep current value',

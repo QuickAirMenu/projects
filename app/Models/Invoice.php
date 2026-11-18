@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -14,6 +15,8 @@ class Invoice extends Model
 
     protected $fillable = [
         'invoice_number',
+        'uuid',
+        'zatca_invoice_type',
         'project_id',
         'client_id',
         'quote_id',
@@ -165,6 +168,15 @@ class Invoice extends Model
             $invoice->tax_amount = round(($invoice->subtotal ?? 0) * ($invoice->tax_percentage ?? 0) / 100, 2);
             $invoice->total = max(0, ($invoice->subtotal ?? 0) + $invoice->tax_amount - $discountAmount);
             $invoice->remaining_amount = max(0, $invoice->total - ($invoice->paid_amount ?? 0));
+        });
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Invoice $invoice) {
+            if (blank($invoice->uuid)) {
+                $invoice->uuid = (string) Str::uuid();
+            }
         });
     }
 }

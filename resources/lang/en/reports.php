@@ -11,6 +11,7 @@ return [
     'days_overdue' => 'Days overdue',
     'bucket' => 'Bucket',
     'total_outstanding' => 'Total outstanding',
+    'net' => 'Net billed',
     'profitability_title' => 'Project billing summary',
     'profitability_hint' => 'Invoiced vs collected per project with collection rate.',
     'invoiced' => 'Invoiced',

@@ -1,5 +1,6 @@
 @extends('portal.layouts.app')
 
+@inject('zatca', 'App\Services\ZatcaQrService')
 @section('title', $invoice->invoice_number)
 
 @section('breadcrumb')
@@ -100,6 +101,14 @@
         </div>
 
         <div class="space-y-6">
+            {{-- ZATCA QR --}}
+            <div class="card rounded-2xl p-5 text-center">
+                <h2 class="mb-3 font-semibold text-gray-900"><i class="fas fa-qrcode me-2 text-primary-600"></i>{{ __('finance.zatca_qr') }}</h2>
+                <img src="{{ $zatca->svgDataUri($invoice) }}" alt="ZATCA QR" class="mx-auto h-40 w-40">
+                <p class="mt-3 text-xs text-gray-500">{{ __('finance.vat_number') }}: {{ $zatca->vatNumber() ?: '-' }}</p>
+                <p class="mt-1 break-all text-[11px] text-gray-400">{{ $invoice->uuid }}</p>
+            </div>
+
             {{-- Bank transfer details --}}
             <div class="card rounded-2xl p-5">
                 <h2 class="mb-3 font-semibold text-gray-900"><i class="fas fa-building-columns me-2 text-blue-600"></i>{{ __('portal.bank_transfer') }}</h2>

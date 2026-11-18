@@ -51,6 +51,8 @@
                         ['key' => 'company_phone',   'label' => __('users.phone'),                  'type' => 'text'],
                         ['key' => 'company_website', 'label' => __('settings.website'),             'type' => 'url'],
                         ['key' => 'company_address', 'label' => __('settings.address'),             'type' => 'text'],
+                        ['key' => 'vat_number',      'label' => __('settings.vat_number'),          'type' => 'text'],
+                        ['key' => 'commercial_registration', 'label' => __('settings.commercial_registration'), 'type' => 'text'],
                     ] as $field)
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ $field['label'] }}</label>

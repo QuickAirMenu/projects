@@ -106,6 +106,18 @@
                 </a>
                 @endcan
                 @can('view-payments')
+                @can('view-projects')
+                <a href="{{ route('time-entries.index') }}" class="sidebar-link {{ request()->routeIs('time-entries.*') ? 'active' : '' }}">
+                    <i class="fas fa-clock w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                    <span>{{ __('time.timesheets') }}</span>
+                </a>
+                @endcan
+                @can('view-expenses')
+                <a href="{{ route('expenses.index') }}" class="sidebar-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                    <i class="fas fa-wallet w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                    <span>{{ __('expenses.title') }}</span>
+                </a>
+                @endcan
                 <a href="{{ route('payments.index') }}" class="sidebar-link {{ request()->routeIs('payments.*') ? 'active' : '' }}">
                     <i class="fas fa-money-bill-wave w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
                     <span>{{ __('common.payments') }}</span>

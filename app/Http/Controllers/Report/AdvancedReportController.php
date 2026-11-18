@@ -61,6 +61,7 @@ class AdvancedReportController extends Controller
         $projects = Project::with(['client:id,name'])
             ->withSum('invoices as invoiced_total', 'total')
             ->withSum('invoices as remaining_total', 'remaining_amount')
+            ->withSum(['expenses as expenses_total' => fn ($q) => $q->where('status', 'approved')], 'total')
             ->orderByDesc('invoiced_total')
             ->paginate(20);
 

@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@inject('zatca', 'App\Services\ZatcaQrService')
 @section('title', $invoice->invoice_number)
 
 @section('breadcrumb')
@@ -55,6 +56,16 @@
                     <tr class="border-t"><td colspan="2" class="p-3 text-end font-bold">{{ __('finance.total') }}</td><td class="p-3 text-end font-bold text-blue-600 text-lg privacy-mask">{{ number_format($invoice->total, 2) }}</td></tr>
                 </tfoot>
             </table>
+        </div>
+
+        {{-- ZATCA QR --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-5">
+            <img src="{{ $zatca->svgDataUri($invoice) }}" alt="ZATCA QR" class="h-28 w-28">
+            <div class="text-sm text-gray-600">
+                <p class="font-semibold text-gray-800 mb-1">{{ __('finance.zatca_qr') }}</p>
+                <p>{{ __('finance.vat_number') }}: <span class="privacy-mask">{{ $zatca->vatNumber() ?: '-' }}</span></p>
+                <p class="break-all text-xs text-gray-400">{{ $invoice->uuid }}</p>
+            </div>
         </div>
 
         {{-- Payments --}}

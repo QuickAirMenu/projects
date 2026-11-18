@@ -15,10 +15,12 @@ use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\Finance\ContractController;
+use App\Http\Controllers\Finance\ExpenseController;
 use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
 use App\Http\Controllers\Finance\QuoteController;
 use App\Http\Controllers\Finance\RecurringInvoiceController;
+use App\Http\Controllers\Finance\TimeEntryController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Portal\ClientPortalController;
@@ -442,6 +444,31 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         ->parameters(['recurring-invoices' => 'recurringInvoice']);
     Route::post('recurring-invoices/{recurringInvoice}/run', [RecurringInvoiceController::class, 'runNow'])
         ->name('recurring-invoices.run');
+
+    // Timesheets
+    Route::prefix('time-entries')->name('time-entries.')->middleware('permission:view-projects')->group(function () {
+        Route::get('/', [TimeEntryController::class, 'index'])->name('index');
+        Route::get('create', [TimeEntryController::class, 'create'])->name('create');
+        Route::post('/', [TimeEntryController::class, 'store'])->name('store');
+        Route::get('bill', [TimeEntryController::class, 'billPreview'])->name('bill.preview');
+        Route::post('bill', [TimeEntryController::class, 'bill'])->name('bill.store');
+        Route::get('{timeEntry}/edit', [TimeEntryController::class, 'edit'])->name('edit');
+        Route::put('{timeEntry}', [TimeEntryController::class, 'update'])->name('update');
+        Route::delete('{timeEntry}', [TimeEntryController::class, 'destroy'])->name('destroy');
+    });
+
+    // Expenses
+    Route::prefix('expenses')->name('expenses.')->middleware('permission:view-expenses')->group(function () {
+        Route::get('/', [ExpenseController::class, 'index'])->name('index');
+        Route::get('create', [ExpenseController::class, 'create'])->name('create');
+        Route::post('/', [ExpenseController::class, 'store'])->name('store');
+        Route::get('{expense}/edit', [ExpenseController::class, 'edit'])->name('edit');
+        Route::put('{expense}', [ExpenseController::class, 'update'])->name('update');
+        Route::delete('{expense}', [ExpenseController::class, 'destroy'])->name('destroy');
+        Route::get('{expense}/receipt', [ExpenseController::class, 'downloadReceipt'])->name('receipt');
+        Route::post('{expense}/approve', [ExpenseController::class, 'approve'])->middleware('permission:approve-expenses')->name('approve');
+        Route::post('{expense}/reject', [ExpenseController::class, 'reject'])->middleware('permission:approve-expenses')->name('reject');
+    });
 
     // Support tickets
     Route::prefix('support-tickets')->name('support-tickets.')->middleware('permission:manage-tickets')->group(function () {
