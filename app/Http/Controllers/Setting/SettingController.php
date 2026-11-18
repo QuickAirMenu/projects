@@ -26,15 +26,7 @@ class SettingController extends Controller
             'error' => $settings['mail']['mail_test_error'] ?? null,
         ];
 
-        $connAt = $settings['mail']['mail_conn_at'] ?? null;
-        $mailConn = [
-            'tested' => filled($connAt),
-            'ok' => filled($connAt) && ($settings['mail']['mail_conn_ok'] ?? null) === '1',
-            'at' => $connAt,
-            'error' => $settings['mail']['mail_conn_error'] ?? null,
-        ];
-
-        return view('settings.index', compact('settings', 'mailStatus', 'mailConn'));
+        return view('settings.index', compact('settings', 'mailStatus'));
     }
 
     public function testMail(Request $request)
@@ -152,50 +144,6 @@ class SettingController extends Controller
 
         return redirect()->route('settings.index')
             ->with('success', __('messages.updated_successfully'));
-    }
-
-    public function checkMailConnection()
-    {
-        app(MailConfigService::class)->applyDynamicMailConfig();
-
-        $host = (string) config('mail.mailers.smtp.host');
-        $port = (int) (config('mail.mailers.smtp.port') ?: 587);
-        $encryption = (string) config('mail.mailers.smtp.encryption');
-
-        if ($host === '') {
-            return back()->with('error', __('messages.mail_not_configured'));
-        }
-
-        $target = $encryption === 'ssl' ? 'ssl://'.$host.':'.$port : 'tcp://'.$host.':'.$port;
-        $error = null;
-        $ok = false;
-
-        $context = stream_context_create();
-        $socket = @stream_socket_client($target, $errno, $errstr, 6, STREAM_CLIENT_CONNECT, $context);
-
-        if ($socket) {
-            stream_set_timeout($socket, 6);
-            $greeting = fgets($socket, 512);
-            $ok = is_string($greeting) && str_starts_with($greeting, '220');
-            if (! $ok) {
-                $error = trim((string) $greeting) ?: 'Unexpected SMTP greeting';
-            }
-            fclose($socket);
-        } else {
-            $error = $errstr ?: 'Connection failed';
-        }
-
-        foreach ([
-            'mail_conn_ok' => $ok ? '1' : '0',
-            'mail_conn_at' => now()->toDateTimeString(),
-            'mail_conn_error' => $ok ? null : mb_substr((string) $error, 0, 500),
-        ] as $key => $value) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value, 'type' => 'string', 'group' => 'mail']);
-        }
-
-        return $ok
-            ? back()->with('success', __('messages.mail_conn_success', ['host' => $host, 'port' => $port]))
-            : back()->with('error', __('messages.mail_conn_failed', ['error' => $error ?: '-']));
     }
 
     protected function recordMailTest(bool $ok, ?string $error): void

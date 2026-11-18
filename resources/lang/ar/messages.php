@@ -235,6 +235,7 @@ return [
     'mail_test_untested' => 'لم يُختبر بعد',
     'mail_test_unconfigured' => 'غير مهيأ',
     'mail_test_button' => 'اختبار الإرسال الآن',
+    'mail_test_compact_hint' => 'جرّب الإرسال إلى بريد الشركة/بريدك.',
     'mail_test_section' => 'اختبار البريد',
     'mail_test_section_hint' => 'أرسل رسالة فعلية للتأكد من الإرسال، أو افحص اتصال الخادم فقط.',
     'mail_test_recipient' => 'بريد المستلم للاختبار',

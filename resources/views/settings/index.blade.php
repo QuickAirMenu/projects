@@ -178,53 +178,19 @@
                     </button>
                 </div>
             </form>
-            <div class="mt-5 rounded-2xl border border-purple-100 bg-purple-50/60 p-4">
-                <div class="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                        <p class="text-sm font-semibold text-gray-800"><i class="fas fa-vial me-1 text-purple-500"></i>{{ __('messages.mail_test_section') }}</p>
-                        <p class="mt-0.5 text-xs text-gray-500">{{ __('messages.mail_test_section_hint') }}</p>
-                    </div>
-                    @if($mailConn['tested'])
-                    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium {{ $mailConn['ok'] ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}" title="{{ $mailConn['error'] }}">
-                        <i class="fas {{ $mailConn['ok'] ? 'fa-circle-check' : 'fa-circle-xmark' }}"></i>
-                        {{ $mailConn['ok'] ? __('messages.mail_conn_success_short') : __('messages.mail_conn_failed_short') }}
-                    </span>
-                    @endif
-                </div>
-
-                <div class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-end">
-                    <form action="{{ route('settings.mail-test') }}" method="POST" class="flex flex-1 flex-col gap-2 sm:flex-row sm:items-end">
-                        @csrf
-                        <div class="flex-1">
-                            <label class="mb-1 block text-xs font-medium text-gray-600">{{ __('messages.mail_test_recipient') }}</label>
-                            <input type="email" name="recipient" value="{{ $settings['mail']['mail_from_address'] ?? $settings['general']['company_email'] ?? auth()->user()?->email }}" placeholder="you@example.com" class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm">
-                        </div>
-                        <button type="submit" class="whitespace-nowrap rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-purple-700">
-                            <i class="fas fa-paper-plane me-2"></i>{{ __('messages.mail_test_button') }}
-                        </button>
-                    </form>
-                    <form action="{{ route('settings.mail-connection') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="whitespace-nowrap rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100">
-                            <i class="fas fa-plug me-2"></i>{{ __('messages.mail_conn_button') }}
-                        </button>
-                    </form>
-                </div>
-
-                <p class="mt-2 text-[11px] text-gray-400">{{ __('messages.mail_test_hint') }}</p>
-
-                @if($mailConn['tested'])
-                <p class="mt-2 break-words text-xs {{ $mailConn['ok'] ? 'text-emerald-600' : 'text-red-500' }}">
-                    {{ $mailConn['at'] }}
-                    @if(! $mailConn['ok'] && $mailConn['error'])
-                    <span class="block">{{ \Illuminate\Support\Str::limit($mailConn['error'], 240) }}</span>
-                    @endif
-                </p>
-                @endif
-                @if($mailStatus['tested'] && ! $mailStatus['ok'] && $mailStatus['error'])
-                <p class="mt-2 max-w-xl break-words text-xs text-red-500">{{ \Illuminate\Support\Str::limit($mailStatus['error'], 240) }}</p>
-                @endif
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-gray-50 px-3 py-2.5">
+                <span class="text-xs text-gray-500">{{ __('messages.mail_test_compact_hint') }}</span>
+                <form action="{{ route('settings.mail-test') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700">
+                        <i class="fas fa-paper-plane me-2"></i>{{ __('messages.mail_test_button') }}
+                    </button>
+                </form>
             </div>
+            @if($mailStatus['tested'] && ! $mailStatus['ok'] && $mailStatus['error'])
+            <p class="mt-2 max-w-xl break-words text-xs text-red-500">{{ \Illuminate\Support\Str::limit($mailStatus['error'], 240) }}</p>
+            @endif
+
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

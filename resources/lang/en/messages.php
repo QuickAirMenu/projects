@@ -235,6 +235,7 @@ return [
     'mail_test_untested' => 'Not tested yet',
     'mail_test_unconfigured' => 'Not configured',
     'mail_test_button' => 'Send test email now',
+    'mail_test_compact_hint' => 'Send a test email to your company/user inbox.',
     'mail_test_section' => 'Mail testing',
     'mail_test_section_hint' => 'Send a real test email, or just check the SMTP server connection.',
     'mail_test_recipient' => 'Test recipient email',
