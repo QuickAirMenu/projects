@@ -18,6 +18,8 @@ return [
     'bank_account_name' => 'Bank Account Name',
     'bank_iban' => 'IBAN Number',
     'reminder_interval_days' => 'Days between payment reminders',
+    'budget_alert_threshold' => 'Budget alert threshold (%)',
+    'budget_alert_interval_days' => 'Budget alerts interval (days)',
     'general_settings' => 'General Settings',
     'service_types' => 'Service Types',
     'project_statuses' => 'Project Statuses',

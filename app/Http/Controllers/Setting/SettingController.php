@@ -86,6 +86,8 @@ class SettingController extends Controller
             'company_logo' => 'general',
             'default_tax_rate' => 'finance',
             'reminder_interval_days' => 'finance',
+            'budget_alert_threshold' => 'finance',
+            'budget_alert_interval_days' => 'finance',
             'currency' => 'finance',
             'currency_symbol' => 'finance',
             'bank_account_name' => 'finance',

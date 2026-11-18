@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Expense;
 use App\Models\Project;
+use App\Models\Setting;
 use App\Models\TimeEntry;
 use App\Models\User;
 use App\Notifications\ProjectBudgetAlert;
@@ -12,14 +13,17 @@ use Illuminate\Support\Facades\Notification;
 
 class SendBudgetAlerts extends Command
 {
-    protected $signature = 'projects:budget-alerts {--threshold=90 : Alert when cost reaches this % of budget} {--days=7 : Minimum days between alerts per project}';
+    protected $signature = 'projects:budget-alerts {--threshold= : Alert when cost reaches this % of budget} {--days= : Minimum days between alerts per project}';
 
     protected $description = 'Notify project managers when project cost approaches or exceeds the budget';
 
     public function handle(): int
     {
-        $threshold = max(1, min(100, (int) $this->option('threshold')));
-        $days = max(1, (int) $this->option('days'));
+        $defaultThreshold = (int) (Setting::query()->where('key', 'budget_alert_threshold')->value('value') ?: 90);
+        $defaultDays = (int) (Setting::query()->where('key', 'budget_alert_interval_days')->value('value') ?: 7);
+
+        $threshold = max(1, min(100, (int) ($this->option('threshold') ?? $defaultThreshold)));
+        $days = max(1, (int) ($this->option('days') ?? $defaultDays));
 
         $expenses = Expense::query()
             ->where('status', 'approved')

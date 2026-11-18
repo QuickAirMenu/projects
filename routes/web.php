@@ -605,7 +605,17 @@ Route::post('/internal/budget-alerts', function (Request $request) {
 
     abort_if($expected === '' || ! hash_equals($expected, $given), 403);
 
-    Artisan::call('projects:budget-alerts');
+    $options = [];
+
+    if ($request->filled('threshold')) {
+        $options['--threshold'] = max(1, min(100, (int) $request->input('threshold')));
+    }
+
+    if ($request->filled('days')) {
+        $options['--days'] = max(1, min(365, (int) $request->input('days')));
+    }
+
+    Artisan::call('projects:budget-alerts', $options);
 
     return response(trim(Artisan::output()), 200)->header('Content-Type', 'text/plain');
 })->middleware('throttle:5,1');

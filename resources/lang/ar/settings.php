@@ -18,6 +18,8 @@ return [
     'bank_account_name' => 'اسم الحساب البنكي',
     'bank_iban' => 'رقم الآيبان',
     'reminder_interval_days' => 'الفاصل بين تذكيرات السداد (أيام)',
+    'budget_alert_threshold' => 'حد تنبيه الميزانية (%)',
+    'budget_alert_interval_days' => 'فاصل تنبيهات الميزانية (أيام)',
     'general_settings' => 'إعدادات عامة',
     'service_types' => 'أنواع الخدمات',
     'project_statuses' => 'حالات المشاريع',
