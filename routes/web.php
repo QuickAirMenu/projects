@@ -391,6 +391,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('backups', [BackupController::class, 'index'])->name('backups');
         Route::get('audit-log', [ActivityLogController::class, 'index'])->name('audit-log');
         Route::post('mail-test', [SettingController::class, 'testMail'])->name('mail-test');
+        Route::post('mail-connection', [SettingController::class, 'checkMailConnection'])->name('mail-connection');
         Route::post('backups/run', [BackupController::class, 'run'])->name('backups.run');
         Route::get('backups/{file}', [BackupController::class, 'download'])->where('file', '[A-Za-z0-9_.-]+')->name('backups.download');
         Route::get('/', [SettingController::class, 'index'])->name('index');
