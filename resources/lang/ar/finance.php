@@ -34,6 +34,8 @@ return [
     'add_item' => 'إضافة بند',
     'terms' => 'الشروط والأحكام',
     'recurring_invoices' => 'الفواتير المتكررة',
+    'new_quote' => 'عرض سعر جديد',
+    'quote_status_label' => 'حالة العرض',
     'zatca_qr' => 'رمز الاستجابة السريع (ZATCA)',
     'vat_number' => 'الرقم الضريبي',
     'invoice_uuid' => 'معرّف الفاتورة (UUID)',

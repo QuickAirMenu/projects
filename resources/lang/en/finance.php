@@ -34,6 +34,8 @@ return [
     'add_item' => 'Add item',
     'terms' => 'Terms & conditions',
     'recurring_invoices' => 'Recurring invoices',
+    'new_quote' => 'New quote',
+    'quote_status_label' => 'Quote status',
     'zatca_qr' => 'ZATCA QR code',
     'vat_number' => 'VAT number',
     'invoice_uuid' => 'Invoice UUID',
