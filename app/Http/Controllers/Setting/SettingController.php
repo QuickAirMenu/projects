@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\MailConfigService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
@@ -14,7 +16,53 @@ class SettingController extends Controller
     {
         $settings = Setting::all()->groupBy('group')->map(fn ($group) => $group->pluck('value', 'key'));
 
-        return view('settings.index', compact('settings'));
+        $host = trim((string) ($settings['mail']['mail_host'] ?? ''));
+        $testedAt = $settings['mail']['mail_test_at'] ?? null;
+        $mailStatus = [
+            'configured' => $host !== '',
+            'tested' => filled($testedAt),
+            'ok' => filled($testedAt) && ($settings['mail']['mail_test_ok'] ?? null) === '1',
+            'at' => $testedAt,
+            'error' => $settings['mail']['mail_test_error'] ?? null,
+        ];
+
+        return view('settings.index', compact('settings', 'mailStatus'));
+    }
+
+    public function testMail(Request $request)
+    {
+        app(MailConfigService::class)->applyDynamicMailConfig();
+
+        $recipient = Setting::query()->where('key', 'mail_from_address')->value('value')
+            ?: Setting::query()->where('key', 'company_email')->value('value')
+            ?: $request->user()?->email;
+
+        if (blank(config('mail.mailers.smtp.host'))) {
+            $this->recordMailTest(false, __('messages.mail_not_configured'));
+
+            return back()->with('error', __('messages.mail_not_configured'));
+        }
+
+        if (blank($recipient)) {
+            $this->recordMailTest(false, __('messages.mail_test_no_recipient'));
+
+            return back()->with('error', __('messages.mail_test_no_recipient'));
+        }
+
+        try {
+            Mail::raw(__('messages.mail_test_body'), function ($message) use ($recipient) {
+                $message->to($recipient)->subject(__('messages.mail_test_subject'));
+            });
+
+            $this->recordMailTest(true, null);
+
+            return back()->with('success', __('messages.mail_test_success', ['email' => $recipient]));
+        } catch (\Throwable $e) {
+            report($e);
+            $this->recordMailTest(false, mb_substr($e->getMessage(), 0, 500));
+
+            return back()->with('error', __('messages.mail_test_failed'));
+        }
     }
 
     public function update(Request $request)
@@ -91,5 +139,16 @@ class SettingController extends Controller
 
         return redirect()->route('settings.index')
             ->with('success', __('messages.updated_successfully'));
+    }
+
+    protected function recordMailTest(bool $ok, ?string $error): void
+    {
+        foreach ([
+            'mail_test_ok' => $ok ? '1' : '0',
+            'mail_test_at' => now()->toDateTimeString(),
+            'mail_test_error' => $error,
+        ] as $key => $value) {
+            Setting::updateOrCreate(['key' => $key], ['value' => $value, 'type' => 'string', 'group' => 'mail']);
+        }
     }
 }

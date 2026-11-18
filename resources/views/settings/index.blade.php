@@ -119,9 +119,28 @@
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-5 flex items-center gap-2">
-                <i class="fas fa-envelope text-purple-500"></i> {{ __('settings.mail_settings') }}
-            </h2>
+            <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-envelope text-purple-500"></i> {{ __('settings.mail_settings') }}
+                </h2>
+                @if($mailStatus['ok'])
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700" title="{{ __('messages.mail_test_last', ['at' => $mailStatus['at']]) }}">
+                    <i class="fas fa-circle-check"></i> {{ __('messages.mail_test_ok') }}
+                </span>
+                @elseif($mailStatus['tested'])
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700" title="{{ $mailStatus['error'] }}">
+                    <i class="fas fa-circle-xmark"></i> {{ __('messages.mail_test_failed_short') }}
+                </span>
+                @elseif($mailStatus['configured'])
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
+                    <i class="fas fa-circle-question"></i> {{ __('messages.mail_test_untested') }}
+                </span>
+                @else
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-500">
+                    <i class="fas fa-circle-info"></i> {{ __('messages.mail_test_unconfigured') }}
+                </span>
+                @endif
+            </div>
             <form action="{{ route('settings.update') }}" method="POST">
                 @csrf @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -153,9 +172,20 @@
                     </div>
                     @endforeach
                 </div>
-                <button type="submit" class="mt-5 bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2.5 rounded-xl transition text-sm">
-                    <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
+                <div class="mt-5 flex flex-wrap items-center gap-2">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2.5 rounded-xl transition text-sm">
+                        <i class="fas fa-save me-2"></i>{{ __('messages.save') }}
+                    </button>
+                </div>
+            </form>
+            <form action="{{ route('settings.mail-test') }}" method="POST" class="mt-3">
+                @csrf
+                <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-xl transition text-sm">
+                    <i class="fas fa-paper-plane me-2"></i>{{ __('messages.mail_test_button') }}
                 </button>
+                @if($mailStatus['tested'] && ! $mailStatus['ok'] && $mailStatus['error'])
+                <p class="mt-2 max-w-xl break-words text-xs text-red-500">{{ \Illuminate\Support\Str::limit($mailStatus['error'], 240) }}</p>
+                @endif
             </form>
         </div>
 
