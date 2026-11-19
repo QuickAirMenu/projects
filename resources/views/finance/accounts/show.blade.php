@@ -16,6 +16,7 @@
     </div>
     <div class="flex gap-2">
         <a href="{{ route('accounts.statement', ['account' => $account, 'from' => $filters['from'] ?? null, 'to' => $filters['to'] ?? null]) }}" class="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl text-sm"><i class="fas fa-file-pdf me-2"></i>{{ __('accounts.statement_pdf') }}</a>
+        <a href="{{ route('accounts.import.create', $account) }}" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm"><i class="fas fa-file-import me-2"></i>{{ __('accounts.import_title') }}</a>
         <a href="{{ route('accounts.export', $account) }}" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm"><i class="fas fa-file-csv me-2"></i>CSV</a>
         <a href="{{ route('accounts.edit', $account) }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm"><i class="fas fa-edit me-1"></i>{{ __('messages.edit') }}</a>
         @if($account->canDelete())
@@ -82,6 +83,20 @@
     </select>
     <button class="rounded-xl bg-gray-800 px-4 py-2 text-sm text-white">{{ __('messages.filter') }}</button>
 </form>
+
+@if(($imports ?? collect())->isNotEmpty())
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-4">
+    <div class="px-5 py-3 border-b border-gray-100 text-sm font-semibold text-gray-800">{{ __('accounts.import_history') }}</div>
+    <div class="divide-y divide-gray-100 text-sm">
+        @foreach($imports as $batch)
+        <div class="flex items-center justify-between px-5 py-2.5">
+            <span class="text-gray-600 truncate">{{ $batch->file_name }}</span>
+            <span class="text-xs text-gray-400">{{ $batch->created_at?->format('Y-m-d H:i') }} · {{ __('accounts.import_matched') }} {{ $batch->matched_count }} · {{ __('accounts.import_created') }} {{ $batch->created_count }}</span>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
 
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
     <table class="w-full text-sm">

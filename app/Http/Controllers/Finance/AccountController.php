@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\AccountTransaction;
+use App\Models\BankImport;
 use App\Models\Setting;
 use App\Services\TreasuryService;
 use Illuminate\Http\Request;
@@ -82,8 +83,11 @@ class AccountController extends Controller
 
         $baseCurrency = app(TreasuryService::class)->baseCurrency();
 
+        $imports = BankImport::where('account_id', $account->id)->latest()->limit(5)->get();
+
         return view('finance.accounts.show', [
             'account' => $account,
+            'imports' => $imports,
             'rows' => $withBalance,
             'balance' => $account->balance(),
             'baseBalance' => $account->baseBalance(),

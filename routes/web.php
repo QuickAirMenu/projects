@@ -16,6 +16,7 @@ use App\Http\Controllers\Client\ClientDocumentController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\Finance\AccountController;
+use App\Http\Controllers\Finance\BankImportController;
 use App\Http\Controllers\Finance\ContractController;
 use App\Http\Controllers\Finance\ExpenseController;
 use App\Http\Controllers\Finance\InvoiceController;
@@ -527,6 +528,9 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('{account}/transactions', [AccountController::class, 'storeTransaction'])->name('transactions.store');
         Route::post('{account}/transactions/{transaction}/reconcile', [AccountController::class, 'reconcile'])->name('reconcile');
         Route::get('{account}/transactions/{transaction}/attachment', [AccountController::class, 'downloadAttachment'])->name('attachment');
+        Route::get('{account}/import', [BankImportController::class, 'create'])->name('import.create');
+        Route::post('{account}/import/preview', [BankImportController::class, 'preview'])->name('import.preview');
+        Route::post('{account}/import/confirm', [BankImportController::class, 'confirm'])->name('import.confirm');
         Route::get('{account}/statement/pdf', [AccountController::class, 'statementPdf'])->name('statement');
         Route::get('{account}/export', [AccountController::class, 'export'])->name('export');
     });
