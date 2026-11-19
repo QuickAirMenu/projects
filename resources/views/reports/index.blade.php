@@ -35,6 +35,7 @@
         ['route' => 'reports.aging',        'label' => __('reports.aging_title'),       'desc' => __('reports.aging_hint'), 'icon' => 'fa-hourglass-half', 'color' => 'red'],
         ['route' => 'reports.profitability','label' => __('reports.profitability_title'), 'desc' => __('reports.profitability_hint'), 'icon' => 'fa-chart-pie', 'color' => 'teal'],
         ['route' => 'reports.wip', 'label' => __('reports.wip_title'), 'desc' => __('reports.wip_hint'), 'icon' => 'fa-hourglass-start', 'color' => 'indigo'],
+        ['route' => 'reports.team-payouts', 'label' => __('reports.team_payouts_title'), 'desc' => __('reports.team_payouts_hint'), 'icon' => 'fa-hand-holding-dollar', 'color' => 'pink'],
         ['route' => 'reports.performance', 'label' => __('messages.performance_report'),     'desc' => __('messages.team_performance'),'icon' => 'fa-tachometer-alt', 'color' => 'orange'],
     ] as $r)
     <a href="{{ route($r['route']) }}" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-{{ $r['color'] }}-200 transition group">

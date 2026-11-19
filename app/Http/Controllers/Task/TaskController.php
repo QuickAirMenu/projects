@@ -182,4 +182,22 @@ class TaskController extends Controller
 
         return view('tasks.timeline', compact('tasks'));
     }
+
+    public function payCost(Task $task)
+    {
+        $this->authorize('update', $task);
+
+        $task->forceFill(['cost_paid_at' => now()])->save();
+
+        return back()->with('success', __('task.cost_marked_paid'));
+    }
+
+    public function unpayCost(Task $task)
+    {
+        $this->authorize('update', $task);
+
+        $task->forceFill(['cost_paid_at' => null])->save();
+
+        return back()->with('success', __('task.cost_marked_unpaid'));
+    }
 }

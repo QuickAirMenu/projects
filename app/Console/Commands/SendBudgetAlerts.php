@@ -5,9 +5,9 @@ namespace App\Console\Commands;
 use App\Models\Expense;
 use App\Models\Project;
 use App\Models\Setting;
-use App\Models\TimeEntry;
 use App\Models\User;
 use App\Notifications\ProjectBudgetAlert;
+use App\Services\ProjectCostService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Notification;
 
@@ -31,10 +31,7 @@ class SendBudgetAlerts extends Command
             ->groupBy('project_id')
             ->pluck('total', 'project_id');
 
-        $labor = TimeEntry::query()
-            ->selectRaw('project_id, SUM(hours * hourly_rate) as labor')
-            ->groupBy('project_id')
-            ->pluck('labor', 'project_id');
+        $labor = app(ProjectCostService::class)->laborByProject();
 
         $projects = Project::with(['manager', 'client:id,name'])
             ->where('budget', '>', 0)

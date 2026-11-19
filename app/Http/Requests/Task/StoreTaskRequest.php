@@ -38,6 +38,7 @@ class StoreTaskRequest extends FormRequest
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
             'estimated_hours' => 'nullable|numeric|min:0',
+            'cost_amount' => 'nullable|numeric|min:0',
         ];
     }
 

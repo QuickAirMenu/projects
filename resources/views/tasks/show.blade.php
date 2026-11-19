@@ -148,6 +148,25 @@
             </div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.priority') }}</span><span class="font-medium">{{ __('project.priority_'.$task->priority) }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('task.assigned_to') }}</span><span class="font-medium">{{ $task->assignedUser?->name ?? '-' }}</span></div>
+            <div class="flex justify-between items-center"><span class="text-gray-500">{{ __('task.team_cost') }}</span><span class="font-medium">{{ $task->cost_amount !== null ? number_format((float) $task->cost_amount, 2) : '-' }}</span></div>
+            @if($task->cost_amount)
+            <div class="flex justify-between items-center">
+                <span class="text-gray-500">{{ __('reports.team_status') }}</span>
+                <span class="inline-flex items-center gap-2">
+                    @if($task->cost_paid_at)
+                    <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs text-emerald-700">{{ __('task.cost_paid') }} · {{ $task->cost_paid_at->format('Y-m-d') }}</span>
+                    @can('update', $task)
+                    <form action="{{ route('tasks.cost.unpay', $task) }}" method="POST">@csrf<button class="text-xs text-gray-400 hover:text-gray-600">{{ __('task.mark_unpaid') }}</button></form>
+                    @endcan
+                    @else
+                    <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700">{{ __('task.cost_unpaid') }}</span>
+                    @can('update', $task)
+                    <form action="{{ route('tasks.cost.pay', $task) }}" method="POST">@csrf<button class="text-xs text-emerald-600 hover:text-emerald-800"><i class="fas fa-check me-1"></i>{{ __('task.mark_paid') }}</button></form>
+                    @endcan
+                    @endif
+                </span>
+            </div>
+            @endif
             <div class="flex justify-between"><span class="text-gray-500">{{ __('task.start_date') }}</span><span class="font-medium">{{ $task->start_date?->format('Y-m-d') ?? '-' }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('task.due_date') }}</span>
                 <span class="font-medium {{ $task->due_date?->isPast() ? 'text-red-500' : '' }}">{{ $task->due_date?->format('Y-m-d') ?? '-' }}</span>

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Project;
-use App\Models\TimeEntry;
+use App\Services\ProjectCostService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -129,10 +129,7 @@ class AdvancedReportController extends Controller
             ->selectRaw('invoices.project_id as project_id, SUM(payments.amount) as collected')
             ->pluck('collected', 'project_id');
 
-        $laborByProject = TimeEntry::query()
-            ->selectRaw('project_id, SUM(hours * hourly_rate) as labor')
-            ->groupBy('project_id')
-            ->pluck('labor', 'project_id');
+        $laborByProject = app(ProjectCostService::class)->laborByProject();
 
         return [$collectedByProject, $laborByProject];
     }

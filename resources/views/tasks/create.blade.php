@@ -87,6 +87,16 @@
                 @error('estimated_hours')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ __('task.team_cost') }}
+                    <x-help :text="__('task.team_cost_help')" />
+                </label>
+                <input type="number" name="cost_amount" value="{{ old('cost_amount') }}" step="0.01" min="0"
+                       class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('cost_amount')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.description') }}</label>
                 <textarea name="description" rows="4"

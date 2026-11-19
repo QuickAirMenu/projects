@@ -37,6 +37,7 @@ use App\Http\Controllers\Report\PerformanceReportController;
 use App\Http\Controllers\Report\ProjectReportController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Report\TaskReportController;
+use App\Http\Controllers\Report\TeamPayoutController;
 use App\Http\Controllers\Report\WipReportController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Setting\SettingController;
@@ -297,6 +298,10 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('{task}/checklist', [TaskChecklistController::class, 'store'])->name('checklist.store');
         Route::put('checklist/{item}', [TaskChecklistController::class, 'update'])->name('checklist.update');
         Route::delete('checklist/{item}', [TaskChecklistController::class, 'destroy'])->name('checklist.destroy');
+        Route::post('{task}/cost/pay', [TaskController::class, 'payCost'])->name('cost.pay');
+        Route::post('{task}/cost/unpay', [TaskController::class, 'unpayCost'])->name('cost.unpay');
+        Route::post('{task}/cost/pay', [TaskController::class, 'payCost'])->name('cost.pay');
+        Route::post('{task}/cost/unpay', [TaskController::class, 'unpayCost'])->name('cost.unpay');
         Route::post('{task}/time-logs', [TimeLogController::class, 'store'])->name('time-logs.store');
         Route::delete('time-logs/{log}', [TimeLogController::class, 'destroy'])->name('time-logs.destroy');
     });
@@ -387,6 +392,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('aging', [AdvancedReportController::class, 'aging'])->name('aging');
         Route::get('aging/export', [AdvancedReportController::class, 'agingExport'])->name('aging.export');
         Route::get('profitability/export', [AdvancedReportController::class, 'profitabilityExport'])->name('profitability.export');
+        Route::get('team-payouts', [TeamPayoutController::class, 'index'])->name('team-payouts');
         Route::get('wip', [WipReportController::class, 'index'])->name('wip');
         Route::get('wip/export', [WipReportController::class, 'export'])->name('wip.export');
         Route::get('profitability', [AdvancedReportController::class, 'profitability'])->name('profitability');

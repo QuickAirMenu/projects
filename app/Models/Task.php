@@ -29,6 +29,8 @@ class Task extends Model
         'due_date',
         'estimated_hours',
         'actual_hours',
+        'cost_amount',
+        'cost_paid_at',
         'progress_percentage',
         'is_blocked',
         'blocked_reason',
@@ -46,6 +48,8 @@ class Task extends Model
         'due_date' => 'date',
         'estimated_hours' => 'decimal:2',
         'actual_hours' => 'decimal:2',
+        'cost_amount' => 'decimal:2',
+        'cost_paid_at' => 'datetime',
         'progress_percentage' => 'integer',
         'is_blocked' => 'boolean',
     ];
