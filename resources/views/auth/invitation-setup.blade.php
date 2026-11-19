@@ -22,6 +22,7 @@
 
     <title>إعداد الحساب</title>
     @vite(['resources/css/app.css'])
+    @include('partials.theme-head')
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
@@ -62,5 +63,6 @@
             </button>
         </form>
     </div>
+    @include('partials.theme-toggle')
 </body>
 </html>

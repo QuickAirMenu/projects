@@ -50,6 +50,11 @@
                 </a>
             </div>
 
+            <!-- Theme toggle -->
+            <button type="button" data-theme-toggle class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition" title="{{ __('messages.theme_toggle') }}">
+                <i class="fas fa-moon text-lg"></i>
+            </button>
+
             <!-- Notifications Bell -->
             <a href="{{ route('notifications.index') }}"
                id="notifications-bell"

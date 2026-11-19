@@ -40,7 +40,7 @@
             } catch (e) {}
         })();
     </script>
-    <link rel="stylesheet" href="{{ asset('css/dark.css?v=2') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark.css?v=3') }}">
 
     
     @stack('styles')
@@ -258,19 +258,23 @@
 
     <script>
         (function () {
-            const btn = document.getElementById('themeToggle');
-            if (!btn) return;
-            const label = btn.querySelector('[data-theme-label]');
-            const icon = btn.querySelector('i');
+            const buttons = Array.from(document.querySelectorAll('#themeToggle,[data-theme-toggle]'));
+            if (!buttons.length) return;
             function paint() {
                 const dark = document.documentElement.classList.contains('dark');
-                if (label) label.textContent = dark ? @json(__('messages.theme_light')) : @json(__('messages.theme_dark'));
-                if (icon) icon.className = dark ? 'fas fa-sun w-4 text-center text-gray-400' : 'fas fa-moon w-4 text-center text-gray-400';
+                buttons.forEach(function (btn) {
+                    const label = btn.querySelector('[data-theme-label]');
+                    const icon = btn.querySelector('i');
+                    if (label) label.textContent = dark ? @json(__('messages.theme_light')) : @json(__('messages.theme_dark'));
+                    if (icon) icon.className = dark ? 'fas fa-sun w-4 text-center' : 'fas fa-moon w-4 text-center';
+                });
             }
-            btn.addEventListener('click', function () {
-                const dark = document.documentElement.classList.toggle('dark');
-                try { localStorage.setItem('ip_theme', dark ? 'dark' : 'light'); } catch (e) {}
-                paint();
+            buttons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const dark = document.documentElement.classList.toggle('dark');
+                    try { localStorage.setItem('ip_theme', dark ? 'dark' : 'light'); } catch (e) {}
+                    paint();
+                });
             });
             paint();
         })();

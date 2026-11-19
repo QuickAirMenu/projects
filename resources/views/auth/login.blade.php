@@ -23,6 +23,7 @@
 
     <title>{{ __('auth.login') }} - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.theme-head')
 </head>
 <body class="antialiased bg-gradient-to-br from-primary-600 to-primary-800">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -117,5 +118,6 @@
 
         </div>
     </div>
+    @include('partials.theme-toggle')
 </body>
 </html>

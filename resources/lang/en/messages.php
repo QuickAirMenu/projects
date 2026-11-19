@@ -253,6 +253,7 @@ return [
     'mail_test_last' => 'Last tested: :at',
     'push_enable' => 'Browser notifications',
     'theme_dark' => 'Dark mode',
+    'theme_toggle' => 'Toggle dark/light mode',
     'theme_light' => 'Light mode',
     'push_enabled' => 'Browser notifications are enabled on this device.',
     'push_disabled' => 'Notifications disabled on this device.',

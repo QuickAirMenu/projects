@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/ip-32.png') }}">
     <title>{{ __('messages.2fa_challenge_title') }} - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.theme-head')
 </head>
 <body class="bg-gradient-to-br from-primary-700 to-primary-900">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -53,5 +54,6 @@
             </div>
         </div>
     </div>
+    @include('partials.theme-toggle')
 </body>
 </html>
