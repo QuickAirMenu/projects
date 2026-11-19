@@ -77,4 +77,9 @@ class Account extends Model
     {
         return $this->meta('icon', 'fa-circle');
     }
+
+    public function canDelete(): bool
+    {
+        return $this->transactions()->count() === 0;
+    }
 }

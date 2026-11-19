@@ -17,6 +17,16 @@
     <div class="flex gap-2">
         <a href="{{ route('accounts.export', $account) }}" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm"><i class="fas fa-file-csv me-2"></i>CSV</a>
         <a href="{{ route('accounts.edit', $account) }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm"><i class="fas fa-edit me-1"></i>{{ __('messages.edit') }}</a>
+        @if($account->canDelete())
+        <form action="{{ route('accounts.destroy', $account) }}" method="POST" onsubmit="return confirm('{{ __('accounts.confirm_delete') }}')">
+            @csrf @method('DELETE')
+            <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl text-sm"><i class="fas fa-trash me-1"></i>{{ __('messages.delete') }}</button>
+        </form>
+        @else
+        <span class="inline-flex items-center gap-1 rounded-xl bg-gray-50 px-3 py-2 text-xs text-gray-400" title="{{ __('accounts.cannot_delete') }}">
+            <i class="fas fa-lock"></i> {{ __('accounts.has_movements') }}
+        </span>
+        @endif
     </div>
 </div>
 
