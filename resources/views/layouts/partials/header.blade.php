@@ -69,10 +69,10 @@
 
             <!-- User Menu -->
             <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" class="flex items-center text-gray-700 hover:text-gray-900">
-                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-full {{ is_rtl() ? 'ml-2' : 'mr-2' }}">
-                    <span class="text-sm font-medium hidden md:block">{{ auth()->user()->name }}</span>
-                    <i class="fas fa-chevron-down text-xs {{ is_rtl() ? 'mr-2' : 'ml-2' }}"></i>
+                <button @click="open = !open" class="flex items-center gap-1 rounded-full p-0.5 text-gray-700 hover:text-gray-900 hover:ring-2 hover:ring-blue-100 transition"
+                        title="{{ auth()->user()->name }}" aria-label="{{ auth()->user()->name }}">
+                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-full">
+                    <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
                 </button>
 
                 <div x-show="open"
