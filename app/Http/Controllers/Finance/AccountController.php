@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\AccountTransaction;
+use App\Models\Setting;
 use App\Services\TreasuryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Mpdf\Mpdf;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AccountController extends Controller
@@ -22,7 +24,29 @@ class AccountController extends Controller
         $liabilitiesTotal = $accounts->filter(fn (Account $a) => $a->nature() === 'liability')->sum(fn (Account $a) => $a->baseBalance());
         $netTotal = $assetsTotal + $liabilitiesTotal;
 
-        return view('finance.accounts.index', compact('accounts', 'assetsTotal', 'liabilitiesTotal', 'netTotal', 'baseCurrency'));
+        $monthIn = (float) AccountTransaction::where('direction', 'in')
+            ->whereYear('transaction_date', now()->year)->whereMonth('transaction_date', now()->month)->sum('base_amount');
+        $monthOut = (float) AccountTransaction::where('direction', 'out')
+            ->whereYear('transaction_date', now()->year)->whereMonth('transaction_date', now()->month)->sum('base_amount');
+
+        $byCurrency = $accounts->groupBy('currency')->map(function ($group, $currency) {
+            return ['currency' => $currency, 'balance' => $group->sum(fn ($a) => $a->balance()), 'count' => $group->count()];
+        })->values();
+
+        $recent = AccountTransaction::with('account:id,name,currency')->latest('id')->limit(8)->get();
+
+        $chart = collect(range(5, 0))->map(function ($i) {
+            $start = now()->startOfMonth()->subMonths($i);
+            $in = (float) AccountTransaction::where('direction', 'in')
+                ->whereYear('transaction_date', $start->year)->whereMonth('transaction_date', $start->month)->sum('base_amount');
+            $out = (float) AccountTransaction::where('direction', 'out')
+                ->whereYear('transaction_date', $start->year)->whereMonth('transaction_date', $start->month)->sum('base_amount');
+
+            return ['label' => $start->format('Y-m'), 'in' => $in, 'out' => $out];
+        });
+        $chartMax = max(1, (float) $chart->max(fn ($m) => max($m['in'], $m['out'])));
+
+        return view('finance.accounts.index', compact('accounts', 'assetsTotal', 'liabilitiesTotal', 'netTotal', 'baseCurrency', 'monthIn', 'monthOut', 'byCurrency', 'recent', 'chart', 'chartMax'));
     }
 
     public function create()
@@ -164,6 +188,48 @@ class AccountController extends Controller
         $transaction->update(['reconciled_at' => $transaction->reconciled_at ? null : now()]);
 
         return back()->with('success', __('accounts.reconciled_updated'));
+    }
+
+    public function statementPdf(Request $request, Account $account)
+    {
+        $from = $request->filled('from') ? $request->date('from')->toDateString() : now()->startOfMonth()->toDateString();
+        $to = $request->filled('to') ? $request->date('to')->toDateString() : now()->toDateString();
+
+        $opening = (float) $account->opening_balance
+            + (float) $account->transactions()->whereDate('transaction_date', '<', $from)->where('direction', 'in')->sum('amount')
+            - (float) $account->transactions()->whereDate('transaction_date', '<', $from)->where('direction', 'out')->sum('amount');
+
+        $txs = $account->transactions()
+            ->whereDate('transaction_date', '>=', $from)
+            ->whereDate('transaction_date', '<=', $to)
+            ->orderBy('transaction_date')->orderBy('id')
+            ->get();
+
+        $running = $opening;
+        $rows = $txs->map(function ($tx) use (&$running) {
+            $running += $tx->direction === 'in' ? (float) $tx->amount : -(float) $tx->amount;
+
+            return ['tx' => $tx, 'balance' => $running];
+        });
+
+        $totalIn = (float) $txs->where('direction', 'in')->sum('amount');
+        $totalOut = (float) $txs->where('direction', 'out')->sum('amount');
+        $closing = $opening + $totalIn - $totalOut;
+
+        $settings = Setting::whereIn('key', [
+            'company_name', 'company_name_ar', 'company_logo', 'company_email', 'company_phone', 'company_address', 'currency_symbol',
+        ])->pluck('value', 'key')->toArray();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8', 'format' => 'A4', 'default_font' => 'dejavusans',
+            'autoScriptToLang' => true, 'autoLangToFont' => true,
+        ]);
+        $mpdf->WriteHTML(view('pdf.account-statement', compact('account', 'rows', 'opening', 'closing', 'totalIn', 'totalOut', 'from', 'to', 'settings'))->render());
+
+        return response($mpdf->Output('statement-'.$account->id.'-'.$from.'_'.$to.'.pdf', 'S'), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="statement-'.$account->id.'-'.$from.'_'.$to.'.pdf"',
+        ]);
     }
 
     public function export(Account $account): StreamedResponse

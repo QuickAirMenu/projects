@@ -15,6 +15,7 @@
         </div>
     </div>
     <div class="flex gap-2">
+        <a href="{{ route('accounts.statement', ['account' => $account, 'from' => $filters['from'] ?? null, 'to' => $filters['to'] ?? null]) }}" class="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl text-sm"><i class="fas fa-file-pdf me-2"></i>{{ __('accounts.statement_pdf') }}</a>
         <a href="{{ route('accounts.export', $account) }}" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm"><i class="fas fa-file-csv me-2"></i>CSV</a>
         <a href="{{ route('accounts.edit', $account) }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm"><i class="fas fa-edit me-1"></i>{{ __('messages.edit') }}</a>
         @if($account->canDelete())

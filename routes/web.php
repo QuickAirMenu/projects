@@ -527,6 +527,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('{account}/transactions', [AccountController::class, 'storeTransaction'])->name('transactions.store');
         Route::post('{account}/transactions/{transaction}/reconcile', [AccountController::class, 'reconcile'])->name('reconcile');
         Route::get('{account}/transactions/{transaction}/attachment', [AccountController::class, 'downloadAttachment'])->name('attachment');
+        Route::get('{account}/statement/pdf', [AccountController::class, 'statementPdf'])->name('statement');
         Route::get('{account}/export', [AccountController::class, 'export'])->name('export');
     });
 
