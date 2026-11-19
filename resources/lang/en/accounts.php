@@ -10,6 +10,7 @@ return [
     'type' => 'Type',
     'type_bank' => 'Bank',
     'type_cash' => 'Cash',
+    'type_wallet' => 'Digital wallet',
     'currency' => 'Currency',
     'exchange_rate' => 'Rate to base currency',
     'exchange_rate_hint' => 'How much of the base currency equals 1 unit of this account currency.',

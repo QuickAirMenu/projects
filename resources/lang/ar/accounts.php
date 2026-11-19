@@ -10,6 +10,7 @@ return [
     'type' => 'النوع',
     'type_bank' => 'بنكي',
     'type_cash' => 'نقدي',
+    'type_wallet' => 'محفظة إلكترونية',
     'currency' => 'العملة',
     'exchange_rate' => 'سعر التحويل للعملة الأساسية',
     'exchange_rate_hint' => 'كم من العملة الأساسية يساوي 1 من عملة الحساب.',

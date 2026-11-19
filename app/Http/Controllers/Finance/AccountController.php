@@ -161,7 +161,7 @@ class AccountController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'type' => ['required', 'in:bank,cash'],
+            'type' => ['required', 'in:bank,cash,wallet'],
             'currency' => ['required', 'string', 'size:3'],
             'bank_name' => ['nullable', 'string', 'max:120'],
             'account_number' => ['nullable', 'string', 'max:60'],
