@@ -81,7 +81,7 @@
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
             {{ __('finance.tax') }} %
-            <i class="fas fa-circle-question text-gray-400 cursor-help" title="{{ __('finance.tax_help') }}"></i>
+            <x-help :text="__('finance.tax_help')" />
         </label>
         <input type="number" name="tax_percentage" value="{{ old('tax_percentage', $isEdit ? $quoteModel?->tax_percentage : 15) }}" step="0.01" min="0" max="100"
                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500" id="taxInput">
@@ -90,7 +90,7 @@
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
             {{ __('finance.discount') }}
-            <i class="fas fa-circle-question text-gray-400 cursor-help" title="{{ __('finance.discount_help') }}"></i>
+            <x-help :text="__('finance.discount_help')" />
         </label>
         <div class="flex gap-2">
             <select name="discount_type" id="discountType" class="border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">

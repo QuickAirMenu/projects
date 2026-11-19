@@ -29,7 +29,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ __('users.role') }} *
-                    <i class="fas fa-circle-question text-gray-400 cursor-help" title="{{ __('users.role_help') }}"></i>
+                    <x-help :text="__('users.role_help')" />
                 </label>
                 <select name="role" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">-- {{ __('users.select_role') }} --</option>

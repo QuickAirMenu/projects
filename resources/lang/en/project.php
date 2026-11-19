@@ -18,6 +18,7 @@ return [
     'budget' => 'Budget',
     'contract_value' => 'Contract value / expected revenue',
     'contract_value_help' => 'Agreed value with the client (excl. tax) — compared against invoices.',
+    'cost_budget_help' => 'Cost ceiling (approved expenses + labor cost) — used for budget-overrun alerts.',
     'cost_budget' => 'Cost budget',
     'actual_cost' => 'Actual Cost',
     'payment_status' => 'Payment Status',
