@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Account extends Model
 {
+    public const TYPES = [
+        'bank', 'cash', 'wallet', 'payment_gateway', 'credit_card',
+        'petty_cash', 'escrow', 'investment', 'loan', 'other',
+    ];
+
     protected $fillable = [
         'name', 'type', 'currency', 'bank_name', 'account_number', 'iban',
         'opening_balance', 'exchange_rate_to_base', 'is_active', 'notes', 'created_by',

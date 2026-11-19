@@ -23,6 +23,8 @@ class UpdateTaskRequest extends FormRequest
             'due_date' => 'nullable|date',
             'estimated_hours' => 'nullable|numeric|min:0',
             'cost_amount' => 'nullable|numeric|min:0',
+            'cost_currency' => 'nullable|string|size:3',
+            'cost_exchange_rate' => 'nullable|numeric|min:0.000001',
             'progress_percentage' => 'nullable|integer|min:0|max:100',
             'is_blocked' => 'boolean',
             'blocked_reason' => 'nullable|string|max:500',

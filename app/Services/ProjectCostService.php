@@ -17,7 +17,7 @@ class ProjectCostService
     {
         $taskCosts = Task::query()
             ->whereNotNull('cost_amount')
-            ->selectRaw('project_id, SUM(cost_amount) as cost')
+            ->selectRaw('project_id, SUM(cost_amount * COALESCE(cost_exchange_rate, 1)) as cost')
             ->groupBy('project_id')
             ->pluck('cost', 'project_id');
 

@@ -39,6 +39,8 @@ class StoreTaskRequest extends FormRequest
             'due_date' => 'nullable|date',
             'estimated_hours' => 'nullable|numeric|min:0',
             'cost_amount' => 'nullable|numeric|min:0',
+            'cost_currency' => 'nullable|string|size:3',
+            'cost_exchange_rate' => 'nullable|numeric|min:0.000001',
         ];
     }
 

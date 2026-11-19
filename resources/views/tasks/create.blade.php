@@ -97,6 +97,21 @@
                 @error('cost_amount')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('task.cost_currency') }}</label>
+                    <select name="cost_currency" class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm">
+                        @foreach(['SAR','EGP','USD','AED'] as $cur)
+                        <option value="{{ $cur }}" @selected(old('cost_currency', workspace_config('currency') ?: 'SAR') === $cur)>{{ $cur }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('task.cost_rate') }}</label>
+                    <input type="number" step="0.000001" min="0.000001" name="cost_exchange_rate" value="{{ old('cost_exchange_rate', 1) }}" class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm">
+                </div>
+            </div>
+
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.description') }}</label>
                 <textarea name="description" rows="4"

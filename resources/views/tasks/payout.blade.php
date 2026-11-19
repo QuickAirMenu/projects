@@ -6,7 +6,7 @@
     <a href="{{ url()->previous() }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm"><i class="fas fa-arrow-{{ is_rtl() ? 'right' : 'left' }}"></i></a>
     <div>
         <h1 class="text-2xl font-bold text-gray-800">{{ __('task.payout_title') }}</h1>
-        <p class="text-sm text-gray-500">{{ $task->title }} · {{ number_format((float) $task->cost_amount, 2) }} {{ $task->cost_currency ?: $baseCurrency }}</p>
+        <p class="text-sm text-gray-500">{{ $task->title }} · {{ number_format((float) $task->cost_amount, 2) }} {{ $task->cost_currency ?: $baseCurrency }} (≈ {{ number_format((float) $task->cost_amount * (float) ($task->cost_exchange_rate ?: 1), 2) }} {{ $baseCurrency }})</p>
     </div>
 </div>
 
@@ -32,7 +32,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('accounts.exchange_rate') }}</label>
-            <input name="exchange_rate" type="number" step="0.000001" min="0.000001" value="{{ old('exchange_rate', 1) }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
+            <input name="exchange_rate" type="number" step="0.000001" min="0.000001" value="{{ old('exchange_rate', $task->cost_exchange_rate ?: 1) }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
             <p class="mt-1 text-[11px] text-gray-400">{{ __('accounts.payout_rate_hint') }}</p>
         </div>
         <div>

@@ -31,6 +31,9 @@ class Task extends Model
         'actual_hours',
         'cost_amount',
         'cost_paid_at',
+        'cost_currency',
+        'cost_exchange_rate',
+        'paid_account_id',
         'progress_percentage',
         'is_blocked',
         'blocked_reason',
@@ -50,6 +53,7 @@ class Task extends Model
         'actual_hours' => 'decimal:2',
         'cost_amount' => 'decimal:2',
         'cost_paid_at' => 'datetime',
+        'cost_exchange_rate' => 'decimal:6',
         'progress_percentage' => 'integer',
         'is_blocked' => 'boolean',
     ];

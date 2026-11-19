@@ -21,8 +21,8 @@ class TeamPayoutController extends Controller
             ->when($request->input('status') !== 'paid' && $request->input('status') !== 'all', fn ($q) => $q->whereNull('cost_paid_at'));
 
         $totals = [
-            'unpaid' => Task::whereNotNull('cost_amount')->whereNull('cost_paid_at')->sum('cost_amount'),
-            'paid' => Task::whereNotNull('cost_amount')->whereNotNull('cost_paid_at')->sum('cost_amount'),
+            'unpaid' => (float) Task::whereNotNull('cost_amount')->whereNull('cost_paid_at')->selectRaw('SUM(cost_amount * COALESCE(cost_exchange_rate,1)) as total')->value('total'),
+            'paid' => (float) Task::whereNotNull('cost_amount')->whereNotNull('cost_paid_at')->selectRaw('SUM(cost_amount * COALESCE(cost_exchange_rate,1)) as total')->value('total'),
             'count' => (clone $query)->count(),
         ];
 

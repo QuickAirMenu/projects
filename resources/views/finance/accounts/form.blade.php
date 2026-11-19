@@ -18,9 +18,9 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('accounts.type') }}</label>
             <select name="type" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
-                <option value="bank" @selected(old('type', $account->type) === 'bank')>{{ __('accounts.type_bank') }}</option>
-                <option value="cash" @selected(old('type', $account->type) === 'cash')>{{ __('accounts.type_cash') }}</option>
-                <option value="wallet" @selected(old('type', $account->type) === 'wallet')>{{ __('accounts.type_wallet') }}</option>
+                @foreach(\App\Models\Account::TYPES as $accountType)
+                <option value="{{ $accountType }}" @selected(old('type', $account->type) === $accountType)>{{ __('accounts.type_'.$accountType) }}</option>
+                @endforeach
             </select>
         </div>
         <div>

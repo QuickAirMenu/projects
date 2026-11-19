@@ -14,6 +14,8 @@ return [
     'due_date' => 'Due Date',
     'estimated_hours' => 'Estimated Hours',
     'team_cost' => 'Team cost (payout)',
+    'cost_currency' => 'Cost currency',
+    'cost_rate' => 'Rate to base currency',
     'team_cost_help' => 'Amount payable to the task assignee in the system currency — used in project P&L and team payouts.',
     'cost_paid' => 'Paid',
     'cost_unpaid' => 'Unpaid',

@@ -148,7 +148,7 @@
             </div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('project.priority') }}</span><span class="font-medium">{{ __('project.priority_'.$task->priority) }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">{{ __('task.assigned_to') }}</span><span class="font-medium">{{ $task->assignedUser?->name ?? '-' }}</span></div>
-            <div class="flex justify-between items-center"><span class="text-gray-500">{{ __('task.team_cost') }}</span><span class="font-medium">{{ $task->cost_amount !== null ? number_format((float) $task->cost_amount, 2) : '-' }}</span></div>
+            <div class="flex justify-between items-center"><span class="text-gray-500">{{ __('task.team_cost') }}</span><span class="font-medium">{{ $task->cost_amount !== null ? number_format((float) $task->cost_amount, 2).' '.($task->cost_currency ?: '') : '-' }}</span></div>
             @if($task->cost_amount)
             <div class="flex justify-between items-center">
                 <span class="text-gray-500">{{ __('reports.team_status') }}</span>

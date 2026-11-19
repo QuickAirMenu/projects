@@ -66,7 +66,7 @@
                 <td class="px-4 py-3 text-gray-800">{{ $task->assignedUser?->name ?? '-' }}</td>
                 <td class="px-4 py-3"><a href="{{ route('tasks.show', $task) }}" class="text-gray-700 hover:text-blue-600">{{ $task->title }}</a></td>
                 <td class="px-4 py-3 text-gray-600">{{ $task->project?->name ?? '-' }}</td>
-                <td class="px-4 py-3 text-end font-medium">{{ number_format((float) $task->cost_amount, 2) }}</td>
+                <td class="px-4 py-3 text-end font-medium">{{ number_format((float) $task->cost_amount, 2) }} {{ $task->cost_currency ?: '' }}<span class="block text-[11px] text-gray-400">≈ {{ number_format((float) $task->cost_amount * (float) ($task->cost_exchange_rate ?: 1), 2) }}</span></td>
                 <td class="px-4 py-3">
                     @if($task->cost_paid_at)
                     <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs text-emerald-700">{{ __('task.cost_paid') }}</span>
