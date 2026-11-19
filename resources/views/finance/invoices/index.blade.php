@@ -9,6 +9,11 @@
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-2xl font-bold text-gray-800">{{ __('finance.invoices') }}</h1>
     <div class="flex gap-2">
+        @can('create-invoices')
+        <a href="{{ route('recurring-invoices.index') }}" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium">
+            <i class="fas fa-rotate me-2"></i>{{ __('finance.recurring_invoices') }}
+        </a>
+        @endcan
         @if(app()->isLocale('ar'))
         <a href="{{ route('exports.invoices') }}" class="btn-success flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition font-medium" title="{{ __('common.export_invoices') }}">
             <i class="fas fa-file-excel"></i>

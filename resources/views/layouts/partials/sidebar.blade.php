@@ -45,6 +45,10 @@
                     <i class="fas fa-chart-line w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
                     <span>{{ __('project.timeline') }}</span>
                 </a>
+                <a href="{{ route('time-entries.index') }}" class="sidebar-link text-sm {{ request()->routeIs('time-entries.*') ? 'active' : '' }}">
+                    <i class="fas fa-clock w-5 text-center {{ is_rtl() ? 'ml-2' : 'mr-2' }}"></i>
+                    <span>{{ __('time.timesheets') }}</span>
+                </a>
             </div>
         </div>
         @endcan
@@ -93,12 +97,6 @@
                     <span>{{ __('common.quotes') }}</span>
                 </a>
                 @endcan
-                @can('create-invoices')
-                <a href="{{ route('recurring-invoices.index') }}" class="sidebar-link {{ request()->routeIs('recurring-invoices.*') ? 'active' : '' }}">
-                    <i class="fas fa-rotate w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
-                    <span>{{ __('finance.recurring_invoices') }}</span>
-                </a>
-                @endcan
                 @can('view-invoices')
                 <a href="{{ route('invoices.index') }}" class="sidebar-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
                     <i class="fas fa-receipt w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
@@ -106,18 +104,6 @@
                 </a>
                 @endcan
                 @can('view-payments')
-                @can('view-projects')
-                <a href="{{ route('time-entries.index') }}" class="sidebar-link {{ request()->routeIs('time-entries.*') ? 'active' : '' }}">
-                    <i class="fas fa-clock w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
-                    <span>{{ __('time.timesheets') }}</span>
-                </a>
-                @endcan
-                @can('view-payments')
-                <a href="{{ route('accounts.index') }}" class="sidebar-link {{ request()->routeIs('accounts.*') ? 'active' : '' }}">
-                    <i class="fas fa-building-columns w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
-                    <span>{{ __('accounts.title') }}</span>
-                </a>
-                @endcan
                 @can('view-expenses')
                 <a href="{{ route('expenses.index') }}" class="sidebar-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
                     <i class="fas fa-wallet w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
@@ -127,6 +113,12 @@
                 <a href="{{ route('payments.index') }}" class="sidebar-link {{ request()->routeIs('payments.*') ? 'active' : '' }}">
                     <i class="fas fa-money-bill-wave w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
                     <span>{{ __('common.payments') }}</span>
+                </a>
+                @endcan
+                @can('view-payments')
+                <a href="{{ route('accounts.index') }}" class="sidebar-link {{ request()->routeIs('accounts.*') ? 'active' : '' }}">
+                    <i class="fas fa-building-columns w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                    <span>{{ __('accounts.title') }}</span>
                 </a>
                 @endcan
                 @can('view-contracts')
