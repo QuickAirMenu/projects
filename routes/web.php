@@ -526,6 +526,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::delete('{account}', [AccountController::class, 'destroy'])->name('destroy');
         Route::post('{account}/transactions', [AccountController::class, 'storeTransaction'])->name('transactions.store');
         Route::post('{account}/transactions/{transaction}/reconcile', [AccountController::class, 'reconcile'])->name('reconcile');
+        Route::get('{account}/transactions/{transaction}/attachment', [AccountController::class, 'downloadAttachment'])->name('attachment');
         Route::get('{account}/export', [AccountController::class, 'export'])->name('export');
     });
 

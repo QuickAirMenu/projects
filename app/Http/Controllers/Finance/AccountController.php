@@ -8,6 +8,7 @@ use App\Models\AccountTransaction;
 use App\Services\TreasuryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AccountController extends Controller
@@ -99,7 +100,14 @@ class AccountController extends Controller
             'exchange_rate' => ['nullable', 'numeric', 'min:0.000001'],
             'category' => ['required', 'in:client_payment,team_payout,expense,transfer,adjustment,other'],
             'description' => ['nullable', 'string', 'max:300'],
+            'attachment' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:10240'],
         ]);
+
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $data['attachment_path'] = $file->store('accounts/'.$account->id, 'private');
+            $data['attachment_name'] = $file->getClientOriginalName();
+        }
 
         $treasury->record($account, $data + ['exchange_rate' => $data['exchange_rate'] ?? $account->exchange_rate_to_base]);
 
@@ -117,15 +125,34 @@ class AccountController extends Controller
             'from_account_id' => ['required', 'exists:accounts,id'],
             'to_account_id' => ['required', 'exists:accounts,id', 'different:from_account_id'],
             'amount_out' => ['required', 'numeric', 'min:0.01'],
-            'amount_in' => ['required', 'numeric', 'min:0.01'],
+            'amount_in' => ['nullable', 'numeric', 'min:0.01'],
+            'rate' => ['nullable', 'numeric', 'min:0.000001'],
             'transaction_date' => ['required', 'date'],
             'description' => ['nullable', 'string', 'max:300'],
+            'attachment' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:10240'],
         ]);
+
+        $attachment = null;
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $attachment = [
+                'path' => $file->store('accounts/'.$data['from_account_id'], 'private'),
+                'name' => $file->getClientOriginalName(),
+            ];
+        }
+
+        if (! empty($data['rate'])) {
+            $data['amount_in'] = round((float) $data['amount_out'] * (float) $data['rate'], 2);
+        }
+
+        if (empty($data['amount_in'])) {
+            return back()->withInput()->withErrors(['amount_in' => __('accounts.rate_or_amount_required')]);
+        }
 
         $from = Account::findOrFail($data['from_account_id']);
         $to = Account::findOrFail($data['to_account_id']);
 
-        $treasury->transfer($from, $to, (float) $data['amount_out'], (float) $data['amount_in'], $data['transaction_date'], $data['description'] ?? null);
+        $treasury->transfer($from, $to, (float) $data['amount_out'], (float) $data['amount_in'], $data['transaction_date'], $data['description'] ?? null, $attachment);
 
         return redirect()->route('accounts.show', $to)->with('success', __('accounts.transferred'));
     }
@@ -158,6 +185,17 @@ class AccountController extends Controller
 
             fclose($out);
         }, 'account-'.$account->id.'-'.now()->format('Ymd').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    public function downloadAttachment(Account $account, AccountTransaction $transaction)
+    {
+        abort_unless((int) $transaction->account_id === (int) $account->id, 404);
+        abort_unless($transaction->attachment_path && Storage::disk('private')->exists($transaction->attachment_path), 404);
+
+        return Storage::disk('private')->download(
+            $transaction->attachment_path,
+            $transaction->attachment_name ?: 'attachment'
+        );
     }
 
     protected function validated(Request $request): array

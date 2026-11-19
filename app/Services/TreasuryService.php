@@ -37,13 +37,15 @@ class TreasuryService
             'reference_type' => $data['reference_type'] ?? null,
             'reference_id' => $data['reference_id'] ?? null,
             'transfer_group' => $data['transfer_group'] ?? null,
+            'attachment_path' => $data['attachment_path'] ?? null,
+            'attachment_name' => $data['attachment_name'] ?? null,
             'created_by' => Auth::id(),
         ]);
     }
 
-    public function transfer(Account $from, Account $to, float $amountOut, float $amountIn, string $date, ?string $description = null): void
+    public function transfer(Account $from, Account $to, float $amountOut, float $amountIn, string $date, ?string $description = null, ?array $attachment = null): void
     {
-        DB::transaction(function () use ($from, $to, $amountOut, $amountIn, $date, $description) {
+        DB::transaction(function () use ($from, $to, $amountOut, $amountIn, $date, $description, $attachment) {
             $group = (string) Str::uuid();
 
             $this->record($from, [
@@ -51,6 +53,8 @@ class TreasuryService
                 'exchange_rate' => $from->exchange_rate_to_base,
                 'category' => 'transfer', 'description' => $description ?: __('accounts.transfer_to', ['account' => $to->name]),
                 'transfer_group' => $group,
+                'attachment_path' => $attachment['path'] ?? null,
+                'attachment_name' => $attachment['name'] ?? null,
             ]);
 
             $this->record($to, [

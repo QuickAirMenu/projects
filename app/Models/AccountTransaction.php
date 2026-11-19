@@ -9,7 +9,7 @@ class AccountTransaction extends Model
     protected $fillable = [
         'account_id', 'transaction_date', 'direction', 'amount', 'currency', 'exchange_rate',
         'base_amount', 'category', 'description', 'reference_type', 'reference_id',
-        'transfer_group', 'reconciled_at', 'created_by',
+        'transfer_group', 'reconciled_at', 'created_by', 'attachment_path', 'attachment_name',
     ];
 
     protected $casts = [

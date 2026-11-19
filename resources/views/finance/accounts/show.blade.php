@@ -41,7 +41,7 @@
     </div>
 </div>
 
-<form action="{{ route('accounts.transactions.store', $account) }}" method="POST" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-5 grid grid-cols-2 md:grid-cols-6 gap-2 items-end">
+<form action="{{ route('accounts.transactions.store', $account) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-5 grid grid-cols-2 md:grid-cols-6 gap-2 items-end">
     @csrf
     <div>
         <label class="text-xs text-gray-500">{{ __('accounts.direction') }}</label>
@@ -68,7 +68,8 @@
         <input name="exchange_rate" type="number" step="0.000001" min="0.000001" value="{{ $account->exchange_rate_to_base }}" class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm">
     </div>
     <button class="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">{{ __('accounts.add_movement') }}</button>
-    <input name="description" placeholder="{{ __('accounts.description') }}" class="col-span-2 md:col-span-6 rounded-xl border border-gray-300 px-3 py-2 text-sm">
+    <input name="description" placeholder="{{ __('accounts.description') }}" class="col-span-2 md:col-span-4 rounded-xl border border-gray-300 px-3 py-2 text-sm">
+    <input type="file" name="attachment" accept=".pdf,.jpg,.jpeg,.png,.webp" class="col-span-2 rounded-xl border border-gray-300 px-3 py-2 text-sm">
 </form>
 
 <form method="GET" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 mb-4 flex flex-wrap gap-2">
@@ -99,7 +100,12 @@
             @php $tx = $row['tx']; @endphp
             <tr class="{{ $tx->reconciled_at ? 'bg-emerald-50/40' : '' }}">
                 <td class="px-3 py-2 whitespace-nowrap text-gray-600">{{ $tx->transaction_date?->format('Y-m-d') }}</td>
-                <td class="px-3 py-2 text-gray-700">{{ $tx->description ?? '-' }}</td>
+                <td class="px-3 py-2 text-gray-700">
+                    {{ $tx->description ?? '-' }}
+                    @if($tx->attachment_path)
+                    <a href="{{ route('accounts.attachment', [$account, $tx]) }}" class="ms-1 text-blue-600" title="{{ $tx->attachment_name }}"><i class="fas fa-paperclip"></i></a>
+                    @endif
+                </td>
                 <td class="px-3 py-2 text-xs text-gray-500">{{ __('accounts.cat_'.$tx->category) }}</td>
                 <td class="px-3 py-2 text-end text-emerald-600">{{ $tx->direction === 'in' ? number_format($tx->amount, 2) : '-' }}</td>
                 <td class="px-3 py-2 text-end text-red-500">{{ $tx->direction === 'out' ? number_format($tx->amount, 2) : '-' }}</td>
