@@ -37,6 +37,7 @@ use App\Http\Controllers\Report\PerformanceReportController;
 use App\Http\Controllers\Report\ProjectReportController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Report\TaskReportController;
+use App\Http\Controllers\Report\WipReportController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Setting\SettingController;
 use App\Http\Controllers\Settings\ActivityLogController;
@@ -386,6 +387,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('aging', [AdvancedReportController::class, 'aging'])->name('aging');
         Route::get('aging/export', [AdvancedReportController::class, 'agingExport'])->name('aging.export');
         Route::get('profitability/export', [AdvancedReportController::class, 'profitabilityExport'])->name('profitability.export');
+        Route::get('wip', [WipReportController::class, 'index'])->name('wip');
+        Route::get('wip/export', [WipReportController::class, 'export'])->name('wip.export');
         Route::get('profitability', [AdvancedReportController::class, 'profitability'])->name('profitability');
         Route::get('performance', [PerformanceReportController::class, 'index'])->name('performance');
     });
