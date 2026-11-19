@@ -29,6 +29,8 @@ use Illuminate\View\ViewServiceProvider;
 
 return [
     'name' => env('APP_NAME', 'Laravel'),
+    'version' => env('APP_VERSION', '1.1.0'),
+    'build' => env('APP_BUILD'),
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
