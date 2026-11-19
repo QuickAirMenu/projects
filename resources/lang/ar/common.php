@@ -51,6 +51,7 @@ return [
     'password_updated' => 'تم تحديث كلمة المرور بنجاح',
     'wrong_current_password' => 'كلمة المرور الحالية غير صحيحة',
     'privacy_mode' => 'وضع الخصوصية',
+    'language' => 'اللغة',
     'privacy_on' => 'وضع الخصوصية مفعل',
     'privacy_off' => 'وضع الخصوصية معطل',
     'unauthorized' => 'غير مصرح لك بهذا الإجراء',

@@ -51,6 +51,7 @@ return [
     'password_updated' => 'Password updated successfully',
     'wrong_current_password' => 'The current password is incorrect',
     'privacy_mode' => 'Privacy Mode',
+    'language' => 'Language',
     'privacy_on' => 'Privacy mode is on',
     'privacy_off' => 'Privacy mode is off',
     'unauthorized' => 'You are not authorized to perform this action',
