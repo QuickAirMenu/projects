@@ -32,7 +32,7 @@ class DarkModeDeepTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('dark.css?v=4', false)
+            ->assertSee('dark.css?v=5', false)
             ->assertSee('data-theme-toggle', false)
             ->assertSee('id="themeToggle"', false);
     }

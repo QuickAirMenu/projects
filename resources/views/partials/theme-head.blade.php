@@ -7,4 +7,4 @@
         } catch (e) {}
     })();
 </script>
-<link rel="stylesheet" href="{{ asset('css/dark.css?v=4') }}">
+<link rel="stylesheet" href="{{ asset('css/dark.css?v=5') }}">

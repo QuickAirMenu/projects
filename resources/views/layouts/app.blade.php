@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" dir="{{ is_rtl() ? 'rtl' : 'ltr' }}">
 <head>
+    <script id="ip_privacy_boot">try{if(localStorage.getItem('privacyMode')==='on'){document.documentElement.classList.add('privacy-on');}}catch(e){}</script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -40,7 +41,7 @@
             } catch (e) {}
         })();
     </script>
-    <link rel="stylesheet" href="{{ asset('css/dark.css?v=4') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark.css?v=5') }}">
 
     
     @stack('styles')
@@ -279,5 +280,48 @@
             paint();
         })();
     </script>
+<script type="module">
+    (function () {
+        function autoMask() {
+            var skip = 'script,style,input,select,textarea,option,canvas,svg,pre,code,button';
+            var re = /^(?=.*[\d\u0660-\u0669])[\d\u0660-\u0669\s.,:%+\-—–()\/]*(\s?(SAR|EGP|USD|AED|ر\.س|ج\.م|ريال|جنيه|درهم))?$/u;
+
+            document.querySelectorAll('td, th, p, span, div, a, strong, li, h1, h2, h3, h4, dd, dt').forEach(function (el) {
+                if (el.children.length > 0 || el.closest(skip)) return;
+                var text = (el.textContent || '').trim();
+                if (text.length < 2 || text.length > 60) return;
+                if (re.test(text)) el.classList.add('privacy-mask-js');
+            });
+        }
+
+        window.togglePrivacy = function () {
+            var on = !document.documentElement.classList.contains('privacy-on');
+            document.documentElement.classList.toggle('privacy-on', on);
+            document.body.classList.toggle('privacy-on', on);
+            try { localStorage.setItem('privacyMode', on ? 'on' : 'off'); } catch (e) {}
+            var icon = document.getElementById('privacyIcon');
+            if (icon) icon.className = on ? 'fas fa-eye-slash w-4 text-center text-amber-500' : 'fas fa-eye w-4 text-center text-gray-400';
+            if (on) autoMask();
+        };
+
+        function boot() {
+            var on = false;
+            try { on = localStorage.getItem('privacyMode') === 'on'; } catch (e) {}
+            if (on) {
+                document.documentElement.classList.add('privacy-on');
+                document.body.classList.add('privacy-on');
+                autoMask();
+                var icon = document.getElementById('privacyIcon');
+                if (icon) icon.className = 'fas fa-eye-slash w-4 text-center text-amber-500';
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+    })();
+</script>
 </body>
 </html>

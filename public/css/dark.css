@@ -233,3 +233,22 @@ html.dark .hover\:bg-emerald-700:hover { background-color: #065f46 !important; }
 
 /* Slightly stronger separation for striped/active rows */
 html.dark .bg-blue-50\/40 { background-color: rgba(23, 42, 74, .55) !important; }
+
+/* ===== Privacy mode (v5) ===== */
+html.privacy-on .privacy-mask,
+body.privacy-on .privacy-mask,
+html.privacy-on .privacy-mask-js,
+body.privacy-on .privacy-mask-js {
+    filter: blur(7px) !important;
+    transition: filter .2s ease;
+    user-select: none !important;
+    cursor: default;
+}
+/* Do not reveal on hover */
+html.privacy-on .privacy-mask:hover,
+body.privacy-on .privacy-mask:hover,
+html.privacy-on .privacy-mask-js:hover,
+body.privacy-on .privacy-mask-js:hover {
+    filter: blur(7px) !important;
+    user-select: none !important;
+}

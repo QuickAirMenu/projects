@@ -49,7 +49,7 @@ class NavigationTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->get(route('dashboard'))
-            ->assertSee('dark.css?v=4', false);
+            ->assertSee('dark.css?v=5', false);
 
         $css = file_get_contents(public_path('css/dark.css'));
         $this->assertStringContainsString('Refined accent palette', $css);

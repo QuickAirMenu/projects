@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" dir="{{ is_rtl() ? 'rtl' : 'ltr' }}">
 <head>
+    <script id="ip_privacy_boot">try{if(localStorage.getItem('privacyMode')==='on'){document.documentElement.classList.add('privacy-on');}}catch(e){}</script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -33,7 +34,7 @@
             } catch (e) {}
         })();
     </script>
-    <link rel="stylesheet" href="{{ asset('css/dark.css?v=4') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark.css?v=5') }}">
 
     <style>
         .portal-sidebar-body .sidebar-link { color: #374151 !important; }
@@ -64,16 +65,30 @@
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
-                                <a href="{{ route('lang.switch', 'ar') }}"
-                                   class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition {{ app()->getLocale() === 'ar' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700' }}">
-                                    <img src="https://flagcdn.com/24x18/sa.png" alt="عربي" class="w-4 h-3 rounded-sm object-cover">
-                                </a>
-                                <a href="{{ route('lang.switch', 'en') }}"
-                                   class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition {{ app()->getLocale() === 'en' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700' }}">
-                                    <img src="https://flagcdn.com/24x18/gb.png" alt="English" class="w-4 h-3 rounded-sm object-cover">
-                                </a>
+                            <div x-data="{ open: false }" class="relative">
+                                <button type="button" @click="open = !open" class="flex h-9 items-center gap-2 rounded-lg px-2.5 text-sm text-gray-600 hover:bg-gray-100 transition" title="{{ __('common.language') }}">
+                                    <img src="https://flagcdn.com/24x18/{{ app()->getLocale() === 'ar' ? 'sa' : 'gb' }}.png" alt="" class="w-4 h-3 rounded-sm object-cover">
+                                    <span class="hidden sm:inline font-medium">{{ app()->getLocale() === 'ar' ? 'AR' : 'EN' }}</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
+                                </button>
+                                <div x-show="open" @click.away="open = false" x-transition
+                                     class="absolute {{ is_rtl() ? 'left-0' : 'right-0' }} mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50">
+                                    <a href="{{ route('lang.switch', 'ar') }}" class="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 {{ app()->getLocale() === 'ar' ? 'font-semibold text-blue-600' : 'text-gray-700' }}">
+                                        <img src="https://flagcdn.com/24x18/sa.png" alt="" class="w-4 h-3 rounded-sm object-cover"> العربية
+                                    </a>
+                                    <a href="{{ route('lang.switch', 'en') }}" class="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 {{ app()->getLocale() === 'en' ? 'font-semibold text-blue-600' : 'text-gray-700' }}">
+                                        <img src="https://flagcdn.com/24x18/gb.png" alt="" class="w-4 h-3 rounded-sm object-cover"> English
+                                    </a>
+                                </div>
                             </div>
+
+                            <button type="button" onclick="togglePrivacy()" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition" title="{{ __('common.privacy_mode') }}">
+                                <i id="privacyIcon" class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" data-theme-toggle class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition" title="{{ __('messages.theme_toggle') }}">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                            <span class="hidden sm:block h-6 w-px bg-gray-200"></span>
 
                             <div x-data="{ open: false }" class="relative">
                                 <button @click="open = !open" class="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition">
@@ -285,5 +300,48 @@
             paint();
         })();
     </script>
+<script type="module">
+    (function () {
+        function autoMask() {
+            var skip = 'script,style,input,select,textarea,option,canvas,svg,pre,code,button';
+            var re = /^(?=.*[\d\u0660-\u0669])[\d\u0660-\u0669\s.,:%+\-—–()\/]*(\s?(SAR|EGP|USD|AED|ر\.س|ج\.م|ريال|جنيه|درهم))?$/u;
+
+            document.querySelectorAll('td, th, p, span, div, a, strong, li, h1, h2, h3, h4, dd, dt').forEach(function (el) {
+                if (el.children.length > 0 || el.closest(skip)) return;
+                var text = (el.textContent || '').trim();
+                if (text.length < 2 || text.length > 60) return;
+                if (re.test(text)) el.classList.add('privacy-mask-js');
+            });
+        }
+
+        window.togglePrivacy = function () {
+            var on = !document.documentElement.classList.contains('privacy-on');
+            document.documentElement.classList.toggle('privacy-on', on);
+            document.body.classList.toggle('privacy-on', on);
+            try { localStorage.setItem('privacyMode', on ? 'on' : 'off'); } catch (e) {}
+            var icon = document.getElementById('privacyIcon');
+            if (icon) icon.className = on ? 'fas fa-eye-slash w-4 text-center text-amber-500' : 'fas fa-eye w-4 text-center text-gray-400';
+            if (on) autoMask();
+        };
+
+        function boot() {
+            var on = false;
+            try { on = localStorage.getItem('privacyMode') === 'on'; } catch (e) {}
+            if (on) {
+                document.documentElement.classList.add('privacy-on');
+                document.body.classList.add('privacy-on');
+                autoMask();
+                var icon = document.getElementById('privacyIcon');
+                if (icon) icon.className = 'fas fa-eye-slash w-4 text-center text-amber-500';
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+    })();
+</script>
 </body>
 </html>

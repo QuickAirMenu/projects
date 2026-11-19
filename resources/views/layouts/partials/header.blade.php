@@ -48,6 +48,11 @@
                 </div>
             </div>
 
+            <!-- Privacy toggle -->
+            <button type="button" onclick="togglePrivacy()" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition" title="{{ __('common.privacy_mode') }}">
+                <i id="privacyIcon" class="fas fa-eye"></i>
+            </button>
+
             <!-- Theme toggle -->
             <button type="button" data-theme-toggle class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition" title="{{ __('messages.theme_toggle') }}">
                 <i class="fas fa-moon text-lg"></i>
@@ -101,7 +106,7 @@
                     </button>
                     <p id="pushStatus" class="px-4 pb-1 text-xs text-gray-400"></p>
                     <button type="button" onclick="togglePrivacy()" class="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-start">
-                        <i id="privacyIcon" class="fas fa-eye w-4 text-center text-gray-400"></i>
+                        <i class="fas fa-eye w-4 text-center text-gray-400"></i>
                         <span>{{ __('common.privacy_mode') }}</span>
                     </button>
                     <button type="button" id="themeToggle" class="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-start">
