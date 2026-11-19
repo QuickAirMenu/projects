@@ -161,7 +161,7 @@
                     @else
                     <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700">{{ __('task.cost_unpaid') }}</span>
                     @can('update', $task)
-                    <form action="{{ route('tasks.cost.pay', $task) }}" method="POST">@csrf<button class="text-xs text-emerald-600 hover:text-emerald-800"><i class="fas fa-check me-1"></i>{{ __('task.mark_paid') }}</button></form>
+                    <a href="{{ route('tasks.cost.payout', $task) }}" class="text-xs text-emerald-600 hover:text-emerald-800"><i class="fas fa-check me-1"></i>{{ __('task.mark_paid') }}</a>
                     @endcan
                     @endif
                 </span>

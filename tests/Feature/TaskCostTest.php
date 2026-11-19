@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Account;
 use App\Models\Client;
 use App\Models\Expense;
 use App\Models\Invoice;
@@ -28,6 +29,8 @@ class TaskCostTest extends TestCase
     protected Project $project;
 
     protected TaskStatus $taskStatus;
+
+    protected Account $account;
 
     protected function setUp(): void
     {
@@ -59,6 +62,12 @@ class TaskCostTest extends TestCase
             'budget' => 5000, 'contract_value' => 5000,
             'payment_status' => 'unpaid', 'progress_percentage' => 0, 'created_by' => $this->admin->id,
         ]);
+        $this->account = Account::create([
+            'name' => 'Cash EGP', 'type' => 'cash', 'currency' => 'EGP',
+            'opening_balance' => 0, 'exchange_rate_to_base' => 0.075, 'is_active' => true,
+            'created_by' => $this->admin->id,
+        ]);
+
         $this->taskStatus = TaskStatus::create([
             'name_ar' => 'جديدة', 'name_en' => 'Todo', 'slug' => 'todo-tc',
             'color' => '#6B7280', 'sort_order' => 1, 'is_default' => true, 'is_active' => true,
@@ -86,7 +95,12 @@ class TaskCostTest extends TestCase
             ->assertSee('3,000.00')
             ->assertSee(__('task.cost_unpaid'));
 
-        $this->actingAs($this->admin)->post(route('tasks.cost.pay', $task))->assertRedirect();
+        $this->actingAs($this->admin)->post(route('tasks.cost.pay', $task), [
+            'account_id' => $this->account->id,
+            'amount' => 3000,
+            'exchange_rate' => 1,
+            'payout_date' => now()->toDateString(),
+        ])->assertRedirect();
         $this->assertNotNull($task->fresh()->cost_paid_at);
 
         $this->actingAs($this->admin)->post(route('tasks.cost.unpay', $task))->assertRedirect();
@@ -142,7 +156,12 @@ class TaskCostTest extends TestCase
             ->assertOk()
             ->assertSee('Paid task');
 
-        $this->actingAs($this->admin)->post(route('tasks.cost.pay', $unpaid))->assertRedirect();
+        $this->actingAs($this->admin)->post(route('tasks.cost.pay', $unpaid), [
+            'account_id' => $this->account->id,
+            'amount' => 3000,
+            'exchange_rate' => 1,
+            'payout_date' => now()->toDateString(),
+        ])->assertRedirect();
         $this->assertNotNull($unpaid->fresh()->cost_paid_at);
     }
 

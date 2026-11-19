@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\StoreInvoiceRequest;
 use App\Mail\InvoiceIssuedMail;
 use App\Mail\InvoiceReminderMail;
+use App\Models\Account;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Project;
@@ -141,7 +142,9 @@ class InvoiceController extends Controller
 
         $invoice->load(['client', 'project', 'items', 'payments', 'contract']);
 
-        return view('finance.invoices.show', compact('invoice'));
+        $accounts = Account::where('is_active', true)->orderBy('name')->get();
+
+        return view('finance.invoices.show', compact('invoice', 'accounts'));
     }
 
     public function remind(Invoice $invoice)

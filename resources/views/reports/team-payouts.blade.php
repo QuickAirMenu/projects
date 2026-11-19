@@ -81,10 +81,7 @@
                         <button class="text-xs text-gray-500 hover:text-gray-700">{{ __('task.mark_unpaid') }}</button>
                     </form>
                     @else
-                    <form action="{{ route('tasks.cost.pay', $task) }}" method="POST">
-                        @csrf
-                        <button class="text-xs text-emerald-600 hover:text-emerald-800"><i class="fas fa-check me-1"></i>{{ __('task.mark_paid') }}</button>
-                    </form>
+                    <a href="{{ route('tasks.cost.payout', $task) }}" class="text-xs text-emerald-600 hover:text-emerald-800"><i class="fas fa-check me-1"></i>{{ __('task.mark_paid') }}</a>
                     @endif
                 </td>
             </tr>

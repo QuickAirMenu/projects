@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Notifications\PaymentReviewed;
 use App\Services\InvoiceService;
 use App\Services\MailConfigService;
+use App\Services\TreasuryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +66,8 @@ class PaymentController extends Controller
             ]);
         }
 
+        app(TreasuryService::class)->recordClientPayment($payment);
+
         return redirect()->route('invoices.show', $invoice)
             ->with('success', __('messages.created_successfully'));
     }
@@ -85,6 +88,7 @@ class PaymentController extends Controller
         ]);
 
         $this->invoiceService->recalculateInvoiceTotals($payment->invoice);
+        app(TreasuryService::class)->recordClientPayment($payment->fresh());
         $this->notifyClient($payment->fresh(['invoice.client']));
 
         return back()->with('success', __('messages.payment_approved'));

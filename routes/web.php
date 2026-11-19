@@ -15,6 +15,7 @@ use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\ClientDocumentController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\Finance\AccountController;
 use App\Http\Controllers\Finance\ContractController;
 use App\Http\Controllers\Finance\ExpenseController;
 use App\Http\Controllers\Finance\InvoiceController;
@@ -298,6 +299,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('{task}/checklist', [TaskChecklistController::class, 'store'])->name('checklist.store');
         Route::put('checklist/{item}', [TaskChecklistController::class, 'update'])->name('checklist.update');
         Route::delete('checklist/{item}', [TaskChecklistController::class, 'destroy'])->name('checklist.destroy');
+        Route::get('{task}/cost/pay', [TaskController::class, 'payoutForm'])->name('cost.payout');
         Route::post('{task}/cost/pay', [TaskController::class, 'payCost'])->name('cost.pay');
         Route::post('{task}/cost/unpay', [TaskController::class, 'unpayCost'])->name('cost.unpay');
         Route::post('{task}/cost/pay', [TaskController::class, 'payCost'])->name('cost.pay');
@@ -509,6 +511,22 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::put('{recurringExpense}', [RecurringExpenseController::class, 'update'])->name('update');
         Route::delete('{recurringExpense}', [RecurringExpenseController::class, 'destroy'])->name('destroy');
         Route::post('{recurringExpense}/run', [RecurringExpenseController::class, 'runNow'])->name('run');
+    });
+
+    // Treasury accounts
+    Route::prefix('accounts')->name('accounts.')->middleware('permission:view-payments')->group(function () {
+        Route::get('/', [AccountController::class, 'index'])->name('index');
+        Route::get('create', [AccountController::class, 'create'])->name('create');
+        Route::post('/', [AccountController::class, 'store'])->name('store');
+        Route::get('transfer', [AccountController::class, 'transferForm'])->name('transfer.form');
+        Route::post('transfer', [AccountController::class, 'transfer'])->name('transfer.store');
+        Route::get('{account}', [AccountController::class, 'show'])->name('show');
+        Route::get('{account}/edit', [AccountController::class, 'edit'])->name('edit');
+        Route::put('{account}', [AccountController::class, 'update'])->name('update');
+        Route::delete('{account}', [AccountController::class, 'destroy'])->name('destroy');
+        Route::post('{account}/transactions', [AccountController::class, 'storeTransaction'])->name('transactions.store');
+        Route::post('{account}/transactions/{transaction}/reconcile', [AccountController::class, 'reconcile'])->name('reconcile');
+        Route::get('{account}/export', [AccountController::class, 'export'])->name('export');
     });
 
     // Support tickets

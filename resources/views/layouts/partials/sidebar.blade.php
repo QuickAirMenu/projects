@@ -112,6 +112,12 @@
                     <span>{{ __('time.timesheets') }}</span>
                 </a>
                 @endcan
+                @can('view-payments')
+                <a href="{{ route('accounts.index') }}" class="sidebar-link {{ request()->routeIs('accounts.*') ? 'active' : '' }}">
+                    <i class="fas fa-building-columns w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>
+                    <span>{{ __('accounts.title') }}</span>
+                </a>
+                @endcan
                 @can('view-expenses')
                 <a href="{{ route('expenses.index') }}" class="sidebar-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
                     <i class="fas fa-wallet w-5 text-center {{ is_rtl() ? 'ml-3' : 'mr-3' }}"></i>

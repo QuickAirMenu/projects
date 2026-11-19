@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Expense;
 use App\Models\Project;
 use App\Services\ExpenseBillingService;
+use App\Services\TreasuryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -68,7 +69,11 @@ class ExpenseController extends Controller
             $data['receipt_name'] = $file->getClientOriginalName();
         }
 
-        Expense::create($data);
+        $expense = Expense::create($data);
+
+        if ($expense->paid_at && $expense->account_id) {
+            app(TreasuryService::class)->recordExpensePayment($expense);
+        }
 
         return redirect()->route('expenses.index')->with('success', __('expenses.created'));
     }
@@ -106,6 +111,10 @@ class ExpenseController extends Controller
         }
 
         $expense->update($data);
+
+        if ($expense->paid_at && $expense->account_id) {
+            app(TreasuryService::class)->recordExpensePayment($expense->fresh());
+        }
 
         return redirect()->route('expenses.index')->with('success', __('expenses.updated'));
     }
@@ -243,6 +252,7 @@ class ExpenseController extends Controller
             'tax_amount' => ['nullable', 'numeric', 'min:0'],
             'paid_at' => ['nullable', 'date'],
             'payment_method' => ['nullable', 'string', 'max:30'],
+            'account_id' => ['nullable', 'exists:accounts,id'],
             'reference' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'project_id' => ['nullable', 'exists:projects,id'],

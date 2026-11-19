@@ -18,6 +18,8 @@ class Payment extends Model
         'amount',
         'payment_date',
         'payment_method',
+        'account_id',
+        'exchange_rate',
         'status',
         'reviewed_by',
         'reviewed_at',

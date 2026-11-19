@@ -84,6 +84,13 @@
                         <option value="{{ $m }}">{{ __('finance.method_'.$m) }}</option>
                     @endforeach
                 </select>
+                <select name="account_id" class="col-span-2 border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                    <option value="">{{ __('accounts.receive_into') }}</option>
+                    @foreach($accounts ?? [] as $account)
+                    <option value="{{ $account->id }}">{{ $account->name }} ({{ $account->currency }})</option>
+                    @endforeach
+                </select>
+                <input type="number" name="exchange_rate" step="0.000001" min="0.000001" value="1" title="{{ __('accounts.exchange_rate') }}" class="col-span-1 border border-gray-300 rounded-xl px-3 py-2 text-sm">
                 <button type="submit" class="col-span-1 bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-2 rounded-xl transition">
                     <i class="fas fa-plus me-1"></i>{{ __('finance.add_payment') }}
                 </button>

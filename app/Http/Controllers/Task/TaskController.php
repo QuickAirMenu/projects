@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Task;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
+use App\Models\Account;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskStatus;
 use App\Models\User;
+use App\Services\TreasuryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -183,20 +185,46 @@ class TaskController extends Controller
         return view('tasks.timeline', compact('tasks'));
     }
 
-    public function payCost(Task $task)
+    public function payoutForm(Task $task)
     {
         $this->authorize('update', $task);
 
-        $task->forceFill(['cost_paid_at' => now()])->save();
+        return view('tasks.payout', [
+            'task' => $task,
+            'accounts' => Account::where('is_active', true)->orderBy('name')->get(),
+            'baseCurrency' => app(TreasuryService::class)->baseCurrency(),
+        ]);
+    }
 
-        return back()->with('success', __('task.cost_marked_paid'));
+    public function payCost(Request $request, Task $task)
+    {
+        $this->authorize('update', $task);
+
+        $data = $request->validate([
+            'account_id' => ['required', 'exists:accounts,id'],
+            'amount' => ['required', 'numeric', 'min:0.01'],
+            'exchange_rate' => ['nullable', 'numeric', 'min:0.000001'],
+            'payout_date' => ['required', 'date'],
+        ]);
+
+        $account = Account::findOrFail($data['account_id']);
+
+        app(TreasuryService::class)->recordTaskPayout(
+            $task,
+            $account,
+            (float) $data['amount'],
+            (float) ($data['exchange_rate'] ?? 1),
+            $data['payout_date']
+        );
+
+        return redirect()->route('tasks.show', $task)->with('success', __('task.cost_marked_paid'));
     }
 
     public function unpayCost(Task $task)
     {
         $this->authorize('update', $task);
 
-        $task->forceFill(['cost_paid_at' => null])->save();
+        app(TreasuryService::class)->reverseTaskPayout($task);
 
         return back()->with('success', __('task.cost_marked_unpaid'));
     }

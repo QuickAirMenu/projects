@@ -60,6 +60,15 @@
             <input name="payment_method" maxlength="30" value="{{ old('payment_method', $expense->payment_method) }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
         </div>
         <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('accounts.paid_from') }}</label>
+            <select name="account_id" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
+                <option value="">{{ __('expenses.none') }}</option>
+                @foreach(\App\Models\Account::where('is_active', true)->orderBy('name')->get() as $account)
+                <option value="{{ $account->id }}" @selected(old('account_id', $expense->account_id) == $account->id)>{{ $account->name }} ({{ $account->currency }})</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('expenses.paid_at') }}</label>
             <input type="date" name="paid_at" value="{{ old('paid_at', $expense->paid_at?->format('Y-m-d')) }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
         </div>
