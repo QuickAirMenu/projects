@@ -11,6 +11,7 @@ class VerifyCsrfToken extends Middleware
         'internal/recurring',
         'internal/reminders',
         'internal/budget-alerts',
+        'internal/recurring-expenses',
         'csp-report',
     ];
 }

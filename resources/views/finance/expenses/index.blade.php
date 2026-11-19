@@ -8,6 +8,9 @@
         <p class="mt-1 text-sm text-gray-500">{{ __('expenses.hint') }}</p>
     </div>
     <div class="flex gap-2">
+    <a href="{{ route('recurring-expenses.index') }}" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium">
+        <i class="fas fa-rotate me-2"></i>{{ __('expenses.recurring_title') }}
+    </a>
     <a href="{{ route('expenses.bill.preview') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium">
         <i class="fas fa-file-invoice-dollar me-2"></i>{{ __('expenses.bill_invoice') }}
     </a>

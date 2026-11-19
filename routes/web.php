@@ -20,6 +20,7 @@ use App\Http\Controllers\Finance\ExpenseController;
 use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
 use App\Http\Controllers\Finance\QuoteController;
+use App\Http\Controllers\Finance\RecurringExpenseController;
 use App\Http\Controllers\Finance\RecurringInvoiceController;
 use App\Http\Controllers\Finance\TimeEntryController;
 use App\Http\Controllers\ImportController;
@@ -58,6 +59,7 @@ use App\Mail\SupportMail;
 use App\Models\Setting;
 use App\Services\InvoiceReminderService;
 use App\Services\MailConfigService;
+use App\Services\RecurringExpenseService;
 use App\Services\RecurringInvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -489,6 +491,17 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::post('{expense}/reject', [ExpenseController::class, 'reject'])->middleware('permission:approve-expenses')->name('reject');
     });
 
+    // Recurring expenses
+    Route::prefix('recurring-expenses')->name('recurring-expenses.')->middleware('permission:view-expenses')->group(function () {
+        Route::get('/', [RecurringExpenseController::class, 'index'])->name('index');
+        Route::get('create', [RecurringExpenseController::class, 'create'])->name('create');
+        Route::post('/', [RecurringExpenseController::class, 'store'])->name('store');
+        Route::get('{recurringExpense}/edit', [RecurringExpenseController::class, 'edit'])->name('edit');
+        Route::put('{recurringExpense}', [RecurringExpenseController::class, 'update'])->name('update');
+        Route::delete('{recurringExpense}', [RecurringExpenseController::class, 'destroy'])->name('destroy');
+        Route::post('{recurringExpense}/run', [RecurringExpenseController::class, 'runNow'])->name('run');
+    });
+
     // Support tickets
     Route::prefix('support-tickets')->name('support-tickets.')->middleware('permission:manage-tickets')->group(function () {
         Route::get('/', [SupportTicketController::class, 'index'])->name('index');
@@ -618,4 +631,15 @@ Route::post('/internal/budget-alerts', function (Request $request) {
     Artisan::call('projects:budget-alerts', $options);
 
     return response(trim(Artisan::output()), 200)->header('Content-Type', 'text/plain');
+})->middleware('throttle:5,1');
+
+Route::post('/internal/recurring-expenses', function (Request $request) {
+    $expected = (string) config('internal.token', '');
+    $given = (string) $request->input('token', '');
+
+    abort_if($expected === '' || ! hash_equals($expected, $given), 403);
+
+    [$generated, $failed] = app(RecurringExpenseService::class)->processDue();
+
+    return response("generated={$generated} failed={$failed}", 200)->header('Content-Type', 'text/plain');
 })->middleware('throttle:5,1');

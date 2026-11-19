@@ -14,7 +14,7 @@ class Expense extends Model
     protected $fillable = [
         'expense_number', 'vendor_name', 'category', 'expense_date', 'amount', 'tax_amount', 'total',
         'status', 'paid_at', 'payment_method', 'reference', 'notes', 'project_id', 'client_id',
-        'billable', 'receipt_path', 'receipt_name', 'created_by', 'approved_by', 'approved_at', 'invoiced_invoice_id',
+        'billable', 'receipt_path', 'receipt_name', 'created_by', 'approved_by', 'approved_at', 'invoiced_invoice_id', 'recurring_expense_id',
         'rejection_reason',
     ];
 
@@ -51,6 +51,11 @@ class Expense extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'invoiced_invoice_id');
+    }
+
+    public function recurring()
+    {
+        return $this->belongsTo(RecurringExpense::class, 'recurring_expense_id');
     }
 
     public function isInvoiced(): bool
