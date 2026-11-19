@@ -69,6 +69,11 @@
             </select>
         </div>
         <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('accounts.exchange_rate') }}</label>
+            <input type="number" step="0.000001" min="0.000001" name="exchange_rate" value="{{ old('exchange_rate', (float) ($expense->exchange_rate ?? 1)) }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
+            <p class="mt-1 text-[11px] text-gray-400">{{ __('accounts.expense_rate_hint') }}</p>
+        </div>
+        <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('expenses.paid_at') }}</label>
             <input type="date" name="paid_at" value="{{ old('paid_at', $expense->paid_at?->format('Y-m-d')) }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm">
         </div>

@@ -13,7 +13,7 @@ class Expense extends Model
 
     protected $fillable = [
         'expense_number', 'vendor_name', 'category', 'expense_date', 'amount', 'tax_amount', 'total',
-        'status', 'paid_at', 'payment_method', 'account_id', 'reference', 'notes', 'project_id', 'client_id',
+        'status', 'paid_at', 'payment_method', 'account_id', 'exchange_rate', 'reference', 'notes', 'project_id', 'client_id',
         'billable', 'receipt_path', 'receipt_name', 'created_by', 'approved_by', 'approved_at', 'invoiced_invoice_id', 'recurring_expense_id',
         'rejection_reason',
     ];
@@ -25,6 +25,7 @@ class Expense extends Model
         'billable' => 'boolean',
         'amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
+        'exchange_rate' => 'decimal:6',
         'total' => 'decimal:2',
     ];
 

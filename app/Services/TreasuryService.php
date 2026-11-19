@@ -87,11 +87,13 @@ class TreasuryService
             return;
         }
 
+        $converted = round((float) $payment->amount * (float) ($payment->exchange_rate ?: 1), 2);
+
         $this->record($account, [
             'direction' => 'in',
-            'amount' => (float) $payment->amount,
+            'amount' => $converted,
             'transaction_date' => $payment->payment_date?->toDateString() ?? now()->toDateString(),
-            'exchange_rate' => (float) ($payment->exchange_rate ?: 1),
+            'exchange_rate' => (float) $account->exchange_rate_to_base,
             'category' => 'client_payment',
             'description' => __('accounts.client_payment_desc', ['number' => $payment->invoice?->invoice_number]),
             'reference_type' => Payment::class,
@@ -151,10 +153,13 @@ class TreasuryService
             return;
         }
 
+        $converted = round((float) $expense->total * (float) ($expense->exchange_rate ?: 1), 2);
+
         $this->record($account, [
             'direction' => 'out',
-            'amount' => (float) $expense->total,
+            'amount' => $converted,
             'transaction_date' => $expense->paid_at->toDateString(),
+            'exchange_rate' => (float) $account->exchange_rate_to_base,
             'category' => 'expense',
             'description' => __('accounts.expense_desc', ['number' => $expense->expense_number]),
             'reference_type' => Expense::class,

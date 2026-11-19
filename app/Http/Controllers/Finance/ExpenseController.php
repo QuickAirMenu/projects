@@ -253,6 +253,7 @@ class ExpenseController extends Controller
             'paid_at' => ['nullable', 'date'],
             'payment_method' => ['nullable', 'string', 'max:30'],
             'account_id' => ['nullable', 'exists:accounts,id'],
+            'exchange_rate' => ['nullable', 'numeric', 'min:0.000001'],
             'reference' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'project_id' => ['nullable', 'exists:projects,id'],
@@ -263,6 +264,7 @@ class ExpenseController extends Controller
 
         $data['billable'] = $request->boolean('billable');
         $data['tax_amount'] = $data['tax_amount'] ?? 0;
+        $data['exchange_rate'] = $data['exchange_rate'] ?? 1;
 
         if (! empty($data['project_id']) && empty($data['client_id'])) {
             $data['client_id'] = Project::whereKey($data['project_id'])->value('client_id');

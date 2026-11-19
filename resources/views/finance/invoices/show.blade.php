@@ -96,6 +96,7 @@
                 </button>
                 <input type="file" name="proof_of_payment" accept=".pdf,.jpg,.jpeg,.png,.webp" class="col-span-4 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <p class="col-span-4 text-xs text-gray-400 -mt-1">{{ __('finance.payment_proof') }}. {{ __('finance.image_compression_notice') }}</p>
+                <p class="col-span-4 text-[11px] text-gray-400">{{ __('accounts.payment_rate_hint') }}</p>
                 <div id="payment-form-error" class="hidden col-span-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
             </form>
             @endif

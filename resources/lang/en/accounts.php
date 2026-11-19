@@ -113,6 +113,8 @@ return [
     'amount_in_hint' => 'The amount actually credited to the destination account after conversion.',
     'rate' => 'Exchange rate',
     'rate_hint' => 'How much of the destination currency per 1 unit of the source currency (e.g. 1 SAR = 13.3 EGP).',
+    'payment_rate_hint' => 'Exchange rate = account currency per 1 invoice currency (leave 1 when identical).',
+    'expense_rate_hint' => 'Exchange rate = account currency per 1 expense currency.',
     'rate_or_amount_required' => 'Enter the exchange rate or the received amount.',
     'paid_from' => 'Paid from account',
     'receive_into' => 'Receive payment into account',
