@@ -22,6 +22,7 @@
                 <option value="{{ $accountType }}" @selected(old('type', $account->type) === $accountType)>{{ __('accounts.type_'.$accountType) }}</option>
                 @endforeach
             </select>
+            <p class="mt-1 text-[11px] text-gray-400">{{ __('accounts.nature_hint') }}</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('accounts.currency') }}</label>

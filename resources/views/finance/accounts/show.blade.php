@@ -8,6 +8,10 @@
         <div>
             <h1 class="text-2xl font-bold text-gray-800">{{ $account->name }}</h1>
             <p class="text-sm text-gray-500">{{ __('accounts.type_'.$account->type) }} · {{ $account->currency }} @if($account->iban) · {{ $account->iban }} @endif</p>
+            <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-{{ $account->color() }}-100 px-2.5 py-0.5 text-xs text-{{ $account->color() }}-700">
+                <i class="fas {{ $account->icon() }}"></i>
+                {{ $account->nature() === 'liability' ? '− ' : '+ ' }}{{ __('accounts.nature_'.$account->nature()) }}
+            </span>
         </div>
     </div>
     <div class="flex gap-2">

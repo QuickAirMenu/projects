@@ -15,10 +15,13 @@ class AccountController extends Controller
     public function index()
     {
         $accounts = Account::withCount('transactions')->orderBy('name')->get();
-        $totalBase = $accounts->sum(fn (Account $account) => $account->baseBalance());
         $baseCurrency = app(TreasuryService::class)->baseCurrency();
 
-        return view('finance.accounts.index', compact('accounts', 'totalBase', 'baseCurrency'));
+        $assetsTotal = $accounts->filter(fn (Account $a) => $a->nature() === 'asset')->sum(fn (Account $a) => $a->baseBalance());
+        $liabilitiesTotal = $accounts->filter(fn (Account $a) => $a->nature() === 'liability')->sum(fn (Account $a) => $a->baseBalance());
+        $netTotal = $assetsTotal + $liabilitiesTotal;
+
+        return view('finance.accounts.index', compact('accounts', 'assetsTotal', 'liabilitiesTotal', 'netTotal', 'baseCurrency'));
     }
 
     public function create()
