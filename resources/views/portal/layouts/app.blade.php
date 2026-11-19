@@ -33,7 +33,7 @@
             } catch (e) {}
         })();
     </script>
-    <link rel="stylesheet" href="{{ asset('css/dark.css?v=1') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark.css?v=2') }}">
 
     <style>
         .portal-sidebar-body .sidebar-link { color: #374151 !important; }

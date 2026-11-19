@@ -40,7 +40,7 @@
             } catch (e) {}
         })();
     </script>
-    <link rel="stylesheet" href="{{ asset('css/dark.css?v=1') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark.css?v=2') }}">
 
     
     @stack('styles')
