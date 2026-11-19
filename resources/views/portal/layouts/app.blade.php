@@ -24,6 +24,17 @@
 
     <title>{{ config('app.name', 'Air Menu') }} - @yield('title', 'Client Portal')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('ip_theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="stylesheet" href="{{ asset('css/dark.css?v=1') }}">
+
     <style>
         .portal-sidebar-body .sidebar-link { color: #374151 !important; }
         .portal-sidebar-body .sidebar-link:hover { background-color: #eff6ff !important; color: #1d4ed8 !important; }
@@ -248,6 +259,26 @@
                 }
             });
             refresh();
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const label = btn.querySelector('[data-theme-label]');
+            const icon = btn.querySelector('i');
+            function paint() {
+                const dark = document.documentElement.classList.contains('dark');
+                if (label) label.textContent = dark ? @json(__('messages.theme_light')) : @json(__('messages.theme_dark'));
+                if (icon) icon.className = dark ? 'fas fa-sun w-4 text-center text-gray-400' : 'fas fa-moon w-4 text-center text-gray-400';
+            }
+            btn.addEventListener('click', function () {
+                const dark = document.documentElement.classList.toggle('dark');
+                try { localStorage.setItem('ip_theme', dark ? 'dark' : 'light'); } catch (e) {}
+                paint();
+            });
+            paint();
         })();
     </script>
 </body>

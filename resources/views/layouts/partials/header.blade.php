@@ -95,6 +95,10 @@
                         {{ __('messages.push_enable') }}
                     </button>
                     <p id="pushStatus" class="px-4 pb-1 text-xs text-gray-400"></p>
+                    <button type="button" id="themeToggle" class="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-start">
+                        <i class="fas fa-moon w-4 text-center text-gray-400"></i>
+                        <span data-theme-label>{{ __('messages.theme_dark') }}</span>
+                    </button>
                     <div class="border-t border-gray-200 my-2"></div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

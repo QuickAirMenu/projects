@@ -252,6 +252,8 @@ return [
     'mail_test_body' => 'This is a test message to verify your mail configuration.',
     'mail_test_last' => 'Last tested: :at',
     'push_enable' => 'Browser notifications',
+    'theme_dark' => 'Dark mode',
+    'theme_light' => 'Light mode',
     'push_enabled' => 'Browser notifications are enabled on this device.',
     'push_disabled' => 'Notifications disabled on this device.',
     'push_denied' => 'Notification permission was not granted.',
