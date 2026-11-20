@@ -67,11 +67,6 @@ class TreasuryAudit extends Command
             $issues[] = ['duplicate_suspects', $duplicates];
         }
 
-        $unreconciled = AccountTransaction::whereNull('reconciled_at')->count();
-        if ($unreconciled > 0) {
-            $issues[] = ['unreconciled_transactions', $unreconciled];
-        }
-
         foreach (Account::all() as $account) {
             if ($account->nature() === 'asset' && $account->balance() < 0) {
                 $issues[] = ['negative_asset_balance:'.$account->name, round($account->balance(), 2)];
