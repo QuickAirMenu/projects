@@ -15,7 +15,7 @@ class SyncInvoiceStatuses extends Command
     {
         $updated = 0;
 
-        Invoice::query()->withTrashed(false)->chunkById(200, function ($invoices) use (&$updated) {
+        Invoice::withTrashed()->chunkById(200, function ($invoices) use (&$updated) {
             foreach ($invoices as $invoice) {
                 $total = (float) $invoice->total;
 

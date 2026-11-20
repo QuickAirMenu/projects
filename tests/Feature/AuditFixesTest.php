@@ -71,6 +71,8 @@ class AuditFixesTest extends TestCase
             'payment_status' => 'unpaid', 'created_by' => $this->admin->id,
         ]);
 
+        $invoice->delete();
+
         $this->artisan('invoices:sync-statuses')->assertSuccessful();
 
         $invoice->refresh();
