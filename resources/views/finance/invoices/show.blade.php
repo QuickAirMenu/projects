@@ -17,7 +17,7 @@
     </div>
     <div class="flex gap-2">
         <a href="{{ route('invoices.pdf', $invoice) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
-        @if((float) $invoice->remaining_amount > 0)
+        @if(!$invoice->trashed() && (float) $invoice->remaining_amount > 0)
         <form action="{{ route('invoices.remind', $invoice) }}" method="POST" class="inline">
             @csrf
             <button type="submit" class="bg-amber-50 text-amber-700 hover:bg-amber-100 px-4 py-2 rounded-xl text-sm transition">
@@ -28,6 +28,26 @@
         <a href="{{ route('invoices.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
     </div>
 </div>
+
+@if($invoice->trashed())
+<div class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+    <span><i class="fas fa-box-archive me-2"></i>{{ __('messages.invoice_archived_hint') }}</span>
+    <span class="flex flex-wrap items-center gap-2">
+        <form action="{{ route('invoices.restore', $invoice) }}" method="POST">@csrf
+            <button class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs text-white"><i class="fas fa-undo me-1"></i>{{ __('messages.restore') }}</button>
+        </form>
+        @if($canForceDelete)
+        @can('delete', $invoice)
+        <form action="{{ route('invoices.force-delete', $invoice) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_force_delete') }}')">@csrf @method('DELETE')
+            <button class="rounded-lg bg-red-600 px-3 py-1.5 text-xs text-white"><i class="fas fa-trash-can me-1"></i>{{ __('messages.delete_permanently') }}</button>
+        </form>
+        @endcan
+        @else
+        <span class="rounded-lg bg-white/60 px-3 py-1.5 text-xs"><i class="fas fa-lock me-1"></i>{{ __('messages.invoice_has_financial_links') }}</span>
+        @endif
+    </span>
+</div>
+@endif
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-5">
@@ -71,7 +91,7 @@
         {{-- Payments --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 class="font-semibold text-gray-700 mb-4">{{ __('finance.payments') }}</h3>
-            @if($invoice->payment_status !== 'paid')
+            @if(!$invoice->trashed() && $invoice->payment_status !== 'paid')
             <form id="payment-form" action="{{ route('payments.store') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-4 gap-2 mb-4">
                 @csrf
                 <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">

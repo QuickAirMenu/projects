@@ -6,6 +6,8 @@ return [
     'deleted_successfully' => 'Deleted successfully',
     'confirm_force_delete' => 'Delete permanently? This cannot be undone.',
     'deleted_permanently' => 'Deleted permanently.',
+    'invoice_archived_hint' => 'Archived invoice — view only. Restore is available; permanent delete is allowed only when there are no payments or billing links.',
+    'invoice_has_financial_links' => 'Linked to payments/billing — permanent delete blocked.',
     'quote_archived_hint' => 'Archived quote — view only. You can restore it or delete it permanently.',
     'restored_successfully' => 'Item restored from archive',
     'approved_successfully' => 'Approved successfully',

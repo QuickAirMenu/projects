@@ -8,10 +8,12 @@ use App\Mail\InvoiceIssuedMail;
 use App\Mail\InvoiceReminderMail;
 use App\Models\Account;
 use App\Models\Client;
+use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\Quote;
 use App\Models\Setting;
+use App\Models\TimeEntry;
 use App\Services\InvoiceService;
 use App\Services\MailConfigService;
 use Illuminate\Http\Request;
@@ -146,8 +148,9 @@ class InvoiceController extends Controller
         $invoice->load(['client', 'project', 'items', 'payments', 'contract']);
 
         $accounts = Account::where('is_active', true)->orderBy('name')->get();
+        $canForceDelete = $invoice->trashed() && ! $this->invoiceHasFinancialLinks($invoice);
 
-        return view('finance.invoices.show', compact('invoice', 'accounts'));
+        return view('finance.invoices.show', compact('invoice', 'accounts', 'canForceDelete'));
     }
 
     public function remind(Invoice $invoice)
@@ -280,6 +283,21 @@ class InvoiceController extends Controller
             ->with('success', __('messages.deleted_successfully'));
     }
 
+    public function forceDestroy(Invoice $invoice)
+    {
+        $this->authorize('delete', $invoice);
+
+        abort_unless($invoice->trashed(), 404);
+
+        if ($this->invoiceHasFinancialLinks($invoice)) {
+            return back()->with('error', __('messages.invoice_has_financial_links'));
+        }
+
+        $invoice->forceDelete();
+
+        return redirect()->route('invoices.index', ['trashed' => 1])->with('success', __('messages.deleted_permanently'));
+    }
+
     public function restore(Invoice $invoice)
     {
         $this->authorize('update', $invoice);
@@ -304,5 +322,14 @@ class InvoiceController extends Controller
             'project_id' => $invoice->project_id,
             'contract_value' => $invoice->total,
         ]);
+    }
+
+    protected function invoiceHasFinancialLinks(Invoice $invoice): bool
+    {
+        return $invoice->payments()->withTrashed()->exists()
+            || $invoice->reminders()->exists()
+            || $invoice->contract()->exists()
+            || TimeEntry::where('invoiced_invoice_id', $invoice->id)->exists()
+            || Expense::where('invoiced_invoice_id', $invoice->id)->exists();
     }
 }

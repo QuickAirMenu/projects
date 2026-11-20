@@ -6,6 +6,8 @@ return [
     'deleted_successfully' => 'تم الحذف بنجاح',
     'confirm_force_delete' => 'حذف نهائي؟ لا يمكن التراجع عن هذه العملية.',
     'deleted_permanently' => 'تم الحذف نهائياً.',
+    'invoice_archived_hint' => 'فاتورة مؤرشفة — للعرض فقط. الاستعادة متاحة، والحذف النهائي متاح فقط إذا لم تكن مرتبطة بأي مدفوعات أو عمليات فوترة.',
+    'invoice_has_financial_links' => 'مرتبطة بمدفوعات/فوترة — لا يمكن الحذف النهائي.',
     'quote_archived_hint' => 'عرض سعر مؤرشف — للعرض فقط. يمكنك استعادته أو حذفه نهائياً.',
     'restored_successfully' => 'تمت استعادة العنصر من الأرشيف',
     'approved_successfully' => 'تم الاعتماد بنجاح',

@@ -351,11 +351,12 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('create', [InvoiceController::class, 'create'])->name('create');
         Route::post('remind-overdue', [InvoiceController::class, 'remindOverdue'])->name('remind-overdue');
         Route::post('/', [InvoiceController::class, 'store'])->name('store');
-        Route::get('{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('pdf');
-        Route::get('{invoice}', [InvoiceController::class, 'show'])->name('show');
+        Route::get('{invoice}/pdf', [InvoiceController::class, 'pdf'])->withTrashed()->name('pdf');
+        Route::get('{invoice}', [InvoiceController::class, 'show'])->withTrashed()->name('show');
         Route::get('{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit');
         Route::put('{invoice}', [InvoiceController::class, 'update'])->name('update');
         Route::post('{invoice}/restore', [InvoiceController::class, 'restore'])->withTrashed()->name('restore');
+        Route::delete('{invoice}/force', [InvoiceController::class, 'forceDestroy'])->withTrashed()->name('force-delete');
         Route::delete('{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
         Route::post('{invoice}/remind', [InvoiceController::class, 'remind'])->name('remind');
         Route::post('{invoice}/convert-to-contract', [InvoiceController::class, 'convertToContract'])->name('convert-to-contract');

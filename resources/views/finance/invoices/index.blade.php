@@ -165,6 +165,14 @@
                                     <i class="fas fa-undo"></i>
                                 </button>
                             </form>
+                            @can('delete', $invoice)
+                            <form action="{{ route('invoices.force-delete', $invoice) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_force_delete') }}')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg" title="{{ __('messages.delete_permanently') }}">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
+                            </form>
+                            @endcan
                             @else
                             <a href="{{ route('invoices.edit', $invoice) }}" class="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"><i class="fas fa-edit"></i></a>
                             <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" onsubmit="return confirmDelete(this)">
