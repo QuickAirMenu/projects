@@ -53,8 +53,11 @@ class InvoiceController extends Controller
         $stats = [
             'total_invoiced' => Invoice::sum('total'),
             'total_paid' => Invoice::sum('paid_amount'),
-            'unpaid' => Invoice::where('payment_status', 'unpaid')->sum('remaining_amount'),
-            'overdue' => Invoice::where('payment_status', 'overdue')->count(),
+            'outstanding' => Invoice::where('remaining_amount', '>', 0)->sum('remaining_amount'),
+            'overdue' => Invoice::where('remaining_amount', '>', 0)
+                ->whereDate('due_date', '<', now()->toDateString())->count(),
+            'never_paid' => Invoice::where('remaining_amount', '>', 0)->where('paid_amount', '<=', 0)->count(),
+            'partial' => Invoice::where('remaining_amount', '>', 0)->where('paid_amount', '>', 0)->count(),
         ];
         $trashed = $request->has('trashed');
 

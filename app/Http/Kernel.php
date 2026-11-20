@@ -6,6 +6,7 @@ use App\Http\Middleware\ActivityLogger;
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckSetup;
+use App\Http\Middleware\NormalizeNumericInput;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
@@ -48,6 +49,7 @@ class Kernel extends HttpKernel
         ConvertEmptyStringsToNull::class,
         CheckSetup::class,
         SecurityHeaders::class,
+        NormalizeNumericInput::class,
     ];
 
     protected $middlewareGroups = [

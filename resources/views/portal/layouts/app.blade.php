@@ -343,5 +343,30 @@
         }
     })();
 </script>
+<script type="module">
+    (function () {
+        var map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9','٫':'.','٬':'','，':','};
+        function latinize(v) { return v.replace(/[٠-٩۰-۹٫٬，]/g, function (c) { return map[c] || c; }); }
+        function prep(input) {
+            if (!input || input.dataset.latinReady === '1') return;
+            if (input.type === 'number') { input.type = 'text'; input.inputMode = 'decimal'; input.dataset.latinReady = '1'; }
+        }
+        function prepAll(root) { (root || document).querySelectorAll('input[type="number"]').forEach(prep); }
+        document.addEventListener('DOMContentLoaded', function () { prepAll(); });
+        document.addEventListener('input', function (e) {
+            var el = e.target;
+            if (!el || el.tagName !== 'INPUT' || el.dataset.latinReady !== '1') return;
+            var converted = latinize(el.value);
+            if (converted !== el.value) el.value = converted;
+        });
+        document.addEventListener('submit', function (e) {
+            (e.target.querySelectorAll ? e.target : document).querySelectorAll('input[data-latin-ready="1"]').forEach(function (el) {
+                el.value = latinize(el.value);
+            });
+        }, true);
+        var observer = new MutationObserver(function (muts) { muts.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) prepAll(n); }); }); });
+        document.addEventListener('DOMContentLoaded', function () { observer.observe(document.body, { childList: true, subtree: true }); });
+    })();
+</script>
 </body>
 </html>
