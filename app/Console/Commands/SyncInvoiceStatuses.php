@@ -18,11 +18,18 @@ class SyncInvoiceStatuses extends Command
         Invoice::query()->withTrashed(false)->chunkById(200, function ($invoices) use (&$updated) {
             foreach ($invoices as $invoice) {
                 $total = (float) $invoice->total;
+
+                if ($total < 0) {
+                    $invoice->forceFill(['subtotal' => 0, 'tax_amount' => 0, 'discount_amount' => 0, 'total' => 0])->save();
+                    $invoice->refresh();
+                    $total = 0;
+                }
+
                 $paid = (float) $invoice->paid_amount;
                 $remaining = max(0, round($total - $paid, 2));
 
                 $status = match (true) {
-                    $total > 0 && $remaining <= 0 => 'paid',
+                    $remaining <= 0 => 'paid',
                     $invoice->due_date && $invoice->due_date->toDateString() < now()->toDateString() => 'overdue',
                     $paid > 0 => 'partially_paid',
                     default => 'unpaid',
