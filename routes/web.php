@@ -321,6 +321,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('{quote}/edit', [QuoteController::class, 'edit'])->name('edit');
         Route::put('{quote}', [QuoteController::class, 'update'])->name('update');
         Route::post('{quote}/restore', [QuoteController::class, 'restore'])->withTrashed()->name('restore');
+        Route::delete('{quote}/force', [QuoteController::class, 'forceDestroy'])->withTrashed()->name('force-delete');
         Route::delete('{quote}', [QuoteController::class, 'destroy'])->name('destroy');
         Route::post('{quote}/send', [QuoteController::class, 'send'])->name('send');
         Route::post('{quote}/send-whatsapp', [QuoteController::class, 'sendWhatsApp'])->name('send-whatsapp');

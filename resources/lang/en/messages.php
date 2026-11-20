@@ -4,6 +4,8 @@ return [
     'created_successfully' => 'Created successfully',
     'updated_successfully' => 'Updated successfully',
     'deleted_successfully' => 'Deleted successfully',
+    'confirm_force_delete' => 'Delete permanently? This cannot be undone.',
+    'deleted_permanently' => 'Deleted permanently.',
     'restored_successfully' => 'Item restored from archive',
     'approved_successfully' => 'Approved successfully',
     'rejected_successfully' => 'Rejected successfully',

@@ -237,6 +237,18 @@ class QuoteController extends Controller
             ->with('success', __('messages.deleted_successfully'));
     }
 
+    public function forceDestroy(Quote $quote)
+    {
+        $this->authorize('delete', $quote);
+
+        abort_unless($quote->trashed(), 404);
+
+        $quote->forceDelete();
+
+        return redirect()->route('quotes.index', ['trashed' => 1])
+            ->with('success', __('messages.deleted_permanently'));
+    }
+
     public function restore(Quote $quote)
     {
         $this->authorize('update', $quote);
