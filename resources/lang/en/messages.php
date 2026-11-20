@@ -6,6 +6,7 @@ return [
     'deleted_successfully' => 'Deleted successfully',
     'confirm_force_delete' => 'Delete permanently? This cannot be undone.',
     'deleted_permanently' => 'Deleted permanently.',
+    'quote_archived_hint' => 'Archived quote — view only. You can restore it or delete it permanently.',
     'restored_successfully' => 'Item restored from archive',
     'approved_successfully' => 'Approved successfully',
     'rejected_successfully' => 'Rejected successfully',

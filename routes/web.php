@@ -314,8 +314,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('/', [QuoteController::class, 'index'])->name('index');
         Route::get('create', [QuoteController::class, 'create'])->name('create');
         Route::post('/', [QuoteController::class, 'store'])->name('store');
-        Route::get('{quote}/pdf', [QuoteController::class, 'pdf'])->name('pdf');
-        Route::get('{quote}', [QuoteController::class, 'show'])->name('show');
+        Route::get('{quote}/pdf', [QuoteController::class, 'pdf'])->withTrashed()->name('pdf');
+        Route::get('{quote}', [QuoteController::class, 'show'])->withTrashed()->name('show');
         Route::get('{quote}/items', [QuoteController::class, 'itemsJson'])->name('items');
         Route::post('{quote}/duplicate', [QuoteController::class, 'duplicate'])->name('duplicate');
         Route::get('{quote}/edit', [QuoteController::class, 'edit'])->name('edit');

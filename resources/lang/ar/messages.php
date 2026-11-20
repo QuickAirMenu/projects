@@ -6,6 +6,7 @@ return [
     'deleted_successfully' => 'تم الحذف بنجاح',
     'confirm_force_delete' => 'حذف نهائي؟ لا يمكن التراجع عن هذه العملية.',
     'deleted_permanently' => 'تم الحذف نهائياً.',
+    'quote_archived_hint' => 'عرض سعر مؤرشف — للعرض فقط. يمكنك استعادته أو حذفه نهائياً.',
     'restored_successfully' => 'تمت استعادة العنصر من الأرشيف',
     'approved_successfully' => 'تم الاعتماد بنجاح',
     'rejected_successfully' => 'تم الرفض بنجاح',

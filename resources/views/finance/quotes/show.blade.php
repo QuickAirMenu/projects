@@ -17,6 +17,7 @@
     <div class="flex gap-2">
         <a href="{{ route('quotes.pdf', $quote) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-file-pdf me-2"></i>{{ __('messages.download_pdf') }}</a>
         <a href="{{ route('quotes.public', $quote->public_token) }}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-link me-2"></i>{{ __('messages.public_link') }}</a>
+        @unless($quote->trashed())
         <a href="{{ route('quotes.edit', $quote) }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-edit me-2"></i>{{ __('messages.edit') }}</a>
         <form action="{{ route('quotes.duplicate', $quote) }}" method="POST" class="inline">
             @csrf
@@ -42,9 +43,26 @@
             <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fab fa-whatsapp me-2"></i>{{ __('finance.send_via_whatsapp') }}</button>
         </form>
         @endif
+        @endunless
         <a href="{{ route('quotes.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-arrow-right me-2"></i>{{ __('messages.back') }}</a>
     </div>
 </div>
+
+@if($quote->trashed())
+<div class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+    <span><i class="fas fa-box-archive me-2"></i>{{ __('messages.quote_archived_hint') }}</span>
+    <span class="flex gap-2">
+        <form action="{{ route('quotes.restore', $quote) }}" method="POST">@csrf
+            <button class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs text-white"><i class="fas fa-undo me-1"></i>{{ __('messages.restore') }}</button>
+        </form>
+        @can('delete', $quote)
+        <form action="{{ route('quotes.force-delete', $quote) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_force_delete') }}')">@csrf @method('DELETE')
+            <button class="rounded-lg bg-red-600 px-3 py-1.5 text-xs text-white"><i class="fas fa-trash-can me-1"></i>{{ __('messages.delete_permanently') }}</button>
+        </form>
+        @endcan
+    </span>
+</div>
+@endif
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2">
@@ -103,19 +121,21 @@
                 <p class="text-xs font-semibold text-red-600 mb-1">{{ __('finance.modification_reason') }}</p>
                 <p class="text-xs text-gray-600 whitespace-pre-line">{{ $quote->rejection_reason }}</p>
             </div>
+            @unless($quote->trashed())
             <form action="{{ route('quotes.redraft', $quote) }}" method="POST">
                 @csrf
                 <button type="submit" class="block w-full bg-amber-500 hover:bg-amber-600 text-white text-center py-2 rounded-xl text-sm transition mt-2"><i class="fas fa-undo me-1"></i>{{ __('finance.return_to_draft') }}</button>
             </form>
             @endif
+            @endunless
 
-            @if($quote->status === 'approved' && !$quote->converted_to_project_id)
+            @if(!$quote->trashed() && $quote->status === 'approved' && !$quote->converted_to_project_id)
             <div class="border-t pt-3">
                 <p class="text-gray-500 text-xs mb-2">{{ __('finance.convert_quote_to_project_label') }}</p>
                 <a href="{{ route('projects.create') }}?quote_id={{ $quote->id }}&client_id={{ $quote->client_id }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-xl text-sm transition">{{ __('finance.convert_to_project') }}</a>
             </div>
             @endif
-            @if($quote->status === 'approved' && !$quote->invoice)
+            @if(!$quote->trashed() && $quote->status === 'approved' && !$quote->invoice)
             <div class="border-t pt-3">
                 <p class="text-gray-500 text-xs mb-2">{{ __('finance.convert_quote_to_invoice_label') }}</p>
                 <form action="{{ route('quotes.convert-to-invoice', $quote) }}" method="POST">
