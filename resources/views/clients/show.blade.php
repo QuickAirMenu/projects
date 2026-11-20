@@ -73,6 +73,15 @@
                 @if($client->sourceLabel())
                 <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-bullseye w-4 text-indigo-400"></i> {{ $client->sourceLabel() }}</div>
                 @endif
+                @if($client->website)
+                <div class="flex items-center gap-3 text-gray-600"><i class="fas fa-globe w-4 text-blue-400"></i> <a href="{{ $client->website }}" target="_blank" rel="noopener" class="text-blue-600 hover:underline">{{ parse_url($client->website, PHP_URL_HOST) ?: $client->website }}</a></div>
+                @endif
+                @php $socials = ['linkedin' => ['fa-linkedin', 'LinkedIn'], 'twitter' => ['fa-x-twitter', 'X'], 'instagram' => ['fa-instagram', 'Instagram'], 'facebook' => ['fa-facebook', 'Facebook']]; @endphp
+                @foreach($socials as $field => [$icon, $label])
+                @if($client->{$field})
+                <div class="flex items-center gap-3 text-gray-600"><i class="fab {{ $icon }} w-4 text-blue-400"></i> <a href="{{ $client->{$field} }}" target="_blank" rel="noopener" class="text-blue-600 hover:underline">{{ $label }}</a></div>
+                @endif
+                @endforeach
             </div>
         </div>
 

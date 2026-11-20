@@ -85,6 +85,18 @@
                 </select>
             </div>
             <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.website') }}</label>
+                <input type="text" name="website" value="{{ old('website') }}" placeholder="example.com" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('website')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            @foreach(['linkedin' => 'LinkedIn', 'twitter' => 'X / Twitter', 'instagram' => 'Instagram', 'facebook' => 'Facebook'] as $field => $label)
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $label }}</label>
+                <input type="text" name="{{ $field }}" value="{{ old($field) }}" placeholder="https://..." class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error($field)<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            @endforeach
+            <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('client.notes') }}</label>
                 <textarea name="notes" rows="3"
                           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('notes') }}</textarea>

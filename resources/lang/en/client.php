@@ -37,6 +37,8 @@ return [
     'country' => 'Country',
     'industry' => 'Industry',
     'source' => 'Lead Source',
+    'website' => 'Website / domain',
+    'social_links' => 'Social links',
     'source_referral' => 'Referral',
     'source_website' => 'Website',
     'source_social_media' => 'Social Media',

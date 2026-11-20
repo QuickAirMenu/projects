@@ -26,7 +26,25 @@ class StoreClientRequest extends FormRequest
             'industry' => 'nullable|string|max:100',
             'source' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
+            'website' => 'nullable|string|max:255',
+            'linkedin' => 'nullable|string|max:255',
+            'twitter' => 'nullable|string|max:255',
+            'instagram' => 'nullable|string|max:255',
+            'facebook' => 'nullable|string|max:255',
             'assigned_to' => 'nullable|exists:users,id',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        foreach (['website', 'linkedin', 'twitter', 'instagram', 'facebook'] as $field) {
+            $value = trim((string) $this->input($field));
+
+            if ($value !== '' && ! preg_match('/^https?:\/\//i', $value)) {
+                $value = 'https://'.$value;
+            }
+
+            $this->merge([$field => $value !== '' ? $value : null]);
+        }
     }
 }

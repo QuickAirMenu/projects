@@ -37,6 +37,8 @@ return [
     'country' => 'الدولة',
     'industry' => 'القطاع',
     'source' => 'مصدر العميل',
+    'website' => 'الموقع الإلكتروني / الدومين',
+    'social_links' => 'روابط التواصل الاجتماعي',
     'source_referral' => 'توصية',
     'source_website' => 'الموقع الإلكتروني',
     'source_social_media' => 'التواصل الاجتماعي',
