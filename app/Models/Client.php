@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToAccessibleProjects;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Client extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
+    use ScopedToAccessibleProjects;
 
     public const SOURCES = [
         'referral', 'website', 'social_media', 'email_campaign', 'exhibition', 'cold_call', 'other',

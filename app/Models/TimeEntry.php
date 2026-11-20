@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToAccessibleProjects;
 use Illuminate\Database\Eloquent\Model;
 
 class TimeEntry extends Model
 {
+    use ScopedToAccessibleProjects;
+
     protected $fillable = [
         'project_id', 'task_id', 'user_id', 'work_date', 'hours', 'description',
         'billable', 'hourly_rate', 'invoiced_invoice_id', 'created_by',

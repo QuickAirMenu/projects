@@ -4,6 +4,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToAccessibleProjects;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Contract extends Model
 {
     use HasFactory, SoftDeletes;
+    use ScopedToAccessibleProjects;
 
     protected $fillable = [
         'contract_number',

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToAccessibleProjects;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class Expense extends Model
 {
+    use ScopedToAccessibleProjects;
+
     public const CATEGORIES = [
         'software', 'hosting', 'marketing', 'travel', 'office', 'equipment', 'subcontractor', 'utilities', 'other',
     ];

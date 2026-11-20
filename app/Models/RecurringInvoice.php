@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToAccessibleProjects;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 class RecurringInvoice extends Model
 {
+    use ScopedToAccessibleProjects;
+
     protected $fillable = [
         'client_id', 'project_id', 'name', 'invoice_type', 'items', 'tax_percentage',
         'discount_type', 'discount_amount', 'notes', 'terms', 'frequency',

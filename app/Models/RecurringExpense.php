@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToAccessibleProjects;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 class RecurringExpense extends Model
 {
+    use ScopedToAccessibleProjects;
+
     protected $fillable = [
         'vendor_name', 'category', 'amount', 'tax_amount', 'frequency', 'next_run_date',
         'last_run_at', 'is_active', 'project_id', 'client_id', 'billable',

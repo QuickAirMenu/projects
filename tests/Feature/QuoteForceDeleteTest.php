@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
+use App\Models\Project;
+use App\Models\ProjectStatus;
 use App\Models\Quote;
+use App\Models\ServiceType;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -72,6 +75,21 @@ class QuoteForceDeleteTest extends TestCase
             'is_active' => true, 'language' => 'en',
         ]);
         $user->assignRole('team-member');
+
+        $status = ProjectStatus::create([
+            'name_ar' => 'قيد التنفيذ', 'name_en' => 'In Progress', 'slug' => 'in-progress-qperm',
+            'color' => '#3B82F6', 'sort_order' => 1, 'is_default' => true, 'is_active' => true,
+        ]);
+        $service = ServiceType::create([
+            'name_ar' => 'تصميم', 'name_en' => 'Design', 'description_ar' => 'x', 'description_en' => 'x',
+            'is_active' => true, 'sort_order' => 1,
+        ]);
+        Project::create([
+            'name' => 'Accessible Project', 'client_id' => $this->client->id, 'service_type_id' => $service->id,
+            'priority' => 'medium', 'status_id' => $status->id, 'manager_id' => $user->id,
+            'budget' => 1000, 'payment_status' => 'unpaid', 'progress_percentage' => 0,
+            'created_by' => $this->admin->id,
+        ]);
 
         $this->actingAs($user)->delete(route('quotes.force-delete', $quote))->assertForbidden();
     }
