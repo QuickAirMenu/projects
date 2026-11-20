@@ -71,28 +71,14 @@ class UserController extends Controller
         $user->assignRole($request->role);
 
         if ($request->boolean('send_invite')) {
-            $token = Str::random(64);
-            $user->update([
-                'invitation_token' => $token,
-                'invitation_expires_at' => now()->addDays(7),
-            ]);
+            $result = $this->sendInvitation($user);
 
-            try {
-                app(MailConfigService::class)->applyDynamicMailConfig();
-                if (config('mail.mailers.smtp.host')) {
-                    Mail::to($user->email)->send(
-                        new UserInvitationMail($user, route('invitation.setup', $token))
-                    );
-                }
-            } catch (\Throwable $e) {
-                Log::error('User invitation email failed: '.$e->getMessage());
-            }
+            return redirect()->route('users.index')
+                ->with('invite_link', $result['link'])
+                ->with($result['sent'] ? 'success' : 'error', $result['sent'] ? __('users.invite_sent') : $result['error']);
         }
 
-        return redirect()->route('users.index')
-            ->with('success', $request->boolean('send_invite')
-                ? __('users.invite_sent')
-                : __('users.user_added'));
+        return redirect()->route('users.index')->with('success', __('users.user_added'));
     }
 
     public function show(User $user)
@@ -147,24 +133,11 @@ class UserController extends Controller
             return back()->with('error', __('messages.user_already_active'));
         }
 
-        $token = Str::random(64);
-        $user->update([
-            'invitation_token' => $token,
-            'invitation_expires_at' => now()->addDays(7),
-        ]);
+        $result = $this->sendInvitation($user);
 
-        try {
-            app(MailConfigService::class)->applyDynamicMailConfig();
-            if (config('mail.mailers.smtp.host')) {
-                Mail::to($user->email)->send(
-                    new UserInvitationMail($user, route('invitation.setup', $token))
-                );
-            }
-        } catch (\Throwable $e) {
-            Log::error('User invitation resend failed: '.$e->getMessage());
-        }
-
-        return back()->with('success', __('users.invite_resent'));
+        return back()
+            ->with('invite_link', $result['link'])
+            ->with($result['sent'] ? 'success' : 'error', $result['sent'] ? __('users.invite_resent') : $result['error']);
     }
 
     public function toggleStatus(User $user)
@@ -173,5 +146,32 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', $user->is_active ? __('users.user_activated') : __('users.user_deactivated'));
+    }
+
+    protected function sendInvitation(User $user): array
+    {
+        $token = Str::random(64);
+        $user->update([
+            'invitation_token' => $token,
+            'invitation_expires_at' => now()->addDays(7),
+        ]);
+
+        $link = route('invitation.setup', $token);
+
+        try {
+            app(MailConfigService::class)->applyDynamicMailConfig();
+
+            if (blank(config('mail.mailers.smtp.host'))) {
+                return ['link' => $link, 'sent' => false, 'error' => __('users.invite_failed')];
+            }
+
+            Mail::to($user->email)->send(new UserInvitationMail($user, $link));
+
+            return ['link' => $link, 'sent' => true, 'error' => null];
+        } catch (\Throwable $e) {
+            Log::error('User invitation email failed for '.$user->email.': '.$e->getMessage());
+
+            return ['link' => $link, 'sent' => false, 'error' => __('users.invite_failed')];
+        }
     }
 }

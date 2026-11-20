@@ -45,6 +45,9 @@ return [
     'invite_sent' => 'Invitation email sent successfully',
     'user_added' => 'User added successfully',
     'invite_resent' => 'Invitation resent',
+    'invite_failed' => 'User created but the email could not be sent. Use the invitation link below.',
+    'invite_link_fallback' => 'Invitation link (fallback)',
+    'invite_link_hint' => 'Send this link to the employee via WhatsApp or email if automatic delivery fails.',
     'user_activated' => 'User activated',
     'user_deactivated' => 'User deactivated',
 

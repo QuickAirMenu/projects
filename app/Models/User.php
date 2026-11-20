@@ -50,6 +50,9 @@ class User extends Authenticatable
         'language',
         'timezone',
         'last_login_at',
+        'email_verified_at',
+        'invitation_token',
+        'invitation_expires_at',
     ];
 
     /**
@@ -72,6 +75,7 @@ class User extends Authenticatable
         'last_login_at' => 'datetime',
         'is_active' => 'boolean',
         'password' => 'hashed',
+        'invitation_expires_at' => 'datetime',
         'two_factor_secret' => 'encrypted',
         'two_factor_recovery_codes' => 'encrypted:array',
         'two_factor_confirmed_at' => 'datetime',

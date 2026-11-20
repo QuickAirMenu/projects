@@ -15,6 +15,17 @@
 </div>
 
 
+@if(session('invite_link'))
+<div class="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+    <p class="text-sm font-semibold text-amber-800">{{ __('users.invite_link_fallback') }}</p>
+    <div class="mt-2 flex flex-wrap items-center gap-2">
+        <input id="inviteLink" readonly value="{{ session('invite_link') }}" class="min-w-64 flex-1 rounded-xl border border-amber-300 bg-white px-3 py-2 font-mono text-xs" onclick="this.select()">
+        <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('inviteLink').value); this.textContent='✓'" class="rounded-xl bg-amber-600 px-4 py-2 text-sm text-white">{{ __('messages.copy') }}</button>
+    </div>
+    <p class="mt-1 text-xs text-amber-700">{{ __('users.invite_link_hint') }}</p>
+</div>
+@endif
+
 {{-- Filters --}}
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
     <form method="GET" class="flex flex-wrap gap-3">
