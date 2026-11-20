@@ -92,6 +92,8 @@ return [
     'quote_count' => 'quotes',
     'total_invoiced' => 'Total Invoiced',
     'outstanding_balance' => 'Outstanding balance',
+    'outstanding_help' => 'Remaining amount on all invoices not fully paid (includes partial and overdue).',
+    'overdue_help' => 'Invoices past their due date that still have a remaining balance.',
     'overdue_invoices' => 'Overdue / not fully paid',
     'invoice_stats_hint' => '“Outstanding” is the remaining amount on all invoices not fully paid (including partial and overdue). “Overdue” means past due date with a remaining balance.',
     'total_collected' => 'Total Collected',

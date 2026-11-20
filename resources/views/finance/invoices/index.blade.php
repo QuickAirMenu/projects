@@ -56,8 +56,8 @@
     @foreach([
         ['label' => __('finance.total_invoiced'), 'val' => number_format($stats['total_invoiced'],2), 'color' => 'blue',  'icon' => 'fa-file-invoice-dollar'],
         ['label' => __('finance.total_collected'), 'val' => number_format($stats['total_paid'],2),     'color' => 'green', 'icon' => 'fa-money-bill-wave'],
-        ['label' => __('finance.outstanding_balance'), 'val' => number_format($stats['outstanding'],2), 'color' => 'red', 'icon' => 'fa-exclamation-circle'],
-        ['label' => __('finance.overdue_invoices'), 'val' => $stats['overdue'].' / '.($stats['never_paid'] + $stats['partial']), 'color' => 'orange', 'icon' => 'fa-clock'],
+        ['label' => __('finance.outstanding_balance'), 'val' => number_format($stats['outstanding'],2), 'color' => 'red', 'icon' => 'fa-exclamation-circle', 'help' => __('finance.outstanding_help')],
+        ['label' => __('finance.overdue_invoices'), 'val' => $stats['overdue'].' / '.($stats['never_paid'] + $stats['partial']), 'color' => 'orange', 'icon' => 'fa-clock', 'help' => __('finance.overdue_help')],
     ] as $c)
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4">
         <div class="w-11 h-11 rounded-xl bg-{{ $c['color'] }}-100 flex items-center justify-center">
@@ -65,15 +65,11 @@
         </div>
         <div class="min-w-0">
             <p class="text-lg font-bold text-gray-800 truncate privacy-mask">{{ $c['val'] }}</p>
-            <p class="text-xs text-gray-500">{{ $c['label'] }}</p>
+            <p class="text-xs text-gray-500">{{ $c['label'] }} @isset($c['help'])<x-help :text="$c['help']" />@endisset</p>
         </div>
     </div>
     @endforeach
 </div>
-
-<p class="mb-4 text-xs text-gray-500">
-    <i class="fas fa-circle-info me-1"></i>{{ __('finance.invoice_stats_hint') }}
-</p>
 
 {{-- Filters --}}
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
