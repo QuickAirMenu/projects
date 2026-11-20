@@ -72,6 +72,11 @@ class Task extends Model
     /**
      * Relationships
      */
+    public function paidAccount()
+    {
+        return $this->belongsTo(Account::class, 'paid_account_id');
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

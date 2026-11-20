@@ -395,6 +395,8 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
         Route::get('aging', [AdvancedReportController::class, 'aging'])->name('aging');
         Route::get('aging/export', [AdvancedReportController::class, 'agingExport'])->name('aging.export');
         Route::get('profitability/export', [AdvancedReportController::class, 'profitabilityExport'])->name('profitability.export');
+        Route::post('team-payouts/pay', [TeamPayoutController::class, 'batchPay'])->middleware('permission:create-payments')->name('team-payouts.pay');
+        Route::get('team-payouts/{user}/statement/pdf', [TeamPayoutController::class, 'statementPdf'])->name('team-payouts.statement');
         Route::get('team-payouts', [TeamPayoutController::class, 'index'])->name('team-payouts');
         Route::get('wip', [WipReportController::class, 'index'])->name('wip');
         Route::get('wip/export', [WipReportController::class, 'export'])->name('wip.export');
