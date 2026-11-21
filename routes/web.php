@@ -55,6 +55,7 @@ use App\Http\Controllers\Task\TaskChecklistController;
 use App\Http\Controllers\Task\TaskCommentController;
 use App\Http\Controllers\Task\TaskController;
 use App\Http\Controllers\Task\TimeLogController;
+use App\Http\Controllers\User\EmailValidationController;
 use App\Http\Controllers\User\PermissionController;
 use App\Http\Controllers\User\RoleController;
 use App\Http\Controllers\User\UserController;
@@ -440,6 +441,7 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
 
     // Users
     Route::prefix('users')->name('users.')->middleware('permission:manage-users')->group(function () {
+        Route::post('validate-email', [EmailValidationController::class, 'check'])->name('validate-email');
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('create', [UserController::class, 'create'])->name('create');
         Route::post('/', [UserController::class, 'store'])->name('store');

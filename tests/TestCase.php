@@ -10,6 +10,13 @@ abstract class TestCase extends BaseTestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['mail.email_domain_check' => false]);
+    }
+
     public function createApplication()
     {
         $app = require __DIR__.'/../bootstrap/app.php';

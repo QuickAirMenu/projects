@@ -8,4 +8,5 @@ return [
         'array' => ['transport' => 'array'],
     ],
     'from' => ['address' => env('MAIL_FROM_ADDRESS', 'noreply@workspace.airmenu.net'), 'name' => env('MAIL_FROM_NAME', 'Air Menu Workspace')],
+    'email_domain_check' => env('EMAIL_DOMAIN_CHECK', true),
 ];

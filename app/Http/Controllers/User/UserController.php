@@ -5,6 +5,8 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Mail\UserInvitationMail;
 use App\Models\User;
+use App\Rules\DeliverableEmail;
+use App\Services\EmailVerificationService;
 use App\Services\MailConfigService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -49,7 +51,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
+            'email' => ['required', 'email', 'max:255', new DeliverableEmail, 'unique:users,email,NULL,id,deleted_at,NULL'],
             'job_title' => 'nullable|string|max:100',
             'job_level' => 'nullable|in:'.implode(',', array_keys(User::JOB_LEVELS)),
             'phone' => 'nullable|string|max:20',
@@ -150,6 +152,12 @@ class UserController extends Controller
 
     protected function sendInvitation(User $user): array
     {
+        $emailCheck = app(EmailVerificationService::class)->inspect((string) $user->email);
+
+        if (! $emailCheck['ok']) {
+            return ['link' => null, 'sent' => false, 'error' => $emailCheck['message'] ?: __('users.invite_failed')];
+        }
+
         $token = Str::random(64);
         $user->update([
             'invitation_token' => $token,
