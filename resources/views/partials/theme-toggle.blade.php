@@ -1,35 +1,65 @@
-<div class="auth-controls">
-    <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
-       class="auth-ctrl"
-       title="{{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}"
-       aria-label="{{ app()->getLocale() === 'ar' ? 'Switch to English' : 'التبديل إلى العربية' }}">
-        <i class="fas fa-language"></i>
-        <span>{{ app()->getLocale() === 'ar' ? 'English' : 'عربي' }}</span>
-    </a>
-    <button type="button" data-auth-theme-toggle class="auth-ctrl auth-ctrl-icon"
-            title="{{ __('messages.theme_toggle') }}" aria-label="{{ __('messages.theme_toggle') }}">
-        <i class="fas fa-moon"></i>
-    </button>
-</div>
+<footer class="auth-footer">
+    <div class="auth-footer-inner">
+        <span class="auth-footer-copy">
+            &copy; {{ date('Y') }} <a href="{{ url('/') }}">{{ config('app.name') }}</a>
+        </span>
+        <nav class="auth-footer-links" aria-label="{{ __('legal.legal_links') }}">
+            <a href="{{ route('privacy') }}">{{ __('legal.privacy.title') }}</a>
+            <span aria-hidden="true">·</span>
+            <a href="{{ route('terms') }}">{{ __('legal.terms.title') }}</a>
+        </nav>
+        <div class="auth-footer-actions">
+            <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
+               class="auth-ctrl"
+               title="{{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}"
+               aria-label="{{ app()->getLocale() === 'ar' ? 'Switch to English' : 'التبديل إلى العربية' }}">
+                <i class="fas fa-language"></i>
+                <span>{{ app()->getLocale() === 'ar' ? 'English' : 'عربي' }}</span>
+            </a>
+            <button type="button" data-auth-theme-toggle class="auth-ctrl auth-ctrl-icon"
+                    title="{{ __('messages.theme_toggle') }}" aria-label="{{ __('messages.theme_toggle') }}">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+</footer>
 
 <style>
-    .auth-controls {
-        position: fixed; top: 1rem; inset-inline-end: 1rem; z-index: 50;
-        display: flex; align-items: center; gap: .5rem;
+    body { padding-bottom: 5.5rem; }
+    .auth-footer {
+        position: fixed; inset-inline: 0; bottom: 0; z-index: 50;
+        background: rgba(255,255,255,.92); border-top: 1px solid rgba(0,0,0,.06);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
+    .auth-footer-inner {
+        max-width: 72rem; margin: 0 auto; padding: .7rem 1rem;
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem;
+        font-size: 12px; color: #6b7280;
+    }
+    .auth-footer-copy a { color: #4b5563; font-weight: 600; text-decoration: none; }
+    .auth-footer-links { display: flex; align-items: center; gap: .5rem; }
+    .auth-footer-links a { color: #4b5563; text-decoration: none; }
+    .auth-footer-links a:hover { color: #2563eb; text-decoration: underline; }
+    .auth-footer-actions { display: flex; align-items: center; gap: .5rem; }
     .auth-ctrl {
         display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
-        height: 38px; padding: 0 .9rem; border-radius: 999px; cursor: pointer;
-        background: rgba(255,255,255,.94); color: #374151; font-size: 13px; font-weight: 600;
-        border: 1px solid rgba(255,255,255,.7); box-shadow: 0 4px 14px rgba(0,0,0,.12);
-        text-decoration: none; transition: background .15s ease, transform .15s ease;
+        height: 34px; padding: 0 .8rem; border-radius: 999px; cursor: pointer;
+        background: #f3f4f6; color: #374151; font-size: 12px; font-weight: 600;
+        border: 1px solid #e5e7eb; text-decoration: none;
     }
-    .auth-ctrl:hover { background: #fff; }
-    .auth-ctrl-icon { width: 38px; padding: 0; }
-    html.dark .auth-ctrl {
-        background: rgba(26,37,55,.94); color: #e2e8f0; border-color: #33465e;
-    }
+    .auth-ctrl:hover { background: #e5e7eb; }
+    .auth-ctrl-icon { width: 34px; padding: 0; }
+    html.dark body { background-color: #0f172a; }
+    html.dark .auth-footer { background: rgba(17,24,39,.94); border-top-color: #26364c; }
+    html.dark .auth-footer-inner { color: #94a3b8; }
+    html.dark .auth-footer-copy a,
+    html.dark .auth-footer-links a { color: #cbd5e1; }
+    html.dark .auth-footer-links a:hover { color: #93c5fd; }
+    html.dark .auth-ctrl { background: #1a2537; color: #e2e8f0; border-color: #33465e; }
     html.dark .auth-ctrl:hover { background: #22314a; }
+    @media (max-width: 640px) {
+        .auth-footer-inner { justify-content: center; text-align: center; }
+    }
 </style>
 
 <script>

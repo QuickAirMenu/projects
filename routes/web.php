@@ -99,6 +99,8 @@ Route::get('lang/{locale}', function ($locale) {
 
 // Help center
 Route::get('/help', fn () => view('help'))->name('help');
+Route::view('/privacy', 'legal.privacy')->name('privacy');
+Route::view('/terms', 'legal.terms')->name('terms');
 
 // Public quotes
 Route::get('/q/{token}', [QuoteController::class, 'publicShow'])->middleware('throttle:30,1')->name('quotes.public');

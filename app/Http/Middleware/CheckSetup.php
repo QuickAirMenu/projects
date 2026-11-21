@@ -11,7 +11,7 @@ class CheckSetup
     public function handle(Request $request, Closure $next)
     {
         // Allow these routes without setup check
-        $allowed = ['setup/*', 'health', 'backup-trigger*', 'login', 'logout', 'csp-report'];
+        $allowed = ['setup/*', 'health', 'backup-trigger*', 'login', 'logout', 'csp-report', 'privacy', 'terms'];
         foreach ($allowed as $pattern) {
             if ($request->is($pattern)) {
                 return $next($request);
