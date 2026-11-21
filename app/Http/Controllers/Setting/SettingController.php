@@ -76,6 +76,7 @@ class SettingController extends Controller
         $request->validate([
             'company_logo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
             'company_email' => ['nullable', 'email', 'max:255', new DeliverableEmail],
+            'mail_from_address' => ['nullable', 'email', 'max:255', new DeliverableEmail],
         ]);
 
         $groupMap = [

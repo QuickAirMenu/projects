@@ -77,6 +77,10 @@ class EmailValidationTest extends TestCase
         $this->actingAs($this->admin)->put(route('settings.update'), [
             'company_email' => 'bad@unknown-domain-xyz.test',
         ])->assertSessionHasErrors('company_email');
+
+        $this->actingAs($this->admin)->put(route('settings.update'), [
+            'mail_from_address' => 'bad@unknown-domain-xyz.test',
+        ])->assertSessionHasErrors('mail_from_address');
     }
 
     public function test_user_creation_is_blocked_for_bad_domain(): void
