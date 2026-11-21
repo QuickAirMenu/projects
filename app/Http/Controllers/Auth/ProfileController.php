@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\DeliverableEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +30,7 @@ class ProfileController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'email' => ['required', 'email', 'max:255', new DeliverableEmail, 'unique:users,email,'.$user->id],
             'phone' => 'nullable|string|max:20',
             'job_title' => 'nullable|string|max:100',
             'job_level' => 'nullable|in:'.implode(',', array_keys(User::JOB_LEVELS)),

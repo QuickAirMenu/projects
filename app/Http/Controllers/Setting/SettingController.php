@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Rules\DeliverableEmail;
 use App\Services\MailConfigService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -74,6 +75,7 @@ class SettingController extends Controller
     {
         $request->validate([
             'company_logo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
+            'company_email' => ['nullable', 'email', 'max:255', new DeliverableEmail],
         ]);
 
         $groupMap = [

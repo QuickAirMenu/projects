@@ -21,6 +21,7 @@ class EmailVerificationService
             'domain' => null,
             'has_mx' => null,
             'suggestion' => null,
+            'suggested_email' => null,
             'ok' => false,
             'message' => null,
         ];
@@ -37,6 +38,7 @@ class EmailVerificationService
         $suggestion = $this->suggestionFor($domain);
         if ($suggestion !== null) {
             $result['suggestion'] = $suggestion;
+            $result['suggested_email'] = $this->replaceDomain($email, $suggestion);
         }
 
         if (! (bool) config('mail.email_domain_check', true)) {

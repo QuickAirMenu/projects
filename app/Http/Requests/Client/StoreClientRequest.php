@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Rules\DeliverableEmail;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreClientRequest extends FormRequest
@@ -16,7 +17,7 @@ class StoreClientRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'company_name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
+            'email' => ['nullable', 'email', 'max:255', new DeliverableEmail],
             'phone' => 'nullable|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'city' => 'nullable|string|max:100',

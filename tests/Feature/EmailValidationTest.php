@@ -39,6 +39,7 @@ class EmailValidationTest extends TestCase
         $typo = $service->inspect('Ahmed@gmal.com');
         $this->assertFalse($typo['ok']);
         $this->assertSame('gmail.com', $typo['suggestion']);
+        $this->assertSame('Ahmed@gmail.com', $typo['suggested_email']);
 
         $valid = $service->inspect('ahmed@example.com');
         $this->assertTrue($valid['ok']);
@@ -49,13 +50,33 @@ class EmailValidationTest extends TestCase
         $this->assertFalse($invalid['valid_format']);
     }
 
-    public function test_live_email_check_endpoint_returns_suggestion(): void
+    public function test_live_email_check_endpoint_returns_full_suggestion(): void
     {
         $this->actingAs($this->admin)
-            ->postJson(route('users.validate-email'), ['email' => 'Ahmed@gmal.com'])
+            ->postJson(route('email.validate'), ['email' => 'Ahmed@gmal.com'])
             ->assertOk()
             ->assertJsonPath('ok', false)
-            ->assertJsonPath('suggestion', 'gmail.com');
+            ->assertJsonPath('suggestion', 'gmail.com')
+            ->assertJsonPath('suggested_email', 'Ahmed@gmail.com');
+    }
+
+    public function test_client_profile_and_settings_use_the_same_check(): void
+    {
+        $mock = Mockery::mock(EmailVerificationService::class);
+        $mock->shouldReceive('inspect')->andReturn(['ok' => false, 'message' => 'Bad domain']);
+        $this->app->instance(EmailVerificationService::class, $mock);
+
+        $this->actingAs($this->admin)->post(route('clients.store'), [
+            'name' => 'Bad Client', 'email' => 'bad@unknown-domain-xyz.test', 'phone' => '0500000000', 'status' => 'active',
+        ])->assertSessionHasErrors('email');
+
+        $this->actingAs($this->admin)->put(route('profile.update'), [
+            'name' => 'Admin', 'email' => 'bad@unknown-domain-xyz.test',
+        ])->assertSessionHasErrors('email');
+
+        $this->actingAs($this->admin)->put(route('settings.update'), [
+            'company_email' => 'bad@unknown-domain-xyz.test',
+        ])->assertSessionHasErrors('company_email');
     }
 
     public function test_user_creation_is_blocked_for_bad_domain(): void

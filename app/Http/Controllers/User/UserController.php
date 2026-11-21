@@ -101,7 +101,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
+            'email' => ['required', 'email', 'max:255', new DeliverableEmail, 'unique:users,email,'.$user->id],
             'job_title' => 'nullable|string|max:100',
             'job_level' => 'nullable|in:'.implode(',', array_keys(User::JOB_LEVELS)),
             'phone' => 'nullable|string|max:20',

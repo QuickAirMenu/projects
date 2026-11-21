@@ -25,40 +25,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('users.email') }} *</label>
                 <input type="email" name="email" value="{{ old('email') }}" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-
-                <p id="emailCheckStatus" class="mt-1 text-xs"></p>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const email = document.querySelector('input[name="email"]');
-                        const status = document.getElementById('emailCheckStatus');
-                        if (!email || !status) return;
-                        let timer;
-                        function check() {
-                            const value = email.value.trim();
-                            if (value === '') { status.textContent = ''; return; }
-                            status.className = 'mt-1 text-xs text-gray-400';
-                            status.textContent = @json(__('users.email_checking'));
-                            fetch(@json(route('users.validate-email')), {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': @json(csrf_token()), 'Accept': 'application/json'},
-                                body: JSON.stringify({email: value})
-                            }).then(r => r.json()).then(data => {
-                                if (data.ok) {
-                                    status.className = 'mt-1 text-xs text-emerald-600';
-                                    status.textContent = @json(__('users.email_ok'));
-                                } else if (data.suggestion) {
-                                    status.className = 'mt-1 text-xs text-amber-600';
-                                    status.textContent = @json(__('users.email_suggestion_short')) + ' ' + data.suggestion;
-                                } else {
-                                    status.className = 'mt-1 text-xs text-red-600';
-                                    status.textContent = data.message || @json(__('users.email_invalid_format'));
-                                }
-                            }).catch(() => {});
-                        }
-                        email.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(check, 600); });
-                        email.addEventListener('blur', check);
-                    });
-                </script>            </div>
+            </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     {{ __('users.role') }} *

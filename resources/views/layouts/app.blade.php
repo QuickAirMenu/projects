@@ -348,5 +348,119 @@
         document.addEventListener('DOMContentLoaded', function () { observer.observe(document.body, { childList: true, subtree: true }); });
     })();
 </script>
+<script type="module">
+    (function () {
+        const endpoint = @json(route('email.validate'));
+        const csrf = @json(csrf_token());
+        const checkingText = @json(__('users.email_checking'));
+        const okText = @json(__('users.email_ok'));
+
+        function enhance(input) {
+            if (input.dataset.emailEnhanced === '1' || input.closest('[data-skip-email-check]')) return;
+            input.dataset.emailEnhanced = '1';
+
+            const wrap = document.createElement('div');
+            wrap.style.position = 'relative';
+            input.parentNode.insertBefore(wrap, input);
+            wrap.appendChild(input);
+            input.style.paddingInlineEnd = '2.25rem';
+
+            const icon = document.createElement('i');
+            icon.style.cssText = 'position:absolute;inset-inline-end:10px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:13px;';
+            wrap.appendChild(icon);
+
+            const status = document.createElement('p');
+            status.style.cssText = 'margin-top:4px;font-size:11px;line-height:1.6;';
+            wrap.parentNode.insertBefore(status, wrap.nextSibling);
+
+            let timer = null;
+            let controller = null;
+
+            function setIcon(classes, color, title) {
+                icon.className = classes;
+                icon.style.color = color || '';
+                icon.title = title || '';
+            }
+
+            function clear() {
+                setIcon('', '');
+                status.textContent = '';
+            }
+
+            async function check() {
+                const value = input.value.trim();
+                if (value === '' || value.indexOf('@') === -1) { clear(); return; }
+
+                setIcon('fas fa-spinner fa-spin', '#6b7280');
+                status.textContent = checkingText;
+                status.style.color = '#6b7280';
+
+                if (controller) controller.abort();
+                controller = new AbortController();
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json'},
+                        body: JSON.stringify({email: value}),
+                        signal: controller.signal
+                    });
+                    const data = await response.json();
+
+                    if (data.ok) {
+                        setIcon('fas fa-circle-check', '#059669', okText);
+                        status.textContent = okText;
+                        status.style.color = '#059669';
+                        return;
+                    }
+
+                    if (data.suggested_email) {
+                        setIcon('fas fa-circle-exclamation', '#d97706', data.message || '');
+                        status.style.color = '#d97706';
+                        status.textContent = '';
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.style.textDecoration = 'underline';
+                        link.textContent = @json(__('users.email_suggestion_short')) + ' ' + data.suggested_email;
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            input.value = data.suggested_email;
+                            check();
+                        });
+                        status.appendChild(link);
+                        return;
+                    }
+
+                    setIcon('fas fa-circle-xmark', '#dc2626', data.message || '');
+                    status.textContent = data.message || @json(__('users.email_invalid_format'));
+                    status.style.color = '#dc2626';
+                } catch (e) {
+                    if (e.name !== 'AbortError') clear();
+                }
+            }
+
+            input.addEventListener('input', function () {
+                clearTimeout(timer);
+                timer = setTimeout(check, 600);
+            });
+            input.addEventListener('blur', check);
+        }
+
+        document.querySelectorAll('input[type="email"]').forEach(enhance);
+
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (m) {
+                m.addedNodes.forEach(function (node) {
+                    if (node.nodeType !== 1) return;
+                    if (node.matches && node.matches('input[type="email"]')) enhance(node);
+                    if (node.querySelectorAll) node.querySelectorAll('input[type="email"]').forEach(enhance);
+                });
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            observer.observe(document.body, {childList: true, subtree: true});
+        });
+    })();
+</script>
 </body>
 </html>

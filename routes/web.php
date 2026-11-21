@@ -158,6 +158,7 @@ Route::post('/invitation/{token}', [UserInvitationController::class, 'completeSe
 
 // Authenticated
 Route::middleware(['auth', 'set.locale'])->group(function () {
+    Route::post('email/validate', [EmailValidationController::class, 'check'])->middleware('throttle:30,1')->name('email.validate');
     Route::get('push/key', [PushSubscriptionController::class, 'key'])->name('push.key');
     Route::post('push/subscribe', [PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
     Route::delete('push/unsubscribe', [PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
