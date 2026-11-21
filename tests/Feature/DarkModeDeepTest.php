@@ -43,7 +43,7 @@ class DarkModeDeepTest extends TestCase
             ->assertOk()
             ->assertSee('css/dark.css', false)
             ->assertSee('ip_theme', false)
-            ->assertSee('data-theme-toggle', false);
+            ->assertSee('data-auth-theme-toggle', false);
     }
 
     public function test_dark_css_includes_print_and_focus_and_extended_tokens(): void
