@@ -20,7 +20,7 @@
         }
     </script>
 
-    <title>إعداد الحساب</title>
+    <title>{{ __('invitation.title') }}</title>
     @vite(['resources/css/app.css'])
     @include('partials.theme-head')
 </head>
@@ -28,7 +28,8 @@
     <div class="max-w-md w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold text-gray-800">{{ config('app.name') }}</h1>
-            <p class="text-gray-500 mt-2">إعداد حسابك الجديد</p>
+            <p class="mt-2 text-sm text-gray-500">{{ __('invitation.heading') }}</p>
+            <p class="mt-1 text-xs text-gray-400">{{ __('invitation.subtitle') }}</p>
         </div>
 
         @if(session('error'))
@@ -47,21 +48,26 @@
         <form action="{{ route('invitation.setup.post', $token) }}" method="POST">
             @csrf
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('invitation.password') }}</label>
                 <input type="password" name="password" required
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="mt-1 text-xs text-gray-400">{{ __('invitation.password_hint') }}</p>
                 @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1">تأكيد كلمة المرور</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('invitation.password_confirmation') }}</label>
                 <input type="password" name="password_confirmation" required
                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <button type="submit"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition">
-                إعداد الحساب
+                {{ __('invitation.submit') }}
             </button>
         </form>
+
+        <div class="mt-5 text-center">
+            <a href="{{ route('login') }}" class="text-sm text-blue-600 hover:underline">{{ __('invitation.login_link') }}</a>
+        </div>
     </div>
     @include('partials.theme-toggle')
 </body>

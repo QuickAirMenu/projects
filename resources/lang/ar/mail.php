@@ -12,4 +12,9 @@ return [
     'handoff_attachments' => 'المرفقات',
     'handoff_notes' => 'ملاحظات',
     'handoff_footer' => 'هذه رسالة آلية من نظام إدارة المشاريع. يرجى عدم الرد عليها.',
+    'reset_password_subject' => 'إعادة تعيين كلمة المرور',
+    'reset_password_greeting' => 'مرحباً :name،',
+    'reset_password_line1' => 'تلقّينا طلباً لإعادة تعيين كلمة مرور حسابك.',
+    'reset_password_action' => 'إعادة تعيين كلمة المرور',
+    'reset_password_line2' => 'الرابط صالح لمدة :minutes دقيقة. إذا لم تطلب ذلك تجاهل الرسالة.',
 ];

@@ -349,4 +349,5 @@ return [
     'statement_email_greeting' => 'Hello :name,',
     'statement_email_body' => 'Attached is your statement for :from to :to.',
     'statement_email_attached' => 'Please review the attached PDF for details.',
+    'reset_link_failed' => 'Could not send the reset link. Check mail settings.',
 ];

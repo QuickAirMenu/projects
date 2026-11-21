@@ -76,4 +76,5 @@ return [
     'role_updated' => 'Role updated successfully',
     'permission_created' => 'Permission created successfully',
     'permission_deleted' => 'Permission deleted successfully',
+    'invitation_invalid' => 'The invitation link is invalid or expired. Ask your administrator for a new invitation.',
 ];

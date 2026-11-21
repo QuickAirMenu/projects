@@ -349,4 +349,5 @@ return [
     'statement_email_greeting' => 'مرحباً :name،',
     'statement_email_body' => 'مرفق كشف حسابك للفترة من :from إلى :to.',
     'statement_email_attached' => 'يمكنك مراجعة التفاصيل في الملف المرفق.',
+    'reset_link_failed' => 'تعذر إرسال رابط إعادة التعيين. تحقق من إعدادات البريد.',
 ];

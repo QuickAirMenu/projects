@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasPushSubscriptions;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -242,5 +243,10 @@ class User extends Authenticatable
         $this->forceFill(['two_factor_recovery_codes' => $codes])->save();
 
         return $codes;
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

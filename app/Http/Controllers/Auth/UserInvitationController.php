@@ -14,7 +14,11 @@ class UserInvitationController extends Controller
     {
         $user = User::where('invitation_token', $token)
             ->where('invitation_expires_at', '>', now())
-            ->firstOrFail();
+            ->first();
+
+        if (! $user) {
+            return redirect()->route('login')->withErrors(['email' => __('users.invitation_invalid')]);
+        }
 
         return view('auth.invitation-setup', compact('user', 'token'));
     }
@@ -27,7 +31,11 @@ class UserInvitationController extends Controller
 
         $user = User::where('invitation_token', $token)
             ->where('invitation_expires_at', '>', now())
-            ->firstOrFail();
+            ->first();
+
+        if (! $user) {
+            return redirect()->route('login')->withErrors(['email' => __('users.invitation_invalid')]);
+        }
 
         $user->update([
             'password' => Hash::make($request->password),

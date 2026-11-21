@@ -44,6 +44,11 @@
                     {{ __('auth.login') }}
                 </h2>
 
+                @if (session('status'))
+                    <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg">
+                        {{ session('status') }}
+                    </div>
+                @endif
                 @if ($errors->any())
                     <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                         <div class="flex items-center">
@@ -77,6 +82,9 @@
                         @error('password')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
 
+                    <div class="mb-3 text-end">
+                        <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">{{ __('auth.forgot_password') }}</a>
+                    </div>
                     <div class="mb-6">
                         <label class="flex items-center">
                             <input type="checkbox" name="remember" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">

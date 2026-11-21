@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ApiDocsController;
 use App\Http\Controllers\ApiTokenController;
+use App\Http\Controllers\Auth\AdminPasswordResetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
@@ -77,6 +78,10 @@ use Symfony\Component\Process\Process;
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+    Route::get('forgot-password', [AdminPasswordResetController::class, 'request'])->name('password.request');
+    Route::post('forgot-password', [AdminPasswordResetController::class, 'email'])->middleware('throttle:3,1')->name('password.email');
+    Route::get('reset-password/{token}', [AdminPasswordResetController::class, 'reset'])->name('password.reset');
+    Route::post('reset-password', [AdminPasswordResetController::class, 'update'])->middleware('throttle:5,1')->name('password.update');
     Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'show'])->name('two-factor.login');
     Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store'])->middleware('throttle:5,1')->name('two-factor.login.store');
 });
