@@ -16,14 +16,60 @@
 
 
 @if(session('invite_link'))
-<div class="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-    <p class="text-sm font-semibold text-amber-800">{{ __('users.invite_link_fallback') }}</p>
-    <div class="mt-2 flex flex-wrap items-center gap-2">
-        <input id="inviteLink" readonly value="{{ session('invite_link') }}" class="min-w-64 flex-1 rounded-xl border border-amber-300 bg-white px-3 py-2 font-mono text-xs" onclick="this.select()">
-        <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('inviteLink').value); this.textContent='✓'" class="rounded-xl bg-amber-600 px-4 py-2 text-sm text-white">{{ __('messages.copy') }}</button>
+<div class="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+    <div class="flex items-start gap-3">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700"><i class="fas fa-link"></i></span>
+        <div>
+            <p class="text-sm font-semibold text-amber-800">{{ __('users.invite_link_fallback') }}</p>
+            <p class="mt-0.5 text-xs text-amber-700">
+                {{ session('error') ? __('users.invite_link_failed_note') : __('users.invite_link_sent_note') }}
+            </p>
+        </div>
     </div>
-    <p class="mt-1 text-xs text-amber-700">{{ __('users.invite_link_hint') }}</p>
+
+    <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <input id="inviteLink" readonly value="{{ session('invite_link') }}" onclick="this.select()"
+               class="w-full flex-1 rounded-xl border border-amber-300 bg-white px-3 py-2.5 font-mono text-xs" aria-label="{{ __('users.invite_link_fallback') }}">
+        <div class="flex shrink-0 gap-2">
+            <button type="button" id="copyInviteBtn" onclick="copyInviteLink(this)"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-amber-700">
+                <i class="fas fa-copy"></i><span>{{ __('users.copy_invite_link') }}</span>
+            </button>
+            <a href="{{ session('invite_link') }}" target="_blank" rel="noopener"
+               class="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-white px-4 py-2.5 text-sm font-medium text-amber-700 hover:bg-amber-100">
+                <i class="fas fa-arrow-up-right-from-square"></i><span>{{ __('users.open_invite_link') }}</span>
+            </a>
+        </div>
+    </div>
+    <p class="mt-2 text-xs text-amber-700">{{ __('users.invite_link_hint') }}</p>
 </div>
+
+<script>
+    function copyInviteLink(btn) {
+        const input = document.getElementById('inviteLink');
+        if (!input) return;
+        const done = function () {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-check"></i><span>{{ __('users.invite_link_copied') }}</span>';
+            btn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+            setTimeout(function () {
+                btn.innerHTML = original;
+                btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+            }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(input.value).then(done).catch(function () {
+                input.select();
+                document.execCommand('copy');
+                done();
+            });
+        } else {
+            input.select();
+            document.execCommand('copy');
+            done();
+        }
+    }
+</script>
 @endif
 
 {{-- Filters --}}

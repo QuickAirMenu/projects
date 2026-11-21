@@ -52,7 +52,9 @@ class InvitationFlowTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('users.index'))
             ->assertOk()
-            ->assertSee($user->invitation_token);
+            ->assertSee($user->invitation_token)
+            ->assertSee(__('users.copy_invite_link'))
+            ->assertSee(__('users.open_invite_link'));
     }
 
     public function test_invitation_setup_completes_and_clears_token(): void

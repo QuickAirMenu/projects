@@ -54,6 +54,11 @@ return [
     'invite_failed' => 'User created but the email could not be sent. Use the invitation link below.',
     'invite_link_fallback' => 'Invitation link (fallback)',
     'invite_link_hint' => 'Send this link to the employee via WhatsApp or email if automatic delivery fails.',
+    'invite_link_sent_note' => 'Email was sent. This is a backup copy of the link in case it did not arrive.',
+    'invite_link_failed_note' => 'Automatic email delivery failed. Copy the link and send it to the employee.',
+    'copy_invite_link' => 'Copy link',
+    'open_invite_link' => 'Open',
+    'invite_link_copied' => 'Copied',
     'user_activated' => 'User activated',
     'user_deactivated' => 'User deactivated',
 
